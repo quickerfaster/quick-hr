@@ -2,9 +2,6 @@ deployment:
   tasks:
     # Paths
     - export COMPOSER_BIN=/home/quickerf/composer.phar
-    # - export REPOPATH=/home/quickerf/laravel_suites_repo/suites.quickerfaster.com
-    # - export DEPLOYPATH=/home/quickerf/public_html/suites.quickerfaster.com
-
     - export REPOPATH=/home/quickerf/laravel_suites_repo/quick_hr
     - export DEPLOYPATH=/home/quickerf/quick_hr
 
