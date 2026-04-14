@@ -35,7 +35,7 @@ return [
   'isTransaction' => false,
   'viewType' => 'modal',
   'includeControllers' => false,
-  'addRoutes' => true,
+  'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
     'addButton' => true,

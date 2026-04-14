@@ -136,7 +136,7 @@ return [
   'isTransaction' => false,
   'viewType' => 'pages',
   'includeControllers' => false,
-  'addRoutes' => true,
+  'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
     'files' => [

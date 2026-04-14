@@ -66,11 +66,3 @@ Route::get('activity-logs/{id}/edit', function (\Illuminate\Http\Request $reques
         'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
     ]);
 })->name('activity-logs.edit')->where('id', '[0-9]+'); // And here;
-
-// Resource routes for \App\Modules\Admin\Http\Controllers\ActivityLogController
-Route::resource('activity-logs', \App\Modules\Admin\Http\Controllers\ActivityLogController::class)
-    ->names('admin.activity_log');
-
-// Resource routes for \App\Modules\Admin\Http\Controllers\JobTitleController
-Route::resource('job-titles', \App\Modules\Admin\Http\Controllers\JobTitleController::class)
-    ->names('admin.job_title');
