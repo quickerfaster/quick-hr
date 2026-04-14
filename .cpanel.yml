@@ -67,7 +67,7 @@ deployment:
     # Migrate
     - /bin/sh -c 'ea-php84 "$DEPLOYPATH/artisan" migrate --force >> "$LOGFILE" 2>&1'
     # Seed
-    # - /bin/sh -c 'ea-php84 "$DEPLOYPATH/artisan" db:seed --force >> "$LOGFILE" 2>&1'
+    - /bin/sh -c 'ea-php84 "$DEPLOYPATH/artisan" db:seed --force >> "$LOGFILE" 2>&1'
 
 
     # Final cache cleanup old
