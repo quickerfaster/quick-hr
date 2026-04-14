@@ -30,11 +30,3 @@ Route::middleware([
 });
 
 
-
-// API routes for App\Modules\Admin\Http\Controllers\Api\ActivityLogController
-Route::apiResource('activity-logs', App\Modules\Admin\Http\Controllers\Api\ActivityLogController::class)
-    ->names('admin.activity_log');
-
-// API routes for App\Modules\Admin\Http\Controllers\Api\JobTitleController
-Route::apiResource('job-titles', App\Modules\Admin\Http\Controllers\Api\JobTitleController::class)
-    ->names('admin.job_title');

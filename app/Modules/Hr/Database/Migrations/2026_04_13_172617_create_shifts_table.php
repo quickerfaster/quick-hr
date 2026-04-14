@@ -24,14 +24,14 @@ return new class extends Migration
             $table->date('last_used_date')->nullable();
             $table->integer('usage_count')->default(0);
             
-            $table->index('code');
-$table->index('is_active');
-$table->index('is_default');
-$table->index('shift_category');
-$table->index('is_overnight');
-$table->index(['is_active', 'is_default']);
-$table->index(['start_time', 'end_time']);
-$table->unique('code');
+            			$table->index('code');
+			$table->index('is_active');
+			$table->index('is_default');
+			$table->index('shift_category');
+			$table->index('is_overnight');
+			$table->index(['is_active', 'is_default']);
+			$table->index(['start_time', 'end_time']);
+			$table->unique('code');
             
             $table->timestamps();
         });

@@ -29,9 +29,9 @@ return new class extends Migration
             $table->string('address_postal_code')->nullable();
             $table->string('address_country')->nullable();
             
-            $table->unique('employee_number');
-$table->unique('email');
-$table->unique('user_id');
+            			$table->unique('employee_number');
+			$table->unique('email');
+			$table->unique('user_id');
             
             $table->timestamps();
         });

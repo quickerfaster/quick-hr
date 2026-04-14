@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('cost_center')->nullable();
             $table->boolean('is_active')->default(true)->nullable();
             
-            $table->unique('code');
+            			$table->unique('code');
             
             $table->timestamps();
         });

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('expiry_date')->nullable();
             $table->text('description')->nullable();
             
-            $table->unique('employee_id');
+            			$table->unique('employee_id');
             
             $table->timestamps();
         });

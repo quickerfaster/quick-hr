@@ -348,7 +348,7 @@ return array (
       'title' => 'Recent Activity (Location)',
       'size' => 'col-12',
       'icon' => 'fas fa-history',
-      'log_name' => 'hr_location',
+      'log_name' => 'hr.location',
       'limit' => 5,
       'width' => 6,
       'show_view_all' => true,

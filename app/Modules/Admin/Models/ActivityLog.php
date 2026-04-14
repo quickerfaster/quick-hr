@@ -23,11 +23,11 @@ class ActivityLog extends Model
     
     
     
-    
+    public $timestamps = false;
     
 
     protected $fillable = [
-        'causer_type', 'causer_id', 'subject_type', 'subject_id', 'log_name', 'action', 'description', 'old_values', 'new_values', 'properties'
+        'causer_type', 'causer_id', 'subject_type', 'subject_id', 'log_name', 'action', 'description', 'old_values', 'new_values', 'properties', 'created_at', 'updated_at'
     ];
 
     protected $guarded = [
@@ -39,7 +39,9 @@ class ActivityLog extends Model
         'subject_id' => 'integer',
         'old_values' => 'array',
         'new_values' => 'array',
-        'properties' => 'array'
+        'properties' => 'array',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
     ];
 
     protected $attributes = [

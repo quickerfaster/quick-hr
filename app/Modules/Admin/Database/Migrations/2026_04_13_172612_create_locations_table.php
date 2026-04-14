@@ -37,18 +37,18 @@ return new class extends Migration
             $table->integer('employee_count')->default(0);
             $table->integer('department_count')->default(0);
             
-            $table->index('code');
-$table->index('is_active');
-$table->index('is_remote');
-$table->index('is_headquarters');
-$table->index('country');
-$table->index('timezone');
-$table->index('city');
-$table->index(['country', 'is_active']);
-$table->index(['is_remote', 'is_active']);
-$table->index(['city', 'state_province']);
-$table->unique(['name', 'city', 'country']);
-$table->unique('code');
+            			$table->index('code');
+			$table->index('is_active');
+			$table->index('is_remote');
+			$table->index('is_headquarters');
+			$table->index('country');
+			$table->index('timezone');
+			$table->index('city');
+			$table->index(['country', 'is_active']);
+			$table->index(['is_remote', 'is_active']);
+			$table->index(['city', 'state_province']);
+			$table->unique(['name', 'city', 'country']);
+			$table->unique('code');
             
             $table->timestamps();
         });

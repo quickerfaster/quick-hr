@@ -20,17 +20,19 @@ return new class extends Migration
             $table->json('old_values');
             $table->json('new_values');
             $table->json('properties');
+            $table->datetime('created_at');
+            $table->datetime('updated_at');
             
-            $table->index('log_name');
-$table->index('action');
-$table->index('created_at');
-$table->index('causer_id');
-$table->index('subject_id');
-$table->index(['log_name', 'created_at']);
-$table->index(['action', 'created_at']);
-$table->index(['causer_type', 'causer_id']);
+            			$table->index('log_name');
+			$table->index('action');
+			$table->index('created_at');
+			$table->index('causer_id');
+			$table->index('subject_id');
+			$table->index(['log_name', 'created_at']);
+			$table->index(['action', 'created_at']);
+			$table->index(['causer_type', 'causer_id']);
             
-            $table->timestamps();
+            
         });
     }
 

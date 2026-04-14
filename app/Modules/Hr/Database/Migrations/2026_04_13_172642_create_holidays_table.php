@@ -35,18 +35,18 @@ return new class extends Migration
             $table->integer('override_id')->nullable();
             $table->datetime('last_synced_at')->nullable();
             
-            $table->index('calendar_id');
-$table->index('date');
-$table->index('is_active');
-$table->index('is_paid_holiday');
-$table->index('holiday_type');
-$table->index('business_impact');
-$table->index('country_code');
-$table->index(['calendar_id', 'date']);
-$table->index(['date', 'is_active']);
-$table->index(['country_code', 'region_code']);
-$table->index(['is_recurring', 'date']);
-$table->unique(['calendar_id', 'date', 'name']);
+            			$table->index('calendar_id');
+			$table->index('date');
+			$table->index('is_active');
+			$table->index('is_paid_holiday');
+			$table->index('holiday_type');
+			$table->index('business_impact');
+			$table->index('country_code');
+			$table->index(['calendar_id', 'date']);
+			$table->index(['date', 'is_active']);
+			$table->index(['country_code', 'region_code']);
+			$table->index(['is_recurring', 'date']);
+			$table->unique(['calendar_id', 'date', 'name']);
             
             $table->timestamps();
         });

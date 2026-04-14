@@ -25,8 +25,8 @@ return new class extends Migration
             $table->string('national_id_number')->nullable();
             $table->text('bio')->nullable();
             
-            $table->unique('employee_id');
-$table->unique('personal_email');
+            			$table->unique('employee_id');
+			$table->unique('personal_email');
             
             $table->timestamps();
         });

@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('level')->default('division')->nullable();
             $table->boolean('is_placeholder')->default(true)->nullable();
             
-            $table->unique('subdomain');
+            			$table->unique('subdomain');
             
             $table->timestamps();
         });

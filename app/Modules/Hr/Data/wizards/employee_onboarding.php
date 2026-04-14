@@ -56,7 +56,7 @@ return array (
         'event' => 'openAddModal',
         'eventParams' => 
         array (
-          'configKey' => 'hr_document',
+          'configKey' => 'hr.document',
           'prefilledData' => 
           array (
             'employee_id' => '{id}',
@@ -81,7 +81,7 @@ return array (
         'event' => 'openAddModal',
         'eventParams' => 
         array (
-          'configKey' => 'hr_employee_profile',
+          'configKey' => 'hr.employee_profile',
           'prefilledData' => 
           array (
             'employee_id' => '{id}',

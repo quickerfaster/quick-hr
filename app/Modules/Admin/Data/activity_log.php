@@ -97,6 +97,22 @@ return [
       'validation' => 'nullable|json',
       'reactivity' => false,
     ],
+    'created_at' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'datetimepicker',
+      'label' => 'Created At',
+      'validation' => 'nullable|date',
+      'reactivity' => false,
+    ],
+    'updated_at' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'datetimepicker',
+      'label' => 'Updated At',
+      'validation' => 'nullable|date',
+      'reactivity' => false,
+    ],
   ],
   'detailComponent' => '',
   'hiddenFields' => [

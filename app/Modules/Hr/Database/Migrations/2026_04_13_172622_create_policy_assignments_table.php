@@ -15,9 +15,9 @@ return new class extends Migration
             $table->string('assignable_type', 255)->nullable();
             $table->integer('assignable_id')->nullable();
             
-            $table->index('assignable_type');
-$table->index('assignable_id');
-$table->index(['assignable_type', 'assignable_id']);
+            			$table->index('assignable_type');
+			$table->index('assignable_id');
+			$table->index(['assignable_type', 'assignable_id']);
             
             $table->timestamps();
         });

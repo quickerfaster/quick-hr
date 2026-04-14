@@ -19,10 +19,10 @@ return new class extends Migration
             $table->string('adjusted_by')->nullable();
             $table->datetime('adjusted_at')->nullable();
             
-            $table->index('attendance_id');
-$table->index('adjusted_at');
-$table->index('adjusted_status');
-$table->index(['attendance_id', 'adjusted_at']);
+            			$table->index('attendance_id');
+			$table->index('adjusted_at');
+			$table->index('adjusted_status');
+			$table->index(['attendance_id', 'adjusted_at']);
             
             $table->timestamps();
         });

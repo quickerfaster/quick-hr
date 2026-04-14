@@ -43,17 +43,17 @@ return new class extends Migration
             $table->json('calculation_metadata')->nullable();
             $table->string('calculation_version')->nullable();
             
-            $table->index('employee_id');
-$table->index('date');
-$table->index('status');
-$table->index('is_approved');
-$table->index('needs_review');
-$table->index('leave_request_id');
-$table->index(['employee_id', 'date']);
-$table->index(['status', 'date']);
-$table->index(['is_approved', 'date']);
-$table->index(['needs_review', 'date']);
-$table->unique(['employee_id', 'date']);
+            			$table->index('employee_id');
+			$table->index('date');
+			$table->index('status');
+			$table->index('is_approved');
+			$table->index('needs_review');
+			$table->index('leave_request_id');
+			$table->index(['employee_id', 'date']);
+			$table->index(['status', 'date']);
+			$table->index(['is_approved', 'date']);
+			$table->index(['needs_review', 'date']);
+			$table->unique(['employee_id', 'date']);
             
             $table->timestamps();
         });

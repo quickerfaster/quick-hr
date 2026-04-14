@@ -31,17 +31,17 @@ return new class extends Migration
             $table->string('last_modified_by')->nullable();
             $table->datetime('last_modified_at')->nullable();
             
-            $table->index('employee_id');
-$table->index('shift_id');
-$table->index('schedule_date');
-$table->index('status');
-$table->index('is_published');
-$table->index('is_cover_required');
-$table->index(['employee_id', 'schedule_date']);
-$table->index(['shift_id', 'schedule_date']);
-$table->index(['status', 'schedule_date']);
-$table->index(['is_published', 'schedule_date']);
-$table->unique(['employee_id', 'schedule_date']);
+            			$table->index('employee_id');
+			$table->index('shift_id');
+			$table->index('schedule_date');
+			$table->index('status');
+			$table->index('is_published');
+			$table->index('is_cover_required');
+			$table->index(['employee_id', 'schedule_date']);
+			$table->index(['shift_id', 'schedule_date']);
+			$table->index(['status', 'schedule_date']);
+			$table->index(['is_published', 'schedule_date']);
+			$table->unique(['employee_id', 'schedule_date']);
             
             $table->timestamps();
         });

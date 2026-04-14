@@ -15,12 +15,12 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date')->nullable();
             
-            $table->index('employee_id');
-$table->index('work_pattern_id');
-$table->index('start_date');
-$table->index('end_date');
-$table->index(['employee_id', 'start_date', 'end_date']);
-$table->index(['start_date', 'end_date']);
+            			$table->index('employee_id');
+			$table->index('work_pattern_id');
+			$table->index('start_date');
+			$table->index('end_date');
+			$table->index(['employee_id', 'start_date', 'end_date']);
+			$table->index(['start_date', 'end_date']);
             
             $table->timestamps();
         });

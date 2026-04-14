@@ -35,16 +35,16 @@ return new class extends Migration
             $table->string('last_updated_by')->nullable();
             $table->datetime('last_updated_at')->nullable();
             
-            $table->index('code');
-$table->index('is_active');
-$table->index('is_default');
-$table->index('country_code');
-$table->index('effective_date');
-$table->index(['country_code', 'is_active']);
-$table->index(['is_active', 'is_default']);
-$table->index(['effective_date', 'expiration_date']);
-$table->unique(['name', 'country_code']);
-$table->unique('code');
+            			$table->index('code');
+			$table->index('is_active');
+			$table->index('is_default');
+			$table->index('country_code');
+			$table->index('effective_date');
+			$table->index(['country_code', 'is_active']);
+			$table->index(['is_active', 'is_default']);
+			$table->index(['effective_date', 'expiration_date']);
+			$table->unique(['name', 'country_code']);
+			$table->unique('code');
             
             $table->timestamps();
         });

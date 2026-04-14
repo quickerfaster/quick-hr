@@ -32,7 +32,7 @@ return new class extends Migration
             $table->text('job_description')->nullable();
             $table->boolean('is_primary')->nullable();
             
-            $table->unique('work_email');
+            			$table->unique('work_email');
             
             $table->timestamps();
         });

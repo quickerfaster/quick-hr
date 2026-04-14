@@ -26,15 +26,15 @@ return new class extends Migration
             $table->string('validation_status')->default('valid')->nullable();
             $table->text('validation_notes')->nullable();
             
-            $table->index('attendance_id');
-$table->index('start_time');
-$table->index('end_time');
-$table->index('session_type');
-$table->index('is_adjusted');
-$table->index(['attendance_id', 'start_time']);
-$table->index(['clock_in_event_id', 'clock_out_event_id']);
-$table->index(['start_time', 'end_time']);
-$table->unique(['attendance_id', 'start_time', 'end_time']);
+            			$table->index('attendance_id');
+			$table->index('start_time');
+			$table->index('end_time');
+			$table->index('session_type');
+			$table->index('is_adjusted');
+			$table->index(['attendance_id', 'start_time']);
+			$table->index(['clock_in_event_id', 'clock_out_event_id']);
+			$table->index(['start_time', 'end_time']);
+			$table->unique(['attendance_id', 'start_time', 'end_time']);
             
             $table->timestamps();
         });

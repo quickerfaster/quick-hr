@@ -27,14 +27,14 @@ return new class extends Migration
             $table->integer('workdays_count')->nullable();
             $table->boolean('overlap_with_holiday')->default(false);
             
-            $table->index('employee_id');
-$table->index('status');
-$table->index('start_date');
-$table->index('end_date');
-$table->index('is_retroactive');
-$table->index(['employee_id', 'start_date']);
-$table->index(['status', 'created_at']);
-$table->index(['start_date', 'end_date']);
+            			$table->index('employee_id');
+			$table->index('status');
+			$table->index('start_date');
+			$table->index('end_date');
+			$table->index('is_retroactive');
+			$table->index(['employee_id', 'start_date']);
+			$table->index(['status', 'created_at']);
+			$table->index(['start_date', 'end_date']);
             
             $table->timestamps();
         });

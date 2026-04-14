@@ -27,17 +27,17 @@ return new class extends Migration
             $table->date('last_used_date')->nullable();
             $table->integer('created_from_template_id')->nullable();
             
-            $table->index('code');
-$table->index('is_active');
-$table->index('is_default');
-$table->index('pattern_type');
-$table->index('shift_id');
-$table->index('effective_date');
-$table->index(['is_active', 'is_default']);
-$table->index(['shift_id', 'pattern_type']);
-$table->index(['effective_date', 'end_date']);
-$table->unique(['name', 'shift_id']);
-$table->unique('code');
+            			$table->index('code');
+			$table->index('is_active');
+			$table->index('is_default');
+			$table->index('pattern_type');
+			$table->index('shift_id');
+			$table->index('effective_date');
+			$table->index(['is_active', 'is_default']);
+			$table->index(['shift_id', 'pattern_type']);
+			$table->index(['effective_date', 'end_date']);
+			$table->unique(['name', 'shift_id']);
+			$table->unique('code');
             
             $table->timestamps();
         });

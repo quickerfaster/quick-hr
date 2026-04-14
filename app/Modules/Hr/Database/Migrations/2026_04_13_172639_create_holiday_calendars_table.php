@@ -21,16 +21,16 @@ return new class extends Migration
             $table->integer('holiday_count')->default(0);
             $table->datetime('last_updated')->nullable();
             
-            $table->index('name');
-$table->index('country_code');
-$table->index('year');
-$table->index('is_active');
-$table->index('is_default');
-$table->index('applicable_to');
-$table->index(['country_code', 'year']);
-$table->index(['is_active', 'is_default']);
-$table->index(['year', 'applicable_to']);
-$table->unique(['name', 'year']);
+            			$table->index('name');
+			$table->index('country_code');
+			$table->index('year');
+			$table->index('is_active');
+			$table->index('is_default');
+			$table->index('applicable_to');
+			$table->index(['country_code', 'year']);
+			$table->index(['is_active', 'is_default']);
+			$table->index(['year', 'applicable_to']);
+			$table->unique(['name', 'year']);
             
             $table->timestamps();
         });

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('net_pay', 12, 2);
             $table->datetime('paid_at')->nullable();
             
-            $table->unique('payslip_number');
+            			$table->unique('payslip_number');
             
             $table->timestamps();
         });
