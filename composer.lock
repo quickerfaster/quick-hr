@@ -4599,12 +4599,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/quickerfaster/ui-library.git",
-                "reference": "dfd96926e3f4b9a764639c703317bc8ef461dfed"
+                "reference": "0a6256219a32591c43dde25134d52fceba29e0a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quickerfaster/ui-library/zipball/dfd96926e3f4b9a764639c703317bc8ef461dfed",
-                "reference": "dfd96926e3f4b9a764639c703317bc8ef461dfed",
+                "url": "https://api.github.com/repos/quickerfaster/ui-library/zipball/0a6256219a32591c43dde25134d52fceba29e0a3",
+                "reference": "0a6256219a32591c43dde25134d52fceba29e0a3",
                 "shasum": ""
             },
             "require": {
@@ -4631,7 +4631,7 @@
                 "source": "https://github.com/quickerfaster/ui-library/tree/main",
                 "issues": "https://github.com/quickerfaster/ui-library/issues"
             },
-            "time": "2026-04-14T06:51:55+00:00"
+            "time": "2026-04-14T13:20:14+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
