@@ -213,6 +213,41 @@ return [
       'reactivity' => false,
     ],
   ],
+
+
+
+
+
+'drawers' => [
+    'filter_drawer' => [
+        'label' => 'Filters',
+        'icon' => 'fas fa-filter',
+        'component' => 'qf.filter-panel', // Livewire component name
+        'params' => ['configKey' => '{configKey}'],
+        'size' => 'md', // or 'lg'
+    ],
+    'quick_add' => [
+        'label' => 'Quick Add Employee',
+        'icon' => 'fas fa-plus',
+        'component' => 'qf.data-table-form',
+        'params' => [
+            'configKey' => '{configKey}',
+            'inline' => true,
+            'modalId' => null, // not used for drawer, but fine
+        ],
+        'size' => 'lg',
+    ],
+],
+
+
+
+
+
+
+
+
+
+
   'detailComponent' => 'qf.employee-detail',
   'hiddenFields' => [
     'onTable' => [],

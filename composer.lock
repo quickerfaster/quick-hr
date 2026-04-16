@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d474e30535aea45d12d1c955b6a02df7",
+    "content-hash": "52848ba702b0164143cfea04289c96e1",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -4596,16 +4596,10 @@
         {
             "name": "quicker-faster/ui-library",
             "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/quickerfaster/ui-library.git",
-                "reference": "0a6256219a32591c43dde25134d52fceba29e0a3"
-            },
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/quickerfaster/ui-library/zipball/0a6256219a32591c43dde25134d52fceba29e0a3",
-                "reference": "0a6256219a32591c43dde25134d52fceba29e0a3",
-                "shasum": ""
+                "type": "path",
+                "url": "./../packages/quicker-faster/ui-library",
+                "reference": "0a6256219a32591c43dde25134d52fceba29e0a3"
             },
             "require": {
                 "barryvdh/laravel-dompdf": "^3.0",
@@ -4616,7 +4610,6 @@
                 "spatie/laravel-onboard": "^2.6",
                 "spatie/laravel-permission": "^6.21"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -4627,11 +4620,9 @@
                 "MIT"
             ],
             "description": "A Laravel livewier ui components",
-            "support": {
-                "source": "https://github.com/quickerfaster/ui-library/tree/main",
-                "issues": "https://github.com/quickerfaster/ui-library/issues"
-            },
-            "time": "2026-04-14T13:20:14+00:00"
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "ralouphie/getallheaders",
@@ -8061,16 +8052,16 @@
         },
         {
             "name": "laravel/sail",
-            "version": "v1.56.0",
+            "version": "v1.57.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/sail.git",
-                "reference": "f43426bb42a1cb7a51a3861d9138063e54766d28"
+                "reference": "fa8d057b6e9310380ccbc3a209ed7f927d54f648"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/sail/zipball/f43426bb42a1cb7a51a3861d9138063e54766d28",
-                "reference": "f43426bb42a1cb7a51a3861d9138063e54766d28",
+                "url": "https://api.github.com/repos/laravel/sail/zipball/fa8d057b6e9310380ccbc3a209ed7f927d54f648",
+                "reference": "fa8d057b6e9310380ccbc3a209ed7f927d54f648",
                 "shasum": ""
             },
             "require": {
@@ -8120,7 +8111,7 @@
                 "issues": "https://github.com/laravel/sail/issues",
                 "source": "https://github.com/laravel/sail"
             },
-            "time": "2026-04-01T15:17:32+00:00"
+            "time": "2026-04-14T13:32:04+00:00"
         },
         {
             "name": "mockery/mockery",
@@ -8908,6 +8899,35 @@
                 }
             ],
             "time": "2026-01-27T05:48:37+00:00"
+        },
+        {
+            "name": "quicker-faster/laravel-code-gen",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "./../packages/quicker-faster/laravel-code-gen",
+                "reference": "5a87421d5c84d9a31641a3eb00c6f23ebf3c5eaa"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "QuickerFaster\\CodeGen\\Providers\\QuickerFasterCodeGenServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "QuickerFaster\\CodeGen\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "A reusable package for your Laravel project to generate a website CRUD operations and other code using various options about the technology and themes  e.g Livewire and Creative Tim's bootstarp soft-ui theme.",
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "sebastian/cli-parser",
@@ -10376,6 +10396,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "quicker-faster/laravel-code-gen": 20,
         "quicker-faster/ui-library": 20
     },
     "prefer-stable": true,

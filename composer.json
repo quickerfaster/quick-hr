@@ -20,7 +20,8 @@
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^7.0",
         "phpunit/phpunit": "^10.1",
-        "spatie/laravel-ignition": "^2.0"
+        "spatie/laravel-ignition": "^2.0",
+        "quicker-faster/laravel-code-gen": "@dev"
     },
     "autoload": {
         "psr-4": {
@@ -69,9 +70,13 @@
 
     "repositories": [
         {
-            "type": "vcs",
-            "url": "https://github.com/quickerfaster/ui-library"
+            "type": "path",
+            "url": "./../packages/quicker-faster/ui-library"
+        },
+
+        {
+            "type": "path",
+            "url": "./../packages/quicker-faster/laravel-code-gen"
         }
     ]
-
 }
