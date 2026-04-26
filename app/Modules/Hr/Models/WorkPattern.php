@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use App\Modules\Hr\Models\Shift;
+use App\Modules\Admin\Models\Shift;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -112,7 +112,7 @@ class WorkPattern extends Model
 
     public function shift()
     {
-        return $this->belongsTo(\App\Modules\Hr\Models\Shift::class, 'shift_id', 'id');
+        return $this->belongsTo(\App\Modules\Admin\Models\Shift::class, 'shift_id', 'id');
     }
 
     /**

@@ -8,16 +8,6 @@
 {{-- Generated Links --}}
 {{-- Generated Links --}}
 {{-- Generated Links --}}
-{{-- Generated Links --}}
-<li class="nav-item text-nowrap">
-<a href="/hr/hr/shifts" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
-data-bs-placement="right" title="Shifts">
-<i class="fas fa-calendar-day me-2"></i>
-@if ($state === 'full')
-<span>Shifts</span>
-@endif
-</a>
-</li>
 <li class="nav-item text-nowrap">
 <a href="/hr/hr/dashboard-time-overview" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
 data-bs-placement="right" title="Overview">

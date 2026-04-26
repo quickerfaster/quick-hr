@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-
+use App\Modules\Hr\Models\PayrollRun;
+use App\Modules\Hr\Models\EmployeePayrollProfile;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,11 +24,11 @@ class PaySchedule extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'name', 'frequency', 'next_pay_date', 'is_active'
+        'name', 'code', 'frequency', 'first_period_start_date', 'next_pay_date', 'payment_delay_days', 'country_code', 'state_code', 'currency_code', 'timezone', 'is_active', 'is_default', 'description'
     ];
 
     protected $guarded = [
@@ -35,12 +36,22 @@ class PaySchedule extends Model
     ];
 
     protected $casts = [
+        'first_period_start_date' => 'date',
         'next_pay_date' => 'date',
-        'is_active' => 'boolean'
+        'payment_delay_days' => 'integer',
+        'is_active' => 'boolean',
+        'is_default' => 'boolean',
+        'created_by' => 'integer',
+        'updated_by' => 'integer'
     ];
 
     protected $attributes = [
-        'is_active' => true
+        'payment_delay_days' => 0,
+        'country_code' => 'US',
+        'currency_code' => 'USD',
+        'timezone' => 'America/New_York',
+        'is_active' => true,
+        'is_default' => false
     ];
 
     protected $dispatchesEvents = [
@@ -93,7 +104,15 @@ class PaySchedule extends Model
         return parent::save($options);
     }
 
-    
+    public function payrollRuns()
+    {
+        return $this->hasMany(\App\Modules\Hr\Models\PayrollRun::class, 'pay_schedule_id', 'id');
+    }
+
+    public function employeeProfiles()
+    {
+        return $this->hasMany(\App\Modules\Hr\Models\EmployeePayrollProfile::class, 'pay_schedule_id', 'id');
+    }
 
     /**
      * Create a new factory instance for the model.

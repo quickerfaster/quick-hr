@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use App\Modules\Hr\Models\PaySchedule;
 use App\Modules\Hr\Models\PayrollPayslip;
+use App\Modules\Hr\Models\PayrollRunAdjustment;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,11 +25,11 @@ class PayrollRun extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'pay_schedule_id', 'period_start', 'period_end', 'status', 'processed_by', 'processed_at', 'notes'
+        'pay_schedule_id', 'period_start', 'period_end', 'status', 'current_step', 'total_gross_pay', 'total_deductions', 'total_taxes', 'total_employer_contributions', 'total_cash_required', 'total_employees', 'processed_employees', 'calculation_status', 'processed_by', 'processed_at', 'approved_by', 'approved_at', 'notes'
     ];
 
     protected $guarded = [
@@ -38,11 +39,32 @@ class PayrollRun extends Model
     protected $casts = [
         'period_start' => 'date',
         'period_end' => 'date',
-        'processed_at' => 'datetime'
+        'current_step' => 'integer',
+        'total_gross_pay' => 'decimal:2',
+        'total_deductions' => 'decimal:2',
+        'total_taxes' => 'decimal:2',
+        'total_employer_contributions' => 'decimal:2',
+        'total_cash_required' => 'decimal:2',
+        'total_employees' => 'integer',
+        'processed_employees' => 'integer',
+        'processed_at' => 'datetime',
+        'approved_at' => 'datetime',
+        'failed_at' => 'datetime',
+        'created_by' => 'integer',
+        'updated_by' => 'integer'
     ];
 
     protected $attributes = [
-        'status' => 'Draft'
+        'status' => 'draft',
+        'current_step' => 1,
+        'total_gross_pay' => 0,
+        'total_deductions' => 0,
+        'total_taxes' => 0,
+        'total_employer_contributions' => 0,
+        'total_cash_required' => 0,
+        'total_employees' => 0,
+        'processed_employees' => 0,
+        'calculation_status' => 'pending'
     ];
 
     protected $dispatchesEvents = [
@@ -103,6 +125,11 @@ class PayrollRun extends Model
     public function payslips()
     {
         return $this->hasMany(\App\Modules\Hr\Models\PayrollPayslip::class, 'payroll_run_id', 'id');
+    }
+
+    public function adjustments()
+    {
+        return $this->hasMany(\App\Modules\Hr\Models\PayrollRunAdjustment::class, 'payroll_run_id', 'id');
     }
 
     /**

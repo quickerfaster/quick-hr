@@ -206,15 +206,6 @@ return array (
       'distinct' => 'employee_id',
       'target_model' => 'App\\Modules\\Hr\\Models\\Employee',
       'target_aggregate' => 'count',
-      'target_conditions' => 
-      array (
-        0 => 
-        array (
-          0 => 'status',
-          1 => '=',
-          2 => 'Active',
-        ),
-      ),
       'width' => 3,
     ),
     10 => 

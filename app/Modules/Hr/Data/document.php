@@ -7,8 +7,8 @@ return [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'livewire-searchable-select',
-      'label' => 'Employee Number',
-      'validation' => 'required|unique:documents,employee_id',
+      'label' => 'Employee',
+      'validation' => 'required',
       'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',

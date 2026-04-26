@@ -286,7 +286,7 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'viewType' => 'pages',
   'includeControllers' => false,
   'addRoutes' => false,
   'dispatchEvents' => false,
@@ -600,6 +600,13 @@ return [
       ],
     ],
   ],
-  'relations' => [],
+  'relations' => [
+    'employeePositions' => [
+      'type' => 'hasMany',
+      'model' => 'App\Modules\Hr\Models\EmployeePosition',
+      'foreignKey' => 'department_id',
+      'localKey' => '',
+    ],
+  ],
   'report' => [],
 ];

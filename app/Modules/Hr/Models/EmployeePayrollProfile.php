@@ -24,11 +24,11 @@ class EmployeePayrollProfile extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'employee_id', 'pay_schedule_id', 'bank_account', 'bank_routing', 'tax_filing_status', 'allowances', 'is_exempt_from_federal_tax', 'currency'
+        'employee_id', 'pay_schedule_id', 'bank_account_holder_name', 'bank_name', 'bank_account_number', 'bank_routing_number', 'bank_iban', 'bank_swift', 'account_type', 'payment_method', 'tax_filing_status', 'allowances', 'extra_withholding', 'is_exempt_from_federal_tax', 'override_country_code', 'override_state_code', 'currency_code', 'effective_date', 'expiry_date', 'is_active'
     ];
 
     protected $guarded = [
@@ -36,16 +36,28 @@ class EmployeePayrollProfile extends Model
     ];
 
     protected $casts = [
-        'bank_account' => 'encrypted',
-        'bank_routing' => 'encrypted',
+        'bank_account_number' => 'encrypted',
+        'bank_routing_number' => 'encrypted',
+        'bank_iban' => 'encrypted',
+        'bank_swift' => 'encrypted',
         'allowances' => 'integer',
-        'is_exempt_from_federal_tax' => 'boolean'
+        'extra_withholding' => 'decimal:2',
+        'is_exempt_from_federal_tax' => 'boolean',
+        'effective_date' => 'date',
+        'expiry_date' => 'date',
+        'is_active' => 'boolean',
+        'created_by' => 'integer',
+        'updated_by' => 'integer'
     ];
 
     protected $attributes = [
+        'account_type' => 'checking',
+        'payment_method' => 'bank_transfer',
         'allowances' => 0,
+        'extra_withholding' => 0,
         'is_exempt_from_federal_tax' => false,
-        'currency' => 'USD'
+        'override_country_code' => 'US',
+        'is_active' => true
     ];
 
     protected $dispatchesEvents = [

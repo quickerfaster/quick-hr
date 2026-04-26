@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use App\Modules\Admin\Models\Department;
+use App\Modules\Hr\Models\EmployeePosition;
+use App\Modules\Hr\Models\EmployeeJobHistory;
+use App\Modules\Hr\Models\EmployeeProfile;
+use App\Modules\Admin\Models\Company;
 use App\Modules\Hr\Models\Document;
 use App\Modules\Hr\Models\EmployeeWorkPattern;
-use App\Modules\Hr\Models\EmployeeProfile;
-use App\Modules\Hr\Models\EmployeePosition;
 use App\Models\User;
 
 use Illuminate\Database\Eloquent\Model;
@@ -32,7 +33,7 @@ class Employee extends Model
     
 
     protected $fillable = [
-        'employee_number', 'first_name', 'last_name', 'phone', 'hire_date', 'department_id', 'status', 'date_of_birth', 'gender', 'email', 'user_id', 'nationality', 'marital_status', 'address_street', 'address_city', 'address_state', 'address_postal_code', 'address_country'
+        'company_id', 'employee_number', 'first_name', 'last_name', 'phone', 'hire_date', 'email', 'user_id'
     ];
 
     protected $guarded = [
@@ -40,12 +41,11 @@ class Employee extends Model
     ];
 
     protected $casts = [
-        'hire_date' => 'date',
-        'date_of_birth' => 'date'
+        'hire_date' => 'date'
     ];
 
     protected $attributes = [
-        'status' => 'Active'
+        
     ];
 
     protected $dispatchesEvents = [
@@ -98,9 +98,24 @@ class Employee extends Model
         return parent::save($options);
     }
 
-    public function department()
+    public function employeePosition()
     {
-        return $this->belongsTo(\App\Modules\Admin\Models\Department::class, 'department_id', 'id');
+        return $this->hasOne(\App\Modules\Hr\Models\EmployeePosition::class, 'employee_id', 'id');
+    }
+
+    public function jobHistory()
+    {
+        return $this->hasMany(\App\Modules\Hr\Models\EmployeeJobHistory::class, 'employee_id', 'id');
+    }
+
+    public function employeeProfile()
+    {
+        return $this->hasOne(\App\Modules\Hr\Models\EmployeeProfile::class, 'employee_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     public function documents()
@@ -111,16 +126,6 @@ class Employee extends Model
     public function employeeWorkPatterns()
     {
         return $this->hasMany(\App\Modules\Hr\Models\EmployeeWorkPattern::class, 'employee_id', 'id');
-    }
-
-    public function employeeProfile()
-    {
-        return $this->hasOne(\App\Modules\Hr\Models\EmployeeProfile::class, 'employee_id', 'id');
-    }
-
-    public function employeePosition()
-    {
-        return $this->hasOne(\App\Modules\Hr\Models\EmployeePosition::class, 'employee_id', 'id');
     }
 
     public function user()

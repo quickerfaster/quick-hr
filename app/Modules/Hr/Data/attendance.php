@@ -99,7 +99,7 @@ return [
       'validation' => 'required|exists:shifts,id',
       'reactivity' => false,
       'relationship' => [
-        'model' => 'App\Modules\Hr\Models\Shift',
+        'model' => 'App\Modules\Admin\Models\Shift',
         'type' => 'belongsTo',
         'display_field' => 'name',
         'dynamic_property' => 'shift',
@@ -107,7 +107,7 @@ return [
         'inlineAdd' => false,
       ],
       'options' => [
-        'model' => 'App\Modules\Hr\Models\Shift',
+        'model' => 'App\Modules\Admin\Models\Shift',
         'column' => 'name',
         'hintField' => '',
       ],
@@ -671,7 +671,7 @@ return [
     '5' => [
       'title' => 'View Work Sessions',
       'icon' => 'fas fa-history',
-      'url' => 'attendance-work-sessions',
+      'url' => 'hr/attendance-work-sessions',
       'newTab' => true,
       'params' => [
         'attendance_id' => '{id}',
@@ -820,7 +820,7 @@ return [
     ],
     'shift' => [
       'type' => 'belongsTo',
-      'model' => 'App\Modules\Hr\Models\Shift',
+      'model' => 'App\Modules\Admin\Models\Shift',
       'foreignKey' => 'shift_id',
       'localKey' => '',
     ],

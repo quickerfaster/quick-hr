@@ -20,10 +20,10 @@ return [
     'permission' => 'view_employee',
 ],
     [
-    'title' => 'Employee Payroll Profiles',
-    'icon' => 'fas fa-user-tie',
+    'title' => 'Overview',
+    'icon' => 'fas fa-file-invoice-dollar',
     'url' => 'hr/hr/dashboard-payroll-overview',
-    'permission' => 'view_employee_payroll_profile',
+    'permission' => 'view_overview',
 ],
     [
     'title' => 'Leave',

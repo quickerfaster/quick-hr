@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use App\Modules\Admin\Models\Location;
+use App\Modules\Hr\Models\Employee;
 use App\Modules\Admin\Models\Company;
 
 use Illuminate\Database\Eloquent\Model;
@@ -98,6 +99,11 @@ class Company extends Model
     public function location()
     {
         return $this->belongsTo(\App\Modules\Admin\Models\Location::class, 'location_id', 'id');
+    }
+
+    public function employees()
+    {
+        return $this->hasMany(\App\Modules\Hr\Models\Employee::class, 'employee_id', 'id');
     }
 
     public function parentCompany()

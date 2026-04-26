@@ -39,7 +39,7 @@
     <a href="/hr/hr/dashboard-payroll-overview"
         class="nav-link @if(request()->is('hr/hr/dashboard-payroll-overview') || request()->is('hr/hr/dashboard-payroll-overview/*')) fw-bold text-primary @endif">
         @if(request()->is('hr/hr/dashboard-payroll-overview') || request()->is('hr/hr/dashboard-payroll-overview/*'))
-            <i class="fas fas fa-user-tie" aria-hidden="true"></i>
+            <i class="fas fas fa-file-invoice-dollar" aria-hidden="true"></i>
         @endif
         <span>Payroll</span>
     </a>

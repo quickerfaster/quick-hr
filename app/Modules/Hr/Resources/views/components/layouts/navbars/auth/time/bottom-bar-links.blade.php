@@ -1,9 +1,5 @@
 {{-- Bottom Bar Links for Hr --}}
 
-            <button role="link" href="hr/shifts" class="btn btn-light flex-shrink-0 text-center" style="min-width:70px;" wire:navigate>
-                <i class=" fas fa-business-time }} d-block mb-1"></i>
-                <small>Shifts</small>
-            </button>
             <button role="link" href="hr/attendances" class="btn btn-light flex-shrink-0 text-center" style="min-width:70px;" wire:navigate>
                 <i class=" fas fa-user-clock }} d-block mb-1"></i>
                 <small>Attendances</small>

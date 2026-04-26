@@ -174,12 +174,6 @@ return array (
       array (
         0 => 
         array (
-          0 => 'status',
-          1 => '=',
-          2 => 'Active',
-        ),
-        1 => 
-        array (
           0 => 'id',
           1 => 'not in',
           2 => 

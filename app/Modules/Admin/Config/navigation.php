@@ -118,6 +118,15 @@ return [
                 'order' => 999,
                 'page_title' => NULL,
             ],
+            [
+                'key' => 'shift',
+                'label' => 'Shifts',
+                'icon' => 'fas fa-calendar-day',
+                'route' => '/admin/shifts',
+                'permission' => 'view_shift',
+                'order' => 999,
+                'page_title' => NULL,
+            ],
         ],
         'General Settings' => [
             [

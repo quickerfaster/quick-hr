@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use App\Modules\Admin\Models\Department;
+use App\Modules\Hr\Models\EmployeePosition;
 use App\Modules\Admin\Models\Company;
 
 use Illuminate\Database\Eloquent\Model;
@@ -96,6 +97,11 @@ class Department extends Model
     public function parentDepartment()
     {
         return $this->belongsTo(\App\Modules\Admin\Models\Department::class, 'parent_department_id', 'id');
+    }
+
+    public function employeePositions()
+    {
+        return $this->hasMany(\App\Modules\Hr\Models\EmployeePosition::class, 'department_id', 'id');
     }
 
     public function company()

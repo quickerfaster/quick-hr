@@ -220,7 +220,7 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'viewType' => 'pages',
   'includeControllers' => false,
   'addRoutes' => false,
   'dispatchEvents' => false,
@@ -268,6 +268,12 @@ return [
       'type' => 'belongsTo',
       'model' => 'App\Modules\Admin\Models\Location',
       'foreignKey' => 'location_id',
+      'localKey' => '',
+    ],
+    'employees' => [
+      'type' => 'hasMany',
+      'model' => 'App\Modules\Hr\Models\Employee',
+      'foreignKey' => 'employee_id',
       'localKey' => '',
     ],
     'parentCompany' => [

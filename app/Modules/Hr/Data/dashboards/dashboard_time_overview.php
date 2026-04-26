@@ -296,15 +296,7 @@ return array (
       ),
       'target_model' => 'App\\Modules\\Hr\\Models\\Employee',
       'target_aggregate' => 'count',
-      'target_conditions' => 
-      array (
-        0 => 
-        array (
-          0 => 'status',
-          1 => '=',
-          2 => 'Active',
-        ),
-      ),
+      'target_conditions' => NULL,
       'width' => 3,
     ),
     10 => 
@@ -312,7 +304,7 @@ return array (
       'type' => 'list',
       'title' => 'Today\'s Schedules',
       'size' => 'col-12',
-      'model' => 'App\\Modules\\Hr\\Models\\ShiftSchedule',
+      'model' => 'App\\Modules\\Admin\\Models\\ShiftSchedule',
       'icon' => 'fas fa-calendar-check',
       'description' => 'Shifts scheduled for today',
       'limit' => 10,

@@ -13,18 +13,28 @@ return array (
       'model' => 'App\\Modules\\Hr\\Models\\Employee',
       'icon' => 'fas fa-users',
       'aggregate' => 'count',
+      'width' => 3,
+    ),
+    1 => 
+    array (
+      'type' => 'stat',
+      'title' => 'Active Employees',
+      'size' => 'col-12',
+      'model' => 'App\\Modules\\Hr\\Models\\EmployeePosition',
+      'icon' => 'fas fa-user-check',
+      'aggregate' => 'count',
       'conditions' => 
       array (
         0 => 
         array (
-          0 => 'status',
+          0 => 'employment_status',
           1 => '=',
           2 => 'Active',
         ),
       ),
       'width' => 3,
     ),
-    1 => 
+    2 => 
     array (
       'type' => 'stat',
       'title' => 'New Hires (This Month)',
@@ -43,7 +53,7 @@ return array (
       ),
       'width' => 3,
     ),
-    2 => 
+    3 => 
     array (
       'type' => 'stat',
       'title' => 'Departments',
@@ -53,17 +63,17 @@ return array (
       'aggregate' => 'count',
       'width' => 3,
     ),
-    3 => 
+    4 => 
     array (
       'type' => 'stat',
       'title' => 'Job Titles',
       'size' => 'col-12',
-      'model' => 'App\\Modules\\Hr\\Models\\JobTitle',
+      'model' => 'App\\Modules\\Admin\\Models\\JobTitle',
       'icon' => 'fas fa-briefcase',
       'aggregate' => 'count',
       'width' => 3,
     ),
-    4 => 
+    5 => 
     array (
       'type' => 'stat',
       'title' => 'Pending Leave Requests',
@@ -82,7 +92,7 @@ return array (
       ),
       'width' => 3,
     ),
-    5 => 
+    6 => 
     array (
       'type' => 'list',
       'title' => 'Recent Leave Requests',
@@ -125,7 +135,7 @@ return array (
       'show_view_all' => true,
       'view_all_link' => '/hr/leave-requests',
     ),
-    6 => 
+    7 => 
     array (
       'type' => 'stat',
       'title' => 'Today\'s Attendance',
@@ -150,7 +160,7 @@ return array (
       ),
       'width' => 3,
     ),
-    7 => 
+    8 => 
     array (
       'type' => 'stat',
       'title' => 'Absent Today',
@@ -175,7 +185,7 @@ return array (
       ),
       'width' => 3,
     ),
-    8 => 
+    9 => 
     array (
       'type' => 'trend',
       'title' => 'Attendance Trend (Last 6 Months)',
@@ -187,7 +197,7 @@ return array (
       'period' => 6,
       'width' => 6,
     ),
-    9 => 
+    10 => 
     array (
       'type' => 'stat',
       'title' => 'Upcoming Pay Runs',
@@ -212,7 +222,7 @@ return array (
       ),
       'width' => 3,
     ),
-    10 => 
+    11 => 
     array (
       'type' => 'list',
       'title' => 'Recent Payroll Runs',
@@ -250,7 +260,7 @@ return array (
       'show_view_all' => true,
       'view_all_link' => '/hr/payroll-runs',
     ),
-    11 => 
+    12 => 
     array (
       'type' => 'stat',
       'title' => 'Active Attendance Policies',
@@ -269,7 +279,7 @@ return array (
       ),
       'width' => 3,
     ),
-    12 => 
+    13 => 
     array (
       'type' => 'stat',
       'title' => 'Active Work Patterns',
@@ -288,7 +298,7 @@ return array (
       ),
       'width' => 3,
     ),
-    13 => 
+    14 => 
     array (
       'type' => 'stat',
       'title' => 'Active Locations',
@@ -307,7 +317,7 @@ return array (
       ),
       'width' => 3,
     ),
-    14 => 
+    15 => 
     array (
       'type' => 'list',
       'title' => 'Locations',
@@ -343,7 +353,7 @@ return array (
       'show_view_all' => true,
       'view_all_link' => '/hr/locations',
     ),
-    15 => 
+    16 => 
     array (
       'type' => 'action_card',
       'title' => 'Request Leave',
@@ -365,7 +375,7 @@ return array (
       ),
       'width' => 3,
     ),
-    16 => 
+    17 => 
     array (
       'type' => 'action_card',
       'title' => 'Process Payroll',
@@ -387,7 +397,7 @@ return array (
       ),
       'width' => 3,
     ),
-    17 => 
+    18 => 
     array (
       'type' => 'action_card',
       'title' => 'Clock In/Out',
@@ -409,7 +419,7 @@ return array (
       ),
       'width' => 3,
     ),
-    18 => 
+    19 => 
     array (
       'type' => 'action_card',
       'title' => 'View My Team',

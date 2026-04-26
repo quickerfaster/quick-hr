@@ -82,4 +82,16 @@ return [
     'permission' => 'view_job_title',
     'groupTitle' => 'Organization',
 ],
+    [
+    'itemType' => 'item-separator',
+    'title' => '<h6 class="ps-3 mt-4 mb-2 text-uppercase text-xs font-weight-bolder opacity-6 group-title">Scheduling</h6>',
+    'url' => null,
+],
+    [
+    'title' => 'Shifts',
+    'icon' => 'fas fa-calendar-day',
+    'url' => 'admin/admin/shifts',
+    'permission' => 'view_shift',
+    'groupTitle' => 'Scheduling',
+],
 ];

@@ -27,15 +27,6 @@ return array (
       'model' => 'App\\Modules\\Hr\\Models\\Department',
       'aggregate' => 'count',
     ),
-    2 => 
-    array (
-      'width' => 6,
-      'type' => 'chart',
-      'title' => 'Employees by Status',
-      'model' => 'App\\Modules\\Hr\\Models\\Employee',
-      'group_by' => 'status',
-      'chart_type' => 'pie',
-    ),
   ),
   'layout' => 
   array (

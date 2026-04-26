@@ -7,6 +7,8 @@
 {{-- Generated Links --}}
 {{-- Generated Links --}}
 {{-- Generated Links --}}
+{{-- Generated Links --}}
+{{-- Generated Links --}}
 <li class="nav-item text-nowrap">
 <a href="/hr/hr/dashboard-people-overview" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
 data-bs-placement="right" title="Overview">
@@ -26,11 +28,11 @@ data-bs-placement="right" title="Employees">
 </a>
 </li>
 <li class="nav-item text-nowrap">
-<a href="/hr/hr/employee-positions" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
-data-bs-placement="right" title="Job Information">
-<i class="fas fa-briefcase me-2"></i>
+<a href="/hr/hr/employee-job-histories" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
+data-bs-placement="right" title="Job History">
+<i class="fas fa-history me-2"></i>
 @if ($state === 'full')
-<span>Job Information</span>
+<span>Job History</span>
 @endif
 </a>
 </li>
@@ -44,11 +46,29 @@ data-bs-placement="right" title="Profiles">
 </a>
 </li>
 <li class="nav-item text-nowrap">
-    <a href="/hr/hr/documents" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
-        data-bs-placement="right" title="Documents">
-        <i class="fas fa-file me-2"></i>
+<a href="/hr/hr/employee-groups" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
+data-bs-placement="right" title="Employee Groups">
+<i class="fas fa-users me-2"></i>
+@if ($state === 'full')
+<span>Employee Groups</span>
+@endif
+</a>
+</li>
+<li class="nav-item text-nowrap">
+<a href="/hr/hr/documents" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
+data-bs-placement="right" title="Documents">
+<i class="fas fa-file me-2"></i>
+@if ($state === 'full')
+<span>Documents</span>
+@endif
+</a>
+</li>
+<li class="nav-item text-nowrap">
+    <a href="/hr/hr/employee-positions" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
+        data-bs-placement="right" title="Current Job">
+        <i class="fas fa-briefcase me-2"></i>
         @if ($state === 'full')
-            <span>Documents</span>
+            <span>Current Job</span>
         @endif
     </a>
 </li>

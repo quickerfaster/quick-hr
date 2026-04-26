@@ -135,6 +135,12 @@ return [
       'foreignKey' => 'parent_department_id',
       'localKey' => '',
     ],
+    'employeePositions' => [
+      'type' => 'hasMany',
+      'model' => 'App\Modules\Hr\Models\EmployeePosition',
+      'foreignKey' => 'department_id',
+      'localKey' => '',
+    ],
     'company' => [
       'type' => 'belongsTo',
       'model' => 'App\Modules\Admin\Models\Company',

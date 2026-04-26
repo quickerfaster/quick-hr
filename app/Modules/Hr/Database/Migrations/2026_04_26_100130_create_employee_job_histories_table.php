@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        Schema::create('employee_job_histories', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('employee_id')->constrained('employees', 'id')->onDelete('cascade');
+            $table->string('job_title');
+            $table->string('department');
+            $table->string('manager_name')->nullable();
+            $table->string('pay_type');
+            $table->decimal('hourly_rate', 10, 2)->nullable();
+            $table->decimal('base_salary', 10, 2)->nullable();
+            $table->string('salary_currency')->default('USD');
+            $table->string('pay_frequency');
+            $table->string('employment_status');
+            $table->string('location')->nullable();
+            $table->string('shift')->nullable();
+            $table->date('effective_date');
+            $table->date('end_date')->nullable();
+            $table->string('change_reason');
+            $table->text('notes')->nullable();
+            
+            
+            
+            $table->timestamps();
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('employee_job_histories');
+    }
+};

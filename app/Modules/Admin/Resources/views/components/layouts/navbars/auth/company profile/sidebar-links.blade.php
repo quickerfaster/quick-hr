@@ -7,6 +7,7 @@
 {{-- Generated Links --}}
 {{-- Generated Links --}}
 {{-- Generated Links --}}
+{{-- Generated Links --}}
 <li class="nav-item text-nowrap">
 <a href="/admin/admin/dashboard-company-profile-overview" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
 data-bs-placement="right" title="Overview">
@@ -44,11 +45,20 @@ data-bs-placement="right" title="Departments">
 </a>
 </li>
 <li class="nav-item text-nowrap">
-    <a href="/admin/admin/job-titles" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
-        data-bs-placement="right" title="Job Titles">
-        <i class="fas fa-briefcase me-2"></i>
+<a href="/admin/admin/job-titles" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
+data-bs-placement="right" title="Job Titles">
+<i class="fas fa-briefcase me-2"></i>
+@if ($state === 'full')
+<span>Job Titles</span>
+@endif
+</a>
+</li>
+<li class="nav-item text-nowrap">
+    <a href="/admin/admin/shifts" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
+        data-bs-placement="right" title="Shifts">
+        <i class="fas fa-calendar-day me-2"></i>
         @if ($state === 'full')
-            <span>Job Titles</span>
+            <span>Shifts</span>
         @endif
     </a>
 </li>

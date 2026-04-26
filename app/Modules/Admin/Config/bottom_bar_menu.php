@@ -71,4 +71,11 @@ return [
     'permission' => 'view_job_title',
     'key' => 'job_title',
 ],
+    [
+    'title' => 'Shifts',
+    'icon' => 'fas fa-business-time',
+    'url' => 'admin/shifts',
+    'permission' => 'view_shift',
+    'key' => 'shift',
+],
 ];

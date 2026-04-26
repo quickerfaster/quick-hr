@@ -4599,7 +4599,7 @@
             "dist": {
                 "type": "path",
                 "url": "./../packages/quicker-faster/ui-library",
-                "reference": "0a6256219a32591c43dde25134d52fceba29e0a3"
+                "reference": "fd769b0597a046c233538d5697ac9c14e14c266c"
             },
             "require": {
                 "barryvdh/laravel-dompdf": "^3.0",

@@ -3,6 +3,27 @@
 return [
   'model' => 'App\Modules\Hr\Models\Employee',
   'fieldDefinitions' => [
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'nullable|exists:companies,id',
+      'reactivity' => false,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'employee_number' => [
       'display' => 'inline',
       'fillable' => true,
@@ -56,68 +77,6 @@ return [
         'employee_onboarding' => true,
       ],
     ],
-    'department_id' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'select',
-      'label' => 'Department',
-      'validation' => 'required|integer',
-      'reactivity' => false,
-      'relationship' => [
-        'model' => 'App\Modules\Admin\Models\Department',
-        'type' => 'belongsTo',
-        'display_field' => 'name',
-        'dynamic_property' => 'department',
-        'foreign_key' => 'department_id',
-        'inlineAdd' => false,
-      ],
-      'options' => [
-        'model' => 'App\Modules\Admin\Models\Department',
-        'column' => 'name',
-        'hintField' => '',
-      ],
-      'wizard' => [
-        'employee_onboarding' => true,
-      ],
-    ],
-    'status' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'select',
-      'label' => 'Status',
-      'validation' => 'nullable',
-      'options' => [
-        'Active' => 'Active',
-        'Inactive' => 'Inactive',
-        'Terminated' => 'Terminated',
-      ],
-      'reactivity' => false,
-      'wizard' => [
-        'employee_onboarding' => true,
-      ],
-    ],
-    'date_of_birth' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'datepicker',
-      'label' => 'Date Of Birth',
-      'validation' => 'nullable|date',
-      'reactivity' => false,
-    ],
-    'gender' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'select',
-      'label' => 'Gender',
-      'validation' => 'required',
-      'options' => [
-        'Male' => 'Male',
-        'Female' => 'Female',
-        'Non-binary' => 'Non-binary',
-        'Prefer not to say' => 'Prefer not to say',
-      ],
-      'reactivity' => false,
-    ],
     'email' => [
       'display' => 'inline',
       'fillable' => true,
@@ -133,121 +92,24 @@ return [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'select',
-      'label' => 'Login Name',
+      'label' => 'User Account',
       'validation' => 'nullable|unique:employees,user_id',
       'reactivity' => false,
       'relationship' => [
         'model' => 'App\Models\User',
         'type' => 'belongsTo',
-        'display_field' => 'name',
+        'display_field' => 'email',
         'dynamic_property' => 'user',
         'foreign_key' => 'user_id',
         'inlineAdd' => false,
       ],
       'options' => [
         'model' => 'App\Models\User',
-        'column' => 'name',
-        'hintField' => 'email',
+        'column' => 'email',
+        'hintField' => 'name',
       ],
-    ],
-    'nationality' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'string',
-      'label' => 'Nationality',
-      'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
-    ],
-    'marital_status' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'select',
-      'label' => 'Marital Status',
-      'validation' => 'nullable|string',
-      'options' => [
-        'Single' => 'Single',
-        'Married' => 'Married',
-        'Divorced' => 'Divorced',
-        'Widowed' => 'Widowed',
-      ],
-      'reactivity' => false,
-    ],
-    'address_street' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'string',
-      'label' => 'Address Street',
-      'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
-    ],
-    'address_city' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'string',
-      'label' => 'Address City',
-      'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
-    ],
-    'address_state' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'string',
-      'label' => 'Address State',
-      'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
-    ],
-    'address_postal_code' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'string',
-      'label' => 'Address Postal Code',
-      'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
-    ],
-    'address_country' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'string',
-      'label' => 'Address Country',
-      'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
   ],
-
-
-
-
-
-'drawers' => [
-    'filter_drawer' => [
-        'label' => 'Filters',
-        'icon' => 'fas fa-filter',
-        'component' => 'qf.filter-panel', // Livewire component name
-        'params' => ['configKey' => '{configKey}'],
-        'size' => 'md', // or 'lg'
-    ],
-    'quick_add' => [
-        'label' => 'Quick Add Employee',
-        'icon' => 'fas fa-plus',
-        'component' => 'qf.data-table-form',
-        'params' => [
-            'configKey' => '{configKey}',
-            'inline' => true,
-            'modalId' => null, // not used for drawer, but fine
-        ],
-        'size' => 'lg',
-    ],
-],
-
-
-
-
-
-
-
-
-
-
   'detailComponent' => 'qf.employee-detail',
   'hiddenFields' => [
     'onTable' => [],
@@ -316,10 +178,6 @@ return [
       'fields' => [
         '0' => 'first_name',
         '1' => 'last_name',
-        '2' => 'date_of_birth',
-        '3' => 'gender',
-        '4' => 'marital_status',
-        '5' => 'nationality',
       ],
     ],
     'contact_information' => [
@@ -327,11 +185,6 @@ return [
       'groupType' => 'hr',
       'fields' => [
         '0' => 'phone',
-        '1' => 'address_street',
-        '2' => 'address_city',
-        '3' => 'address_state',
-        '4' => 'address_postal_code',
-        '5' => 'address_country',
       ],
     ],
     'employment_details' => [
@@ -342,88 +195,35 @@ return [
         '1' => 'email',
         '2' => 'user_id',
         '3' => 'hire_date',
-        '4' => 'department_id',
-        '5' => 'status',
+        '4' => 'company_id',
       ],
     ],
   ],
   'moreActions' => [],
-  'switchViews' => [
-    'default' => 'list',
-    'card' => [
-      'titleFields' => [
-        '0' => 'first_name',
-        '1' => 'last_name',
-      ],
-      'subtitleFields' => [
-        '0' => 'employee_number',
-        '1' => 'department.name',
-      ],
-      'contentFields' => [
-        '0' => 'email',
-        '1' => 'gender',
-        '2' => 'hire_date',
-      ],
-      'badgeField' => 'status',
-      'badgeColors' => [
-        'Active' => 'success',
-        'Inctive' => 'secondary',
-      ],
-    ],
-    'list' => [
-      'titleFields' => [
-        '0' => 'first_name',
-        '1' => 'last_name',
-      ],
-      'subtitleFields' => [
-        '0' => 'employee_number',
-        '1' => 'department.name',
-      ],
-      'contentFields' => [
-        '0' => 'email',
-        '1' => 'gender',
-        '2' => 'hire_date',
-      ],
-      'badgeField' => 'status',
-      'badgeColors' => [
-        'Active' => 'success',
-        'Inctive' => 'secondary',
-      ],
-    ],
-    'detail' => [
-      'layout' => 'tab',
-      'detailType' => 'profile',
-      'icon' => 'fas fa-user-profile',
-      'titleFields' => [
-        '0' => 'first_name',
-        '1' => 'last_name',
-      ],
-      'subtitleFields' => [
-        '0' => 'email',
-        '1' => 'phone',
-      ],
-      'contentFields' => [
-        '0' => 'gender',
-        '1' => 'date_of_birth',
-      ],
-      'headerLink' => [
-        '0' => [
-          'label' => 'Documents',
-        ],
-        '1' => [
-          'url' => '/hr/documents?employee_id={id}',
-        ],
-        '2' => [
-          'returnTo' => '/hr/employees',
-        ],
-      ],
-    ],
-  ],
+  'switchViews' => [],
   'relations' => [
-    'department' => [
+    'employeePosition' => [
+      'type' => 'hasOne',
+      'model' => 'App\Modules\Hr\Models\EmployeePosition',
+      'foreignKey' => 'employee_id',
+      'localKey' => '',
+    ],
+    'jobHistory' => [
+      'type' => 'hasMany',
+      'model' => 'App\Modules\Hr\Models\EmployeeJobHistory',
+      'foreignKey' => 'employee_id',
+      'localKey' => '',
+    ],
+    'employeeProfile' => [
+      'type' => 'hasOne',
+      'model' => 'App\Modules\Hr\Models\EmployeeProfile',
+      'foreignKey' => 'employee_id',
+      'localKey' => '',
+    ],
+    'company' => [
       'type' => 'belongsTo',
-      'model' => 'App\Modules\Admin\Models\Department',
-      'foreignKey' => 'department_id',
+      'model' => 'App\Modules\Admin\Models\Company',
+      'foreignKey' => 'company_id',
       'localKey' => '',
     ],
     'documents' => [
@@ -435,18 +235,6 @@ return [
     'employeeWorkPatterns' => [
       'type' => 'hasMany',
       'model' => 'App\Modules\Hr\Models\EmployeeWorkPattern',
-      'foreignKey' => 'employee_id',
-      'localKey' => '',
-    ],
-    'employeeProfile' => [
-      'type' => 'hasOne',
-      'model' => 'App\Modules\Hr\Models\EmployeeProfile',
-      'foreignKey' => 'employee_id',
-      'localKey' => '',
-    ],
-    'employeePosition' => [
-      'type' => 'hasOne',
-      'model' => 'App\Modules\Hr\Models\EmployeePosition',
       'foreignKey' => 'employee_id',
       'localKey' => '',
     ],

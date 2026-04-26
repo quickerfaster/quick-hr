@@ -1,0 +1,113 @@
+<?php
+
+return [
+  'model' => 'App\Modules\Hr\Models\EmployeeWorkPattern',
+  'fieldDefinitions' => [
+    'employee_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'livewire-searchable-select',
+      'label' => 'Employee',
+      'validation' => 'required|exists:employees,id',
+      'reactivity' => false,
+      'relationship' => [
+        'model' => 'App\Modules\Hr\Models\Employee',
+        'type' => 'belongsTo',
+        'display_field' => 'employee_number',
+        'dynamic_property' => 'employee',
+        'foreign_key' => 'employee_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Hr\Models\Employee',
+        'column' => 'employee_number',
+        'hintField' => 'first_name,last_name',
+      ],
+    ],
+    'work_pattern_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Work Pattern',
+      'validation' => 'required|exists:work_patterns,id',
+      'reactivity' => false,
+      'relationship' => [
+        'model' => 'App\Modules\Hr\Models\WorkPattern',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'workPattern',
+        'foreign_key' => 'work_pattern_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Hr\Models\WorkPattern',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
+    'start_date' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'datepicker',
+      'label' => 'Start Date',
+      'validation' => 'required|date',
+      'reactivity' => false,
+    ],
+    'end_date' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'datepicker',
+      'label' => 'End Date',
+      'validation' => 'nullable|date|after:start_date',
+      'reactivity' => false,
+    ],
+  ],
+  'detailComponent' => '',
+  'hiddenFields' => [
+    'onTable' => [],
+    'onNewForm' => [],
+    'onEditForm' => [],
+    'onQuery' => [],
+  ],
+  'simpleActions' => [
+    '0' => 'show',
+    '1' => 'edit',
+    '2' => 'delete',
+  ],
+  'isTransaction' => false,
+  'viewType' => 'modal',
+  'includeControllers' => false,
+  'addRoutes' => false,
+  'dispatchEvents' => false,
+  'controls' => 'all',
+  'fieldGroups' => [
+    'assignment' => [
+      'title' => 'Assignment Details',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-link',
+      'fields' => [
+        '0' => 'employee_id',
+        '1' => 'work_pattern_id',
+        '2' => 'start_date',
+        '3' => 'end_date',
+      ],
+    ],
+  ],
+  'moreActions' => [],
+  'switchViews' => [],
+  'relations' => [
+    'employee' => [
+      'type' => 'belongsTo',
+      'model' => 'App\Modules\Hr\Models\Employee',
+      'foreignKey' => 'employee_id',
+      'localKey' => '',
+    ],
+    'workPattern' => [
+      'type' => 'belongsTo',
+      'model' => 'App\Modules\Hr\Models\WorkPattern',
+      'foreignKey' => 'work_pattern_id',
+      'localKey' => '',
+    ],
+  ],
+  'report' => [],
+];

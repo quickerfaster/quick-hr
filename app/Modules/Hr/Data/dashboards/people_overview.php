@@ -13,15 +13,6 @@ return array (
       'model' => 'App\\Modules\\Hr\\Models\\Employee',
       'icon' => 'fas fa-users',
       'aggregate' => 'count',
-      'conditions' => 
-      array (
-        0 => 
-        array (
-          0 => 'status',
-          1 => '=',
-          2 => 'Active',
-        ),
-      ),
       'width' => 3,
     ),
     1 => 
@@ -86,7 +77,7 @@ return array (
         2 => 
         array (
           'label' => 'Department',
-          'field' => 'department.name',
+          'field' => 'employeePosition.department.name',
         ),
         3 => 
         array (
@@ -107,15 +98,6 @@ return array (
       'model' => 'App\\Modules\\Hr\\Models\\Employee',
       'icon' => 'fas fa-chalkboard-teacher',
       'aggregate' => 'count',
-      'conditions' => 
-      array (
-        0 => 
-        array (
-          0 => 'status',
-          1 => '=',
-          2 => 'Active',
-        ),
-      ),
       'target' => 100,
       'width' => 3,
     ),
@@ -137,7 +119,7 @@ return array (
       'type' => 'chart',
       'title' => 'Employees by Department',
       'size' => 'col-12',
-      'model' => 'App\\Modules\\Hr\\Models\\Employee',
+      'model' => 'App\\Modules\\Hr\\Models\\EmployeePosition',
       'group_by' => 'department_id',
       'chart_type' => 'bar',
       'aggregate' => 'count',

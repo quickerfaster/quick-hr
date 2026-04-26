@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-
+use App\Modules\Hr\Models\EmployeePosition;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -110,7 +110,10 @@ class Location extends Model
         return parent::save($options);
     }
 
-    
+    public function employeePositions()
+    {
+        return $this->hasMany(\App\Modules\Hr\Models\EmployeePosition::class, 'department_id', 'id');
+    }
 
     /**
      * Create a new factory instance for the model.

@@ -27,7 +27,7 @@ class EmployeeProfile extends Model
     
 
     protected $fillable = [
-        'photo', 'employee_id', 'middle_name', 'preferred_name', 'personal_email', 'personal_phone', 'work_phone', 'emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relationship', 'passport_number', 'passport_expiry_date', 'national_id_number', 'bio'
+        'photo', 'employee_id', 'middle_name', 'preferred_name', 'personal_email', 'personal_phone', 'work_phone', 'emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relationship', 'passport_number', 'passport_expiry_date', 'national_id_number', 'bio', 'date_of_birth', 'gender', 'nationality', 'marital_status', 'address_street', 'address_city', 'address_state', 'address_postal_code', 'address_country'
     ];
 
     protected $guarded = [
@@ -35,7 +35,8 @@ class EmployeeProfile extends Model
     ];
 
     protected $casts = [
-        'passport_expiry_date' => 'date'
+        'passport_expiry_date' => 'date',
+        'date_of_birth' => 'date'
     ];
 
     protected $attributes = [

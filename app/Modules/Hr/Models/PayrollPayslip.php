@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use App\Modules\Hr\Models\PayrollRun;
 use App\Modules\Hr\Models\Employee;
+use App\Modules\Hr\Models\PayslipItem;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,11 +25,11 @@ class PayrollPayslip extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'payslip_number', 'payroll_run_id', 'employee_id', 'base_salary', 'gross_pay', 'total_deductions', 'net_pay', 'paid_at'
+        'payslip_number', 'payroll_run_id', 'employee_id', 'base_salary', 'gross_pay', 'total_deductions', 'total_taxes', 'total_benefit_deductions', 'net_pay', 'payment_status', 'paid_at', 'payment_reference', 'bank_account_snapshot', 'notes'
     ];
 
     protected $guarded = [
@@ -39,12 +40,20 @@ class PayrollPayslip extends Model
         'base_salary' => 'decimal:2',
         'gross_pay' => 'decimal:2',
         'total_deductions' => 'decimal:2',
+        'total_taxes' => 'decimal:2',
+        'total_benefit_deductions' => 'decimal:2',
         'net_pay' => 'decimal:2',
-        'paid_at' => 'datetime'
+        'paid_at' => 'datetime',
+        'bank_account_snapshot' => 'array',
+        'created_by' => 'integer',
+        'updated_by' => 'integer'
     ];
 
     protected $attributes = [
-        
+        'total_deductions' => 0,
+        'total_taxes' => 0,
+        'total_benefit_deductions' => 0,
+        'payment_status' => 'pending'
     ];
 
     protected $dispatchesEvents = [
@@ -105,6 +114,11 @@ class PayrollPayslip extends Model
     public function employee()
     {
         return $this->belongsTo(\App\Modules\Hr\Models\Employee::class, 'employee_id', 'id');
+    }
+
+    public function items()
+    {
+        return $this->hasMany(\App\Modules\Hr\Models\PayslipItem::class, 'payslip_id', 'id');
     }
 
     /**
