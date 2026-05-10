@@ -9,7 +9,6 @@ return [
       'field_type' => 'string',
       'label' => 'Shift Name',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
     ],
     'code' => [
       'display' => 'inline',
@@ -18,7 +17,6 @@ return [
       'label' => 'Shift Code',
       'validation' => 'required|string|max:50|unique:shifts,code',
       'autoGenerate' => true,
-      'reactivity' => false,
     ],
     'start_time' => [
       'display' => 'inline',
@@ -26,7 +24,6 @@ return [
       'field_type' => 'timepicker',
       'label' => 'Start Time',
       'validation' => 'required',
-      'reactivity' => false,
     ],
     'end_time' => [
       'display' => 'inline',
@@ -34,7 +31,6 @@ return [
       'field_type' => 'timepicker',
       'label' => 'End Time',
       'validation' => 'required',
-      'reactivity' => false,
     ],
     'duration_hours' => [
       'display' => 'inline',
@@ -42,7 +38,6 @@ return [
       'field_type' => 'number',
       'label' => 'Total Hours (Payable)',
       'validation' => 'nullable|numeric|min:0',
-      'reactivity' => false,
     ],
     'is_overnight' => [
       'display' => 'inline',
@@ -50,7 +45,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Overnight Shift',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'description' => [
       'display' => 'inline',
@@ -58,7 +52,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -66,7 +59,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'is_default' => [
       'display' => 'inline',
@@ -74,7 +66,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Default Shift',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'shift_category' => [
       'display' => 'inline',
@@ -90,7 +81,6 @@ return [
         'emergency' => 'Emergency/Call',
         'training' => 'Training',
       ],
-      'reactivity' => false,
     ],
     'created_from_template_id' => [
       'display' => 'inline',
@@ -98,7 +88,6 @@ return [
       'field_type' => 'number',
       'label' => 'Template Source',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'last_used_date' => [
       'display' => 'inline',
@@ -106,7 +95,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Last Used',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'usage_count' => [
       'display' => 'inline',
@@ -114,7 +102,6 @@ return [
       'field_type' => 'number',
       'label' => 'Usage Count',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -158,8 +145,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'pages',
+  'crudType' => 'drawers',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

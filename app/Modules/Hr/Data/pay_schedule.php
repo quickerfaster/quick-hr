@@ -9,7 +9,7 @@ return [
       'field_type' => 'string',
       'label' => 'Schedule Name',
       'validation' => 'required|string|max:255|unique:pay_schedules,name',
-      'reactivity' => false,
+      'searchable' => true,
     ],
     'code' => [
       'display' => 'inline',
@@ -18,7 +18,6 @@ return [
       'label' => 'Schedule Code',
       'validation' => 'required|string|max:50|unique:pay_schedules,code',
       'autoGenerate' => true,
-      'reactivity' => false,
     ],
     'frequency' => [
       'display' => 'inline',
@@ -34,7 +33,7 @@ return [
         'quarterly' => 'Quarterly (4 pay periods per year)',
         'yearly' => 'Yearly (1 pay period per year)',
       ],
-      'reactivity' => false,
+      'filterable' => true,
     ],
     'first_period_start_date' => [
       'display' => 'inline',
@@ -42,7 +41,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'First Period Start Date',
       'validation' => 'required|date',
-      'reactivity' => false,
     ],
     'next_pay_date' => [
       'display' => 'inline',
@@ -50,7 +48,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Next Pay Date',
       'validation' => 'required|date|after_or_equal:first_period_start_date',
-      'reactivity' => false,
     ],
     'payment_delay_days' => [
       'display' => 'inline',
@@ -58,7 +55,6 @@ return [
       'field_type' => 'number',
       'label' => 'Payment Delay (Days)',
       'validation' => 'nullable|integer|min:0|max:30',
-      'reactivity' => false,
     ],
     'country_code' => [
       'display' => 'inline',
@@ -71,7 +67,6 @@ return [
         'UK' => 'UK',
         'NG' => 'NG',
       ],
-      'reactivity' => false,
     ],
     'state_code' => [
       'display' => 'inline',
@@ -84,7 +79,6 @@ return [
         'UK' => 'UK',
         'NG' => 'NG',
       ],
-      'reactivity' => false,
     ],
     'currency_code' => [
       'display' => 'inline',
@@ -97,7 +91,6 @@ return [
         'BP' => 'BP',
         'NGN' => 'NGN',
       ],
-      'reactivity' => false,
     ],
     'timezone' => [
       'display' => 'inline',
@@ -111,7 +104,6 @@ return [
         'Africa/Lagos' => 'Africa/Lagos',
         '' => '',
       ],
-      'reactivity' => false,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -119,7 +111,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'is_default' => [
       'display' => 'inline',
@@ -127,7 +118,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Default Schedule',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'description' => [
       'display' => 'inline',
@@ -135,7 +125,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
     ],
     'created_by' => [
       'display' => 'inline',
@@ -143,7 +132,6 @@ return [
       'field_type' => 'number',
       'label' => 'Created By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'updated_by' => [
       'display' => 'inline',
@@ -151,7 +139,6 @@ return [
       'field_type' => 'number',
       'label' => 'Updated By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -178,8 +165,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'pages',
+  'crudType' => 'pages',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

@@ -9,7 +9,6 @@ return [
       'field_type' => 'select',
       'label' => 'Holiday Calendar',
       'validation' => 'required|exists:holiday_calendars,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\HolidayCalendar',
         'type' => 'belongsTo',
@@ -30,7 +29,6 @@ return [
       'field_type' => 'string',
       'label' => 'Holiday Name',
       'validation' => 'required|string|max:100',
-      'reactivity' => false,
     ],
     'description' => [
       'display' => 'inline',
@@ -38,7 +36,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string|max:500',
-      'reactivity' => false,
     ],
     'date' => [
       'display' => 'inline',
@@ -46,7 +43,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Holiday Date',
       'validation' => 'required|date',
-      'reactivity' => false,
     ],
     'observed_date' => [
       'display' => 'inline',
@@ -54,7 +50,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Observed Date',
       'validation' => 'nullable|date|after_or_equal:date',
-      'reactivity' => false,
     ],
     'is_recurring' => [
       'display' => 'inline',
@@ -62,7 +57,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Recurring Holiday',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'recurrence_pattern' => [
       'display' => 'inline',
@@ -76,7 +70,6 @@ return [
         'custom' => 'Custom Pattern',
         'none' => 'One-time Only',
       ],
-      'reactivity' => false,
     ],
     'recurrence_rule' => [
       'display' => 'inline',
@@ -84,7 +77,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Recurrence Rule',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'holiday_type' => [
       'display' => 'inline',
@@ -99,7 +91,6 @@ return [
         'observance' => 'Observance',
         'optional' => 'Optional Holiday',
       ],
-      'reactivity' => false,
     ],
     'is_paid_holiday' => [
       'display' => 'inline',
@@ -107,7 +98,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Paid Holiday',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'affects_payroll' => [
       'display' => 'inline',
@@ -115,7 +105,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Affects Payroll',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'business_impact' => [
       'display' => 'inline',
@@ -130,7 +119,6 @@ return [
         'remote_only' => 'Remote Work Only',
         'essential_only' => 'Essential Staff Only',
       ],
-      'reactivity' => false,
     ],
     'eligible_employee_types' => [
       'display' => 'inline',
@@ -147,7 +135,6 @@ return [
         'all' => 'All Employees',
       ],
       'multiSelect' => true,
-      'reactivity' => false,
     ],
     'holiday_pay_rate' => [
       'display' => 'inline',
@@ -155,7 +142,6 @@ return [
       'field_type' => 'number',
       'label' => 'Holiday Pay Rate',
       'validation' => 'nullable|numeric|min:1.0|max:3.0',
-      'reactivity' => false,
     ],
     'minimum_hours_for_pay' => [
       'display' => 'inline',
@@ -163,7 +149,6 @@ return [
       'field_type' => 'number',
       'label' => 'Minimum Hours for Pay',
       'validation' => 'nullable|numeric|min:0|max:24',
-      'reactivity' => false,
     ],
     'country_code' => [
       'display' => 'inline',
@@ -171,7 +156,6 @@ return [
       'field_type' => 'string',
       'label' => 'Country Code',
       'validation' => 'nullable|string|size:2',
-      'reactivity' => false,
     ],
     'region_code' => [
       'display' => 'inline',
@@ -179,7 +163,6 @@ return [
       'field_type' => 'string',
       'label' => 'Region/State Code',
       'validation' => 'nullable|string|max:10',
-      'reactivity' => false,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -187,7 +170,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'is_half_day' => [
       'display' => 'inline',
@@ -195,7 +177,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Half Day Holiday',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'half_day_end_time' => [
       'display' => 'inline',
@@ -203,7 +184,6 @@ return [
       'field_type' => 'timepicker',
       'label' => 'Half Day End Time',
       'validation' => 'required_if:is_half_day,true',
-      'reactivity' => false,
     ],
     'year' => [
       'display' => 'inline',
@@ -211,7 +191,6 @@ return [
       'field_type' => 'number',
       'label' => 'Year',
       'validation' => 'nullable|integer|min:2000|max:2100',
-      'reactivity' => false,
     ],
     'generated_from_template' => [
       'display' => 'inline',
@@ -219,7 +198,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Generated from Template',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'override_id' => [
       'display' => 'inline',
@@ -227,7 +205,6 @@ return [
       'field_type' => 'number',
       'label' => 'Override ID',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'last_synced_at' => [
       'display' => 'inline',
@@ -235,7 +212,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Last Synced',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -275,8 +251,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'pages',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

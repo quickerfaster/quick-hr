@@ -9,7 +9,6 @@ return [
       'field_type' => 'string',
       'label' => 'Name',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
       'wizard' => [
         'permission_setup' => true,
       ],
@@ -20,7 +19,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
     ],
     'guard_name' => [
       'display' => 'inline',
@@ -32,7 +30,6 @@ return [
         'web' => 'Web',
         'api' => 'API',
       ],
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -48,8 +45,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'drawers',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

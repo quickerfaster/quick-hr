@@ -29,7 +29,7 @@ class PayrollRun extends Model
     
 
     protected $fillable = [
-        'pay_schedule_id', 'period_start', 'period_end', 'status', 'current_step', 'total_gross_pay', 'total_deductions', 'total_taxes', 'total_employer_contributions', 'total_cash_required', 'total_employees', 'processed_employees', 'calculation_status', 'processed_by', 'processed_at', 'approved_by', 'approved_at', 'notes'
+        'title', 'pay_schedule_id', 'period_start', 'period_end', 'status', 'current_step', 'total_gross_pay', 'total_deductions', 'total_taxes', 'total_employer_contributions', 'total_cash_required', 'total_employees', 'processed_employees', 'calculation_status', 'processed_by', 'processed_at', 'approved_by', 'approved_at', 'notes'
     ];
 
     protected $guarded = [

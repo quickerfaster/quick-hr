@@ -9,7 +9,6 @@ return [
       'field_type' => 'select',
       'label' => 'Attendance Policy',
       'validation' => 'required|exists:attendance_policies,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\AttendancePolicy',
         'type' => 'belongsTo',
@@ -30,7 +29,6 @@ return [
       'field_type' => 'number',
       'label' => 'Priority',
       'validation' => 'integer|min:0',
-      'reactivity' => false,
     ],
     'assignable_type' => [
       'display' => 'inline',
@@ -43,14 +41,12 @@ return [
         'department' => 'Department',
         'shift' => 'Shift',
       ],
-      'reactivity' => false,
     ],
     'assignable_id' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'morph_to_select',
       'label' => 'Assign to Entity',
-      'reactivity' => false,
       'morph_relation' => 'assignable',
       'morph_map' => [
         'company' => 'App\Modules\Admin\Models\Company',
@@ -76,8 +72,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'modals',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => 'all',

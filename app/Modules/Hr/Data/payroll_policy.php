@@ -9,7 +9,7 @@ return [
       'field_type' => 'string',
       'label' => 'Policy Name',
       'validation' => 'required|string|max:255|unique:payroll_policies,name',
-      'reactivity' => false,
+      'searchable' => true,
     ],
     'type' => [
       'display' => 'inline',
@@ -25,7 +25,7 @@ return [
         'bonus' => 'Bonus',
         'deduction' => 'Deduction',
       ],
-      'reactivity' => false,
+      'filterable' => true,
     ],
     'effect' => [
       'display' => 'inline',
@@ -37,7 +37,6 @@ return [
         'addition' => 'Addition (adds to gross pay)',
         'subtraction' => 'Subtraction (deducts from gross pay)',
       ],
-      'reactivity' => false,
     ],
     'country_code' => [
       'display' => 'inline',
@@ -50,7 +49,6 @@ return [
         'UK' => 'UK',
         'NG' => 'NG',
       ],
-      'reactivity' => false,
     ],
     'state_code' => [
       'display' => 'inline',
@@ -58,7 +56,6 @@ return [
       'field_type' => 'select',
       'label' => 'State/Province',
       'validation' => 'nullable|string|max:10',
-      'reactivity' => false,
     ],
     'calculation_logic' => [
       'display' => 'inline',
@@ -66,7 +63,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Calculation Logic (JSON)',
       'validation' => 'nullable|json',
-      'reactivity' => false,
     ],
     'employer_ratio' => [
       'display' => 'inline',
@@ -74,7 +70,6 @@ return [
       'field_type' => 'number',
       'label' => 'Employer Contribution (%)',
       'validation' => 'nullable|numeric|min:0|max:100',
-      'reactivity' => false,
     ],
     'is_statutory' => [
       'display' => 'inline',
@@ -82,7 +77,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Statutory (Government Mandated)',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'effective_date' => [
       'display' => 'inline',
@@ -90,7 +84,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Effective From',
       'validation' => 'required|date',
-      'reactivity' => false,
     ],
     'expiry_date' => [
       'display' => 'inline',
@@ -98,7 +91,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Expiry Date',
       'validation' => 'nullable|date|after:effective_date',
-      'reactivity' => false,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -106,7 +98,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'description' => [
       'display' => 'inline',
@@ -114,7 +105,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
     ],
     'parent_policy_id' => [
       'display' => 'inline',
@@ -122,7 +112,6 @@ return [
       'field_type' => 'select',
       'label' => 'Parent Policy',
       'validation' => 'nullable|exists:payroll_policies,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PayrollPolicy',
         'type' => 'belongsTo',
@@ -143,7 +132,6 @@ return [
       'field_type' => 'number',
       'label' => 'Created By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'updated_by' => [
       'display' => 'inline',
@@ -151,7 +139,6 @@ return [
       'field_type' => 'number',
       'label' => 'Updated By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -179,8 +166,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'pages',
+  'crudType' => 'pages',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

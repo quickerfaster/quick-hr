@@ -15,7 +15,7 @@ class EmployeeProfile extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -23,11 +23,11 @@ class EmployeeProfile extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'photo', 'employee_id', 'middle_name', 'preferred_name', 'personal_email', 'personal_phone', 'work_phone', 'emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relationship', 'passport_number', 'passport_expiry_date', 'national_id_number', 'bio', 'date_of_birth', 'gender', 'nationality', 'marital_status', 'address_street', 'address_city', 'address_state', 'address_postal_code', 'address_country'
+        'employee_id', 'photo', 'preferred_name', 'middle_name', 'date_of_birth', 'gender', 'nationality', 'marital_status', 'bio', 'personal_email', 'personal_phone', 'work_phone', 'address_street', 'address_city', 'address_state', 'address_postal_code', 'address_country', 'emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relationship', 'passport_number', 'passport_expiry_date', 'national_id_number'
     ];
 
     protected $guarded = [
@@ -35,8 +35,8 @@ class EmployeeProfile extends Model
     ];
 
     protected $casts = [
-        'passport_expiry_date' => 'date',
-        'date_of_birth' => 'date'
+        'date_of_birth' => 'date',
+        'passport_expiry_date' => 'date'
     ];
 
     protected $attributes = [

@@ -9,7 +9,6 @@ return [
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -34,7 +33,7 @@ return [
         'earning' => 'Earning (Addition)',
         'deduction' => 'Deduction (Subtraction)',
       ],
-      'reactivity' => false,
+      'filterable' => true,
     ],
     'label' => [
       'display' => 'inline',
@@ -42,7 +41,7 @@ return [
       'field_type' => 'string',
       'label' => 'Description',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
+      'searchable' => true,
     ],
     'calculation_type' => [
       'display' => 'inline',
@@ -54,7 +53,6 @@ return [
         'fixed' => 'Fixed Amount',
         'percentage' => 'Percentage of Base Salary',
       ],
-      'reactivity' => false,
     ],
     'value' => [
       'display' => 'inline',
@@ -62,7 +60,6 @@ return [
       'field_type' => 'number',
       'label' => 'Value',
       'validation' => 'required|numeric|min:0',
-      'reactivity' => false,
     ],
     'effective_date' => [
       'display' => 'inline',
@@ -70,7 +67,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Effective From',
       'validation' => 'required|date',
-      'reactivity' => false,
     ],
     'expiry_date' => [
       'display' => 'inline',
@@ -78,7 +74,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Expiry Date',
       'validation' => 'nullable|date|after:effective_date',
-      'reactivity' => false,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -86,7 +81,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'policy_id' => [
       'display' => 'inline',
@@ -94,7 +88,6 @@ return [
       'field_type' => 'select',
       'label' => 'Source Policy',
       'validation' => 'nullable|exists:payroll_policies,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PayrollPolicy',
         'type' => 'belongsTo',
@@ -115,7 +108,6 @@ return [
       'field_type' => 'number',
       'label' => 'Created By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'updated_by' => [
       'display' => 'inline',
@@ -123,7 +115,6 @@ return [
       'field_type' => 'number',
       'label' => 'Updated By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -148,8 +139,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'pages',
+  'crudType' => 'drawers',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

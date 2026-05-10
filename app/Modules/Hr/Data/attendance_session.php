@@ -9,7 +9,6 @@ return [
       'field_type' => 'select',
       'label' => 'Attendance Record',
       'validation' => 'required|exists:attendances,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Attendance',
         'type' => 'belongsTo',
@@ -30,7 +29,6 @@ return [
       'field_type' => 'number',
       'label' => 'Clock-In Event',
       'validation' => 'nullable|exists:clock_events,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\ClockEvent',
         'type' => 'belongsTo',
@@ -51,7 +49,6 @@ return [
       'field_type' => 'number',
       'label' => 'Clock-Out Event',
       'validation' => 'nullable|exists:clock_events,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\ClockEvent',
         'type' => 'belongsTo',
@@ -72,7 +69,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Session Start',
       'validation' => 'required|date',
-      'reactivity' => false,
     ],
     'end_time' => [
       'display' => 'inline',
@@ -80,7 +76,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Session End',
       'validation' => 'required|date|after:start_time',
-      'reactivity' => false,
     ],
     'duration_hours' => [
       'display' => 'inline',
@@ -88,7 +83,6 @@ return [
       'field_type' => 'number',
       'label' => 'Duration (hours)',
       'validation' => 'required|numeric|min:0|max:24',
-      'reactivity' => false,
     ],
     'session_type' => [
       'display' => 'inline',
@@ -105,7 +99,6 @@ return [
         'on_call' => 'On-Call',
         'travel' => 'Travel Time',
       ],
-      'reactivity' => false,
     ],
     'is_overnight' => [
       'display' => 'inline',
@@ -113,7 +106,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Overnight Session',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'is_adjusted' => [
       'display' => 'inline',
@@ -121,7 +113,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Manually Adjusted',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'adjustment_reason' => [
       'display' => 'inline',
@@ -129,7 +120,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Adjustment Reason',
       'validation' => 'required|string|max:500',
-      'reactivity' => false,
     ],
     'adjusted_by' => [
       'display' => 'inline',
@@ -137,7 +127,6 @@ return [
       'field_type' => 'string',
       'label' => 'Adjusted By',
       'validation' => 'nullable|string',
-      'reactivity' => false,
     ],
     'adjusted_at' => [
       'display' => 'inline',
@@ -145,7 +134,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Adjusted At',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'calculated_duration' => [
       'display' => 'inline',
@@ -153,7 +141,6 @@ return [
       'field_type' => 'number',
       'label' => 'Calculated Duration',
       'validation' => 'nullable|numeric',
-      'reactivity' => false,
     ],
     'validation_status' => [
       'display' => 'inline',
@@ -168,7 +155,6 @@ return [
         'too_short' => 'Session Too Short',
         'too_long' => 'Session Too Long',
       ],
-      'reactivity' => false,
     ],
     'validation_notes' => [
       'display' => 'inline',
@@ -176,7 +162,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Validation Notes',
       'validation' => 'nullable|string',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -221,8 +206,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'drawers',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

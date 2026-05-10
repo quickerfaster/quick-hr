@@ -15,7 +15,7 @@ class Document extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -23,11 +23,11 @@ class Document extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'employee_id', 'document', 'name', 'type', 'uploaded_at', 'expiry_date', 'description'
+        'employee_id', 'name', 'type', 'document', 'uploaded_at', 'expiry_date', 'description'
     ];
 
     protected $guarded = [

@@ -9,7 +9,6 @@ return [
       'field_type' => 'string',
       'label' => 'Company Name',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
     ],
     'parent_company_id' => [
       'display' => 'inline',
@@ -17,7 +16,6 @@ return [
       'field_type' => 'select',
       'label' => 'Parent Company',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Admin\Models\Company',
         'type' => 'belongsTo',
@@ -38,7 +36,6 @@ return [
       'field_type' => 'select',
       'label' => 'Company Location',
       'validation' => 'required|integer',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Admin\Models\Location',
         'type' => 'belongsTo',
@@ -59,7 +56,6 @@ return [
       'field_type' => 'string',
       'label' => 'Subdomain',
       'validation' => 'required|string|alpha_dash|min:3|max:63|unique:companies,subdomain|regex:/^[a-z][a-z0-9-]{1,61}[a-z0-9]$/',
-      'reactivity' => false,
     ],
     'database_name' => [
       'display' => 'inline',
@@ -67,7 +63,6 @@ return [
       'field_type' => 'string',
       'label' => 'Database Name',
       'validation' => 'nullable|string|max:64',
-      'reactivity' => false,
     ],
     'status' => [
       'display' => 'inline',
@@ -81,7 +76,6 @@ return [
         'suspended' => 'Suspended',
         'canceled' => 'Canceled',
       ],
-      'reactivity' => false,
     ],
     'billing_email' => [
       'display' => 'inline',
@@ -89,7 +83,6 @@ return [
       'field_type' => 'string',
       'label' => 'Billing Email',
       'validation' => 'required|email|max:255',
-      'reactivity' => false,
     ],
     'billing_address_line_1' => [
       'display' => 'inline',
@@ -97,7 +90,6 @@ return [
       'field_type' => 'string',
       'label' => 'Billing Address Line 1',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
     ],
     'billing_address_line_2' => [
       'display' => 'inline',
@@ -105,7 +97,6 @@ return [
       'field_type' => 'string',
       'label' => 'Billing Address Line 2',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'billing_city' => [
       'display' => 'inline',
@@ -113,7 +104,6 @@ return [
       'field_type' => 'string',
       'label' => 'City',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
     ],
     'billing_state_province' => [
       'display' => 'inline',
@@ -121,7 +111,6 @@ return [
       'field_type' => 'string',
       'label' => 'State / Province',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'billing_postal_code' => [
       'display' => 'inline',
@@ -129,7 +118,6 @@ return [
       'field_type' => 'string',
       'label' => 'Postal Code',
       'validation' => 'nullable|string|max:20',
-      'reactivity' => false,
     ],
     'billing_country_code' => [
       'display' => 'inline',
@@ -137,7 +125,6 @@ return [
       'field_type' => 'select',
       'label' => 'Country',
       'validation' => 'required|string|size:2',
-      'reactivity' => false,
     ],
     'timezone' => [
       'display' => 'inline',
@@ -145,7 +132,6 @@ return [
       'field_type' => 'select',
       'label' => 'Primary Timezone',
       'validation' => 'required|string|max:64',
-      'reactivity' => false,
     ],
     'currency_code' => [
       'display' => 'inline',
@@ -153,7 +139,6 @@ return [
       'field_type' => 'select',
       'label' => 'Currency',
       'validation' => 'required|string|size:3',
-      'reactivity' => false,
     ],
     'level' => [
       'display' => 'inline',
@@ -166,7 +151,6 @@ return [
         'division' => 'Division / Business Unit',
         'branch' => 'Branch',
       ],
-      'reactivity' => false,
     ],
     'is_placeholder' => [
       'display' => 'inline',
@@ -174,7 +158,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Is Placeholder',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -220,8 +203,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'pages',
+  'crudType' => 'drawers',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => 'all',
@@ -273,7 +257,7 @@ return [
     'employees' => [
       'type' => 'hasMany',
       'model' => 'App\Modules\Hr\Models\Employee',
-      'foreignKey' => 'employee_id',
+      'foreignKey' => 'company_id',
       'localKey' => '',
     ],
     'parentCompany' => [

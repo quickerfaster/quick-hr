@@ -30,7 +30,7 @@
     <a href="/hr/hr/dashboard-people-overview"
         class="nav-link @if(request()->is('hr/hr/dashboard-people-overview') || request()->is('hr/hr/dashboard-people-overview/*')) fw-bold text-primary @endif">
         @if(request()->is('hr/hr/dashboard-people-overview') || request()->is('hr/hr/dashboard-people-overview/*'))
-            <i class="fas fas fa-user-friends" aria-hidden="true"></i>
+            <i class="fas fas fa-user-tie" aria-hidden="true"></i>
         @endif
         <span>People</span>
     </a>

@@ -3,13 +3,19 @@
 return [
   'model' => 'App\Modules\Hr\Models\PayrollRun',
   'fieldDefinitions' => [
+    'title' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'string',
+      'label' => 'Payroll Unique Title',
+      'validation' => 'required|unique:payroll_runs,title',
+    ],
     'pay_schedule_id' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'select',
       'label' => 'Pay Schedule',
       'validation' => 'required|exists:pay_schedules,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PaySchedule',
         'type' => 'belongsTo',
@@ -30,7 +36,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Period Start',
       'validation' => 'required|date',
-      'reactivity' => false,
     ],
     'period_end' => [
       'display' => 'inline',
@@ -38,7 +43,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Period End',
       'validation' => 'required|date|after:period_start',
-      'reactivity' => false,
     ],
     'status' => [
       'display' => 'inline',
@@ -57,7 +61,7 @@ return [
         'cancelled' => 'Cancelled',
         'archived' => 'Archived',
       ],
-      'reactivity' => false,
+      'filterable' => true,
     ],
     'current_step' => [
       'display' => 'inline',
@@ -65,7 +69,6 @@ return [
       'field_type' => 'number',
       'label' => 'Wizard Step',
       'validation' => 'nullable|integer|min:1|max:4',
-      'reactivity' => false,
     ],
     'total_gross_pay' => [
       'display' => 'inline',
@@ -73,7 +76,6 @@ return [
       'field_type' => 'number',
       'label' => 'Total Gross Pay',
       'validation' => 'nullable|numeric|min:0',
-      'reactivity' => false,
     ],
     'total_deductions' => [
       'display' => 'inline',
@@ -81,7 +83,6 @@ return [
       'field_type' => 'number',
       'label' => 'Total Deductions',
       'validation' => 'nullable|numeric|min:0',
-      'reactivity' => false,
     ],
     'total_taxes' => [
       'display' => 'inline',
@@ -89,7 +90,6 @@ return [
       'field_type' => 'number',
       'label' => 'Total Taxes',
       'validation' => 'nullable|numeric|min:0',
-      'reactivity' => false,
     ],
     'total_employer_contributions' => [
       'display' => 'inline',
@@ -97,7 +97,6 @@ return [
       'field_type' => 'number',
       'label' => 'Total Employer Contributions',
       'validation' => 'nullable|numeric|min:0',
-      'reactivity' => false,
     ],
     'total_cash_required' => [
       'display' => 'inline',
@@ -105,7 +104,6 @@ return [
       'field_type' => 'number',
       'label' => 'Total Cash Required',
       'validation' => 'nullable|numeric|min:0',
-      'reactivity' => false,
     ],
     'total_employees' => [
       'display' => 'inline',
@@ -113,7 +111,6 @@ return [
       'field_type' => 'number',
       'label' => 'Total Employees',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'processed_employees' => [
       'display' => 'inline',
@@ -121,7 +118,6 @@ return [
       'field_type' => 'number',
       'label' => 'Processed Employees',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'calculation_status' => [
       'display' => 'inline',
@@ -135,7 +131,6 @@ return [
         'completed' => 'Completed',
         'failed' => 'Failed',
       ],
-      'reactivity' => false,
     ],
     'processed_by' => [
       'display' => 'inline',
@@ -143,7 +138,6 @@ return [
       'field_type' => 'string',
       'label' => 'Processed By',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'processed_at' => [
       'display' => 'inline',
@@ -151,7 +145,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Processed At',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'approved_by' => [
       'display' => 'inline',
@@ -159,7 +152,6 @@ return [
       'field_type' => 'string',
       'label' => 'Approved By',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'approved_at' => [
       'display' => 'inline',
@@ -167,7 +159,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Approved At',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'failed_at' => [
       'display' => 'inline',
@@ -175,7 +166,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Failed At',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'failure_reason' => [
       'display' => 'inline',
@@ -183,7 +173,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Failure Reason',
       'validation' => 'nullable|string',
-      'reactivity' => false,
     ],
     'notes' => [
       'display' => 'inline',
@@ -191,7 +180,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Notes',
       'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
     ],
     'created_by' => [
       'display' => 'inline',
@@ -199,7 +187,6 @@ return [
       'field_type' => 'number',
       'label' => 'Created By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'updated_by' => [
       'display' => 'inline',
@@ -207,7 +194,6 @@ return [
       'field_type' => 'number',
       'label' => 'Updated By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => 'qf.payroll-run-detail',
@@ -259,8 +245,9 @@ return [
     '0' => 'show',
   ],
   'isTransaction' => false,
-  'viewType' => 'pages',
+  'crudType' => 'pages',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
@@ -394,9 +381,10 @@ return [
       'groupType' => 'payroll',
       'icon' => 'fas fa-calendar-alt',
       'fields' => [
-        '0' => 'pay_schedule_id',
-        '1' => 'period_start',
-        '2' => 'period_end',
+        '0' => 'title',
+        '1' => 'pay_schedule_id',
+        '2' => 'period_start',
+        '3' => 'period_end',
       ],
     ],
     'status_workflow' => [

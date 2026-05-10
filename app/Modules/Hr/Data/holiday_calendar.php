@@ -9,7 +9,6 @@ return [
       'field_type' => 'string',
       'label' => 'Calendar Name',
       'validation' => 'required|string|max:100',
-      'reactivity' => false,
     ],
     'country_code' => [
       'display' => 'inline',
@@ -25,7 +24,6 @@ return [
         'IN' => 'India',
         'NG' => 'Nigeria',
       ],
-      'reactivity' => false,
     ],
     'region' => [
       'display' => 'inline',
@@ -33,7 +31,6 @@ return [
       'field_type' => 'string',
       'label' => 'Region/State',
       'validation' => 'nullable|string|max:100',
-      'reactivity' => false,
     ],
     'is_default' => [
       'display' => 'inline',
@@ -41,7 +38,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Default Calendar',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -49,7 +45,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'description' => [
       'display' => 'inline',
@@ -57,7 +52,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string|max:500',
-      'reactivity' => false,
     ],
     'applicable_to' => [
       'display' => 'inline',
@@ -71,7 +65,6 @@ return [
         'specific_locations' => 'Specific Locations',
         'employee_groups' => 'Employee Groups',
       ],
-      'reactivity' => false,
     ],
     'year' => [
       'display' => 'inline',
@@ -86,7 +79,6 @@ return [
         '2029' => 2029,
         '2030' => 2030,
       ],
-      'reactivity' => false,
     ],
     'holiday_count' => [
       'display' => 'inline',
@@ -94,7 +86,6 @@ return [
       'field_type' => 'number',
       'label' => 'Number of Holidays',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'last_updated' => [
       'display' => 'inline',
@@ -102,7 +93,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Last Updated',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -130,8 +120,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'drawers',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

@@ -9,7 +9,6 @@ return [
       'field_type' => 'select',
       'label' => 'Payslip',
       'validation' => 'required|exists:payroll_payslips,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PayrollPayslip',
         'type' => 'belongsTo',
@@ -36,7 +35,7 @@ return [
         'tax' => 'Tax',
         'reimbursement' => 'Reimbursement',
       ],
-      'reactivity' => false,
+      'filterable' => true,
     ],
     'label' => [
       'display' => 'inline',
@@ -44,7 +43,7 @@ return [
       'field_type' => 'string',
       'label' => 'Description',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
+      'searchable' => true,
     ],
     'amount' => [
       'display' => 'inline',
@@ -52,7 +51,6 @@ return [
       'field_type' => 'number',
       'label' => 'Amount',
       'validation' => 'required|numeric',
-      'reactivity' => false,
     ],
     'policy_id' => [
       'display' => 'inline',
@@ -60,7 +58,6 @@ return [
       'field_type' => 'select',
       'label' => 'Linked Policy',
       'validation' => 'nullable|exists:payroll_policies,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PayrollPolicy',
         'type' => 'belongsTo',
@@ -81,7 +78,6 @@ return [
       'field_type' => 'select',
       'label' => 'Linked Adjustment',
       'validation' => 'nullable|exists:payroll_run_adjustments,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PayrollRunAdjustment',
         'type' => 'belongsTo',
@@ -102,7 +98,6 @@ return [
       'field_type' => 'select',
       'label' => 'Recurring Adjustment Profile',
       'validation' => 'nullable|exists:employee_adjustment_profiles,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\EmployeeAdjustmentProfile',
         'type' => 'belongsTo',
@@ -123,7 +118,6 @@ return [
       'field_type' => 'json',
       'label' => 'Calculation Metadata',
       'validation' => 'nullable|json',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -146,8 +140,9 @@ return [
     '0' => 'show',
   ],
   'isTransaction' => false,
-  'viewType' => 'pages',
+  'crudType' => 'modals',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

@@ -9,7 +9,6 @@ return [
       'field_type' => 'string',
       'label' => 'Department Name',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
     ],
     'code' => [
       'display' => 'inline',
@@ -18,7 +17,6 @@ return [
       'label' => 'Department Code',
       'validation' => 'required|string|max:50|unique:departments,code',
       'autoGenerate' => true,
-      'reactivity' => false,
     ],
     'description' => [
       'display' => 'inline',
@@ -26,7 +24,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string',
-      'reactivity' => false,
     ],
     'company_id' => [
       'display' => 'inline',
@@ -34,7 +31,6 @@ return [
       'field_type' => 'select',
       'label' => 'Company',
       'validation' => 'required|integer',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Admin\Models\Company',
         'type' => 'belongsTo',
@@ -55,7 +51,6 @@ return [
       'field_type' => 'select',
       'label' => 'Parent Department',
       'validation' => 'nullable|string',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Admin\Models\Department',
         'type' => 'belongsTo',
@@ -76,7 +71,6 @@ return [
       'field_type' => 'string',
       'label' => 'Cost Center',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -84,7 +78,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Is Active',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -100,8 +93,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'drawers',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => 'all',

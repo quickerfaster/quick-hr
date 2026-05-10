@@ -9,7 +9,6 @@ return [
       'field_type' => 'string',
       'label' => 'Full Name',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
       'wizard' => [
         'user_onboarding' => true,
       ],
@@ -20,7 +19,6 @@ return [
       'field_type' => 'string',
       'label' => 'Email Address',
       'validation' => 'required|email|max:255|unique:users,email',
-      'reactivity' => false,
       'wizard' => [
         'user_onboarding' => true,
       ],
@@ -31,7 +29,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Email Verified At',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'password' => [
       'display' => 'inline',
@@ -39,7 +36,6 @@ return [
       'field_type' => 'password',
       'label' => 'Password',
       'validation' => 'required|string|min:8|confirmed',
-      'reactivity' => false,
       'wizard' => [
         'user_onboarding' => true,
       ],
@@ -50,7 +46,6 @@ return [
       'field_type' => 'password',
       'label' => 'Confirm Password',
       'validation' => 'required_with:password|same:password',
-      'reactivity' => false,
     ],
     'remember_token' => [
       'display' => 'inline',
@@ -58,7 +53,6 @@ return [
       'field_type' => 'string',
       'label' => 'Remember Token',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'status' => [
       'display' => 'inline',
@@ -71,7 +65,6 @@ return [
         'inactive' => 'Inactive',
         'invited' => 'Invited',
       ],
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -101,8 +94,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'modals',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
@@ -168,6 +162,12 @@ return [
       'model' => 'Spatie\Permission\Models\Role',
       'foreignKey' => 'model_id',
       'localKey' => '',
+      'pivotTable' => 'model_has_roles',
+      'foreignPivotKey' => '',
+      'relatedPivotKey' => 'role_id',
+      'morphType' => 'model_type',
+      'morphName' => 'roles',
+      'displayField' => 'name',
     ],
     'employee' => [
       'type' => 'hasOne',

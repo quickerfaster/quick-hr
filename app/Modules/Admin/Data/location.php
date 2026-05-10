@@ -9,7 +9,6 @@ return [
       'field_type' => 'string',
       'label' => 'Location Name',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
     ],
     'code' => [
       'display' => 'inline',
@@ -18,7 +17,6 @@ return [
       'label' => 'Location Code',
       'validation' => 'required|string|max:50|unique:locations,code',
       'autoGenerate' => true,
-      'reactivity' => false,
     ],
     'address_line_1' => [
       'display' => 'inline',
@@ -26,7 +24,6 @@ return [
       'field_type' => 'string',
       'label' => 'Address Line 1',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
     ],
     'address_line_2' => [
       'display' => 'inline',
@@ -34,7 +31,6 @@ return [
       'field_type' => 'string',
       'label' => 'Address Line 2',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'city' => [
       'display' => 'inline',
@@ -42,7 +38,6 @@ return [
       'field_type' => 'string',
       'label' => 'City',
       'validation' => 'required|string|max:100',
-      'reactivity' => false,
     ],
     'state_province' => [
       'display' => 'inline',
@@ -50,7 +45,6 @@ return [
       'field_type' => 'string',
       'label' => 'State/Province',
       'validation' => 'nullable|string|max:100',
-      'reactivity' => false,
     ],
     'postal_code' => [
       'display' => 'inline',
@@ -58,7 +52,6 @@ return [
       'field_type' => 'string',
       'label' => 'Postal Code',
       'validation' => 'nullable|string|max:20',
-      'reactivity' => false,
     ],
     'country' => [
       'display' => 'inline',
@@ -78,7 +71,6 @@ return [
         'JP' => 'Japan',
         'CN' => 'China',
       ],
-      'reactivity' => false,
     ],
     'phone' => [
       'display' => 'inline',
@@ -86,7 +78,6 @@ return [
       'field_type' => 'string',
       'label' => 'Phone Number',
       'validation' => 'nullable|string|max:20',
-      'reactivity' => false,
     ],
     'email' => [
       'display' => 'inline',
@@ -94,7 +85,6 @@ return [
       'field_type' => 'string',
       'label' => 'Email Address',
       'validation' => 'nullable|email|max:255',
-      'reactivity' => false,
     ],
     'website' => [
       'display' => 'inline',
@@ -102,7 +92,6 @@ return [
       'field_type' => 'string',
       'label' => 'Website',
       'validation' => 'nullable|url|max:255',
-      'reactivity' => false,
     ],
     'timezone' => [
       'display' => 'inline',
@@ -121,7 +110,6 @@ return [
         'Africa/Lagos' => 'West Africa Time (WAT)',
         'Australia/Sydney' => 'Australian Eastern Time (AET)',
       ],
-      'reactivity' => false,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -129,7 +117,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'is_remote' => [
       'display' => 'inline',
@@ -137,7 +124,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Remote Location',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'is_headquarters' => [
       'display' => 'inline',
@@ -145,7 +131,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Headquarters',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'capacity' => [
       'display' => 'inline',
@@ -153,7 +138,6 @@ return [
       'field_type' => 'number',
       'label' => 'Employee Capacity',
       'validation' => 'nullable|integer|min:0',
-      'reactivity' => false,
     ],
     'opening_hours' => [
       'display' => 'inline',
@@ -161,7 +145,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Opening Hours',
       'validation' => 'nullable|string|max:500',
-      'reactivity' => false,
     ],
     'opening_date' => [
       'display' => 'inline',
@@ -169,7 +152,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Opening Date',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'closing_date' => [
       'display' => 'inline',
@@ -177,7 +159,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Closing Date',
       'validation' => 'nullable|date|after:opening_date',
-      'reactivity' => false,
     ],
     'latitude' => [
       'display' => 'inline',
@@ -185,7 +166,6 @@ return [
       'field_type' => 'number',
       'label' => 'Latitude',
       'validation' => 'nullable|numeric|between:-90,90',
-      'reactivity' => false,
     ],
     'longitude' => [
       'display' => 'inline',
@@ -193,7 +173,6 @@ return [
       'field_type' => 'number',
       'label' => 'Longitude',
       'validation' => 'nullable|numeric|between:-180,180',
-      'reactivity' => false,
     ],
     'geofence_radius' => [
       'display' => 'inline',
@@ -201,7 +180,6 @@ return [
       'field_type' => 'number',
       'label' => 'Geofence Radius (meters)',
       'validation' => 'nullable|numeric|min:0|max:10000',
-      'reactivity' => false,
     ],
     'external_id' => [
       'display' => 'inline',
@@ -209,7 +187,6 @@ return [
       'field_type' => 'string',
       'label' => 'External ID',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'last_synced_at' => [
       'display' => 'inline',
@@ -217,7 +194,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Last Synced At',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'employee_count' => [
       'display' => 'inline',
@@ -225,7 +201,6 @@ return [
       'field_type' => 'number',
       'label' => 'Employee Count',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'department_count' => [
       'display' => 'inline',
@@ -233,7 +208,6 @@ return [
       'field_type' => 'number',
       'label' => 'Department Count',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -286,8 +260,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'pages',
+  'crudType' => 'pages',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

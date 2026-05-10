@@ -9,7 +9,6 @@ return [
       'field_type' => 'string',
       'label' => 'Employee ID',
       'validation' => 'required',
-      'reactivity' => false,
     ],
     'event_type' => [
       'display' => 'inline',
@@ -25,7 +24,6 @@ return [
         'meal_start' => 'Meal Start',
         'meal_end' => 'Meal End',
       ],
-      'reactivity' => false,
     ],
     'timestamp' => [
       'display' => 'inline',
@@ -33,7 +31,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Event Time',
       'validation' => 'required|date',
-      'reactivity' => false,
     ],
     'method' => [
       'display' => 'inline',
@@ -49,7 +46,6 @@ return [
         'api' => 'API Integration',
         'manual' => 'Manual Entry',
       ],
-      'reactivity' => false,
     ],
     'latitude' => [
       'display' => 'inline',
@@ -57,7 +53,6 @@ return [
       'field_type' => 'number',
       'label' => 'Latitude',
       'validation' => 'nullable|numeric|between:-90,90',
-      'reactivity' => false,
     ],
     'longitude' => [
       'display' => 'inline',
@@ -65,7 +60,6 @@ return [
       'field_type' => 'number',
       'label' => 'Longitude',
       'validation' => 'nullable|numeric|between:-180,180',
-      'reactivity' => false,
     ],
     'location_name' => [
       'display' => 'inline',
@@ -73,7 +67,6 @@ return [
       'field_type' => 'string',
       'label' => 'Location Name',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'timezone' => [
       'display' => 'inline',
@@ -81,7 +74,6 @@ return [
       'field_type' => 'string',
       'label' => 'Timezone',
       'validation' => 'nullable|timezone',
-      'reactivity' => false,
     ],
     'ip_address' => [
       'display' => 'inline',
@@ -89,7 +81,6 @@ return [
       'field_type' => 'string',
       'label' => 'IP Address',
       'validation' => 'nullable|ip',
-      'reactivity' => false,
     ],
     'device_id' => [
       'display' => 'inline',
@@ -97,7 +88,6 @@ return [
       'field_type' => 'string',
       'label' => 'Device ID',
       'validation' => 'nullable|string|max:100',
-      'reactivity' => false,
     ],
     'device_name' => [
       'display' => 'inline',
@@ -105,7 +95,6 @@ return [
       'field_type' => 'string',
       'label' => 'Device Name',
       'validation' => 'nullable|string|max:100',
-      'reactivity' => false,
     ],
     'sync_status' => [
       'display' => 'inline',
@@ -119,7 +108,6 @@ return [
         'failed' => 'Sync Failed',
         'manual' => 'Manual Entry',
       ],
-      'reactivity' => false,
     ],
     'sync_attempts' => [
       'display' => 'inline',
@@ -127,7 +115,6 @@ return [
       'field_type' => 'number',
       'label' => 'Sync Attempts',
       'validation' => 'nullable|integer|min:0',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -159,8 +146,9 @@ return [
     '0' => 'show',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'drawers',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

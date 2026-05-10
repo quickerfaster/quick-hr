@@ -23,11 +23,11 @@ class EmployeeJobHistory extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'employee_id', 'job_title', 'department', 'manager_name', 'pay_type', 'hourly_rate', 'base_salary', 'salary_currency', 'pay_frequency', 'employment_status', 'location', 'shift', 'effective_date', 'end_date', 'change_reason', 'notes'
+        'employee_id', 'effective_date', 'end_date', 'change_reason', 'notes', 'job_title', 'department', 'manager_name', 'pay_type', 'hourly_rate', 'base_salary', 'salary_currency', 'pay_frequency', 'employment_status', 'location', 'shift'
     ];
 
     protected $guarded = [
@@ -35,10 +35,10 @@ class EmployeeJobHistory extends Model
     ];
 
     protected $casts = [
-        'hourly_rate' => 'decimal:2',
-        'base_salary' => 'decimal:2',
         'effective_date' => 'date',
-        'end_date' => 'date'
+        'end_date' => 'date',
+        'hourly_rate' => 'decimal:2',
+        'base_salary' => 'decimal:2'
     ];
 
     protected $attributes = [

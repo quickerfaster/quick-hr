@@ -9,7 +9,6 @@ return [
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -33,7 +32,6 @@ return [
       'field_type' => 'select',
       'label' => 'Leave Type',
       'validation' => 'required|exists:leave_types,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\LeaveType',
         'type' => 'belongsTo',
@@ -57,7 +55,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Start Date',
       'validation' => 'required|date|after_or_equal:today',
-      'reactivity' => false,
       'wizard' => [
         'employee_self_service' => true,
       ],
@@ -68,7 +65,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'End Date',
       'validation' => 'required|date|after_or_equal:start_date',
-      'reactivity' => false,
       'wizard' => [
         'employee_self_service' => true,
       ],
@@ -79,7 +75,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Reason',
       'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
       'wizard' => [
         'employee_self_service' => true,
       ],
@@ -96,7 +91,6 @@ return [
         'Denied' => 'Denied',
         'Cancelled' => 'Cancelled',
       ],
-      'reactivity' => false,
     ],
     'approved_by' => [
       'display' => 'inline',
@@ -104,7 +98,6 @@ return [
       'field_type' => 'select',
       'label' => 'Approved By',
       'validation' => 'nullable|exists:employees,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -125,7 +118,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Approved At',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'denial_reason' => [
       'display' => 'inline',
@@ -133,7 +125,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Denial Reason',
       'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
     ],
     'attendance_synced' => [
       'display' => 'inline',
@@ -141,7 +132,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Synced to Attendance',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'attendance_records_count' => [
       'display' => 'inline',
@@ -149,7 +139,6 @@ return [
       'field_type' => 'number',
       'label' => 'Attendance Days Created',
       'validation' => 'integer|min:0',
-      'reactivity' => false,
     ],
     'last_sync_at' => [
       'display' => 'inline',
@@ -157,7 +146,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Last Sync Time',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'is_retroactive' => [
       'display' => 'inline',
@@ -165,7 +153,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Retroactive Request',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'reported_after_absence' => [
       'display' => 'inline',
@@ -173,7 +160,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Reported Post-Absence',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'workdays_count' => [
       'display' => 'inline',
@@ -181,7 +167,6 @@ return [
       'field_type' => 'number',
       'label' => 'Working Days',
       'validation' => 'nullable|integer|min:1',
-      'reactivity' => false,
     ],
     'overlap_with_holiday' => [
       'display' => 'inline',
@@ -189,7 +174,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Overlaps Company Holiday',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -218,8 +202,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'pages',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

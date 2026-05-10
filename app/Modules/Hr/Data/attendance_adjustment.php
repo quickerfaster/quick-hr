@@ -9,7 +9,6 @@ return [
       'field_type' => 'select',
       'label' => 'Attendance Record',
       'validation' => 'required|exists:attendances,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Attendance',
         'type' => 'belongsTo',
@@ -30,7 +29,6 @@ return [
       'field_type' => 'number',
       'label' => 'Original Hours',
       'validation' => 'nullable|numeric',
-      'reactivity' => false,
     ],
     'original_status' => [
       'display' => 'inline',
@@ -38,7 +36,6 @@ return [
       'field_type' => 'string',
       'label' => 'Original Status',
       'validation' => 'nullable|string',
-      'reactivity' => false,
     ],
     'adjusted_net_hours' => [
       'display' => 'inline',
@@ -46,7 +43,6 @@ return [
       'field_type' => 'number',
       'label' => 'New Hours',
       'validation' => 'required|numeric|min:0|max:24',
-      'reactivity' => false,
     ],
     'adjusted_status' => [
       'display' => 'inline',
@@ -62,7 +58,6 @@ return [
         'holiday' => 'Holiday',
         'leave' => 'On Leave',
       ],
-      'reactivity' => false,
     ],
     'reason' => [
       'display' => 'inline',
@@ -70,7 +65,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Reason for Change',
       'validation' => 'required|string|max:500',
-      'reactivity' => false,
     ],
     'adjusted_by' => [
       'display' => 'inline',
@@ -78,7 +72,6 @@ return [
       'field_type' => 'string',
       'label' => 'Adjusted By',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'adjusted_at' => [
       'display' => 'inline',
@@ -86,7 +79,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Adjusted At',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -110,8 +102,9 @@ return [
     '0' => 'show',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'drawers',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

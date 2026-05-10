@@ -9,7 +9,6 @@ return [
       'field_type' => 'string',
       'label' => 'Leave Type Name',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
     ],
     'code' => [
       'display' => 'inline',
@@ -17,7 +16,6 @@ return [
       'field_type' => 'string',
       'label' => 'Short Code',
       'validation' => 'required|string|max:10|unique:leave_types,code',
-      'reactivity' => false,
     ],
     'deducts_from_balance' => [
       'display' => 'inline',
@@ -29,7 +27,6 @@ return [
         'Yes' => 'Yes',
         'No' => 'No',
       ],
-      'reactivity' => false,
     ],
     'requires_approval' => [
       'display' => 'inline',
@@ -41,7 +38,6 @@ return [
         'Yes' => 'Yes',
         'No' => 'No',
       ],
-      'reactivity' => false,
     ],
     'max_days_per_request' => [
       'display' => 'inline',
@@ -49,7 +45,6 @@ return [
       'field_type' => 'number',
       'label' => 'Max Days Per Request',
       'validation' => 'nullable|integer|min:1',
-      'reactivity' => false,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -61,7 +56,6 @@ return [
         'Active' => 'Active',
         'Inactive' => 'Inactive',
       ],
-      'reactivity' => false,
     ],
     'description' => [
       'display' => 'inline',
@@ -69,7 +63,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -80,8 +73,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'drawers',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

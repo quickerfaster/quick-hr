@@ -9,7 +9,6 @@ return [
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -30,7 +29,6 @@ return [
       'field_type' => 'select',
       'label' => 'Work Pattern',
       'validation' => 'required|exists:work_patterns,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\WorkPattern',
         'type' => 'belongsTo',
@@ -51,7 +49,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Start Date',
       'validation' => 'required|date',
-      'reactivity' => false,
     ],
     'end_date' => [
       'display' => 'inline',
@@ -59,7 +56,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'End Date',
       'validation' => 'nullable|date|after:start_date',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -75,8 +71,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'modals',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => 'all',

@@ -9,7 +9,6 @@ return [
       'field_type' => 'select',
       'label' => 'Payroll Policy',
       'validation' => 'required|exists:payroll_policies,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PayrollPolicy',
         'type' => 'belongsTo',
@@ -36,14 +35,12 @@ return [
         'shift' => 'Shift',
         'employee_group' => 'Employee Group',
       ],
-      'reactivity' => false,
     ],
     'assignable_id' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'morph_to_select',
       'label' => 'Assign to Entity',
-      'reactivity' => false,
       'morph_relation' => 'assignable',
       'morph_map' => [
         'company' => 'App\Modules\Admin\Models\Company',
@@ -60,7 +57,6 @@ return [
       'field_type' => 'number',
       'label' => 'Priority',
       'validation' => 'integer|min:0',
-      'reactivity' => false,
     ],
     'effective_date' => [
       'display' => 'inline',
@@ -68,7 +64,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Assignment Effective From',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'expiry_date' => [
       'display' => 'inline',
@@ -76,7 +71,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Assignment Expiry Date',
       'validation' => 'nullable|date|after:effective_date',
-      'reactivity' => false,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -84,7 +78,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'created_by' => [
       'display' => 'inline',
@@ -92,7 +85,6 @@ return [
       'field_type' => 'number',
       'label' => 'Created By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'updated_by' => [
       'display' => 'inline',
@@ -100,7 +92,6 @@ return [
       'field_type' => 'number',
       'label' => 'Updated By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -126,8 +117,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'pages',
+  'crudType' => 'modals',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

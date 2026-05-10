@@ -39,35 +39,6 @@ Route::group([
 
 
 
-// Routes for ActivityLog
-
-// Create Route
-Route::get('activity-logs/create', function (\Illuminate\Http\Request $request) {
-    return view('admin::activity-logs.create', [
-        'configKey' => 'admin.activity_log',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('activity-logs.create');
-
-// Show Route
-Route::get('activity-logs/{id}', function (\Illuminate\Http\Request $request, $id) {
-    return view('admin::activity-logs.show', [
-        'recordId' => (int) $id,
-        'configKey' => 'admin.activity_log',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('activity-logs.show')->where('id', '[0-9]+'); 
-
-// Edit Route
-Route::get('activity-logs/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
-    return view('admin::activity-logs.edit', [
-        'recordId' => (int) $id,
-        'configKey' => 'admin.activity_log',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('activity-logs.edit')->where('id', '[0-9]+'); // And here;
-
-
 // Routes for Location
 
 // Create Route
@@ -95,61 +66,3 @@ Route::get('locations/{id}/edit', function (\Illuminate\Http\Request $request, $
         'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
     ]);
 })->name('locations.edit')->where('id', '[0-9]+'); // And here;
-
-
-// Routes for Company
-
-// Create Route
-Route::get('companies/create', function (\Illuminate\Http\Request $request) {
-    return view('admin::companies.create', [
-        'configKey' => 'admin.company',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('companies.create');
-
-// Show Route
-Route::get('companies/{id}', function (\Illuminate\Http\Request $request, $id) {
-    return view('admin::companies.show', [
-        'recordId' => (int) $id,
-        'configKey' => 'admin.company',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('companies.show')->where('id', '[0-9]+'); 
-
-// Edit Route
-Route::get('companies/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
-    return view('admin::companies.edit', [
-        'recordId' => (int) $id,
-        'configKey' => 'admin.company',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('companies.edit')->where('id', '[0-9]+'); // And here;
-
-
-// Routes for Shift
-
-// Create Route
-Route::get('shifts/create', function (\Illuminate\Http\Request $request) {
-    return view('admin::shifts.create', [
-        'configKey' => 'admin.shift',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('shifts.create');
-
-// Show Route
-Route::get('shifts/{id}', function (\Illuminate\Http\Request $request, $id) {
-    return view('admin::shifts.show', [
-        'recordId' => (int) $id,
-        'configKey' => 'admin.shift',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('shifts.show')->where('id', '[0-9]+'); 
-
-// Edit Route
-Route::get('shifts/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
-    return view('admin::shifts.edit', [
-        'recordId' => (int) $id,
-        'configKey' => 'admin.shift',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('shifts.edit')->where('id', '[0-9]+'); // And here;

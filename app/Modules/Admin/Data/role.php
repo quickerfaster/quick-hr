@@ -9,7 +9,6 @@ return [
       'field_type' => 'string',
       'label' => 'Role Name',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
       'wizard' => [
         'role_setup' => true,
       ],
@@ -20,7 +19,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
     ],
     'editable' => [
       'display' => 'inline',
@@ -32,7 +30,6 @@ return [
         'Yes' => 'Yes',
         'No' => 'No',
       ],
-      'reactivity' => false,
     ],
     'guard_name' => [
       'display' => 'inline',
@@ -44,7 +41,6 @@ return [
         'web' => 'Web',
         'api' => 'API',
       ],
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -68,8 +64,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'drawers',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

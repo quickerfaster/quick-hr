@@ -9,7 +9,6 @@ return [
       'field_type' => 'select',
       'label' => 'Payroll Run',
       'validation' => 'required|exists:payroll_runs,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PayrollRun',
         'type' => 'belongsTo',
@@ -30,7 +29,6 @@ return [
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -58,7 +56,7 @@ return [
         'reimbursement' => 'Reimbursement',
         'deduction' => 'Deduction',
       ],
-      'reactivity' => false,
+      'filterable' => true,
     ],
     'label' => [
       'display' => 'inline',
@@ -66,7 +64,7 @@ return [
       'field_type' => 'string',
       'label' => 'Description',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
+      'searchable' => true,
     ],
     'amount' => [
       'display' => 'inline',
@@ -74,7 +72,6 @@ return [
       'field_type' => 'number',
       'label' => 'Amount',
       'validation' => 'required|numeric',
-      'reactivity' => false,
     ],
     'note' => [
       'display' => 'inline',
@@ -82,7 +79,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Note / Reason',
       'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
     ],
     'source_type' => [
       'display' => 'inline',
@@ -96,7 +92,6 @@ return [
         'review' => 'Performance Review',
         'reimbursement' => 'Expense Reimbursement',
       ],
-      'reactivity' => false,
     ],
     'source_id' => [
       'display' => 'inline',
@@ -104,7 +99,6 @@ return [
       'field_type' => 'number',
       'label' => 'Source ID',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'created_by' => [
       'display' => 'inline',
@@ -112,7 +106,6 @@ return [
       'field_type' => 'number',
       'label' => 'Created By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'updated_by' => [
       'display' => 'inline',
@@ -120,7 +113,6 @@ return [
       'field_type' => 'number',
       'label' => 'Updated By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -149,8 +141,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'pages',
+  'crudType' => 'drawers',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

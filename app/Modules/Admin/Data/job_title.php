@@ -9,7 +9,6 @@ return [
       'field_type' => 'string',
       'label' => 'Title',
       'validation' => 'required|unique:job_titles,title',
-      'reactivity' => false,
     ],
     'description' => [
       'display' => 'inline',
@@ -17,7 +16,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -33,8 +31,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'drawers',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

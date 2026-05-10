@@ -9,6 +9,8 @@
 {{-- Generated Links --}}
 {{-- Generated Links --}}
 {{-- Generated Links --}}
+{{-- Generated Links --}}
+{{-- Generated Links --}}
 <li class="nav-item text-nowrap">
 <a href="/hr/hr/dashboard-people-overview" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
 data-bs-placement="right" title="Overview">
@@ -19,9 +21,27 @@ data-bs-placement="right" title="Overview">
 </a>
 </li>
 <li class="nav-item text-nowrap">
+<a href="/hr/hr/employee-groups" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
+data-bs-placement="right" title="Employee Groups">
+<i class="fas fa-layer-group me-2"></i>
+@if ($state === 'full')
+<span>Employee Groups</span>
+@endif
+</a>
+</li>
+<li class="nav-item text-nowrap">
+<a href="/hr/hr/tags" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
+data-bs-placement="right" title="Tags">
+<i class="fas fa-tags me-2"></i>
+@if ($state === 'full')
+<span>Tags</span>
+@endif
+</a>
+</li>
+<li class="nav-item text-nowrap">
 <a href="/hr/hr/employees" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
 data-bs-placement="right" title="Employees">
-<i class="fas fa-user-friends me-2"></i>
+<i class="fas fa-user-tie me-2"></i>
 @if ($state === 'full')
 <span>Employees</span>
 @endif
@@ -39,25 +59,25 @@ data-bs-placement="right" title="Job History">
 <li class="nav-item text-nowrap">
 <a href="/hr/hr/employee-profiles" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
 data-bs-placement="right" title="Profiles">
-<i class="fas fa-user-circle me-2"></i>
+<i class="fas fa-id-card me-2"></i>
 @if ($state === 'full')
 <span>Profiles</span>
 @endif
 </a>
 </li>
 <li class="nav-item text-nowrap">
-<a href="/hr/hr/employee-groups" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
-data-bs-placement="right" title="Employee Groups">
-<i class="fas fa-users me-2"></i>
+<a href="/hr/hr/teams" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
+data-bs-placement="right" title="Teams">
+<i class="fas fa-user-friends me-2"></i>
 @if ($state === 'full')
-<span>Employee Groups</span>
+<span>Teams</span>
 @endif
 </a>
 </li>
 <li class="nav-item text-nowrap">
 <a href="/hr/hr/documents" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
 data-bs-placement="right" title="Documents">
-<i class="fas fa-file me-2"></i>
+<i class="fas fa-folder-open me-2"></i>
 @if ($state === 'full')
 <span>Documents</span>
 @endif
@@ -65,10 +85,10 @@ data-bs-placement="right" title="Documents">
 </li>
 <li class="nav-item text-nowrap">
     <a href="/hr/hr/employee-positions" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
-        data-bs-placement="right" title="Current Job">
+        data-bs-placement="right" title="Current Jobs">
         <i class="fas fa-briefcase me-2"></i>
         @if ($state === 'full')
-            <span>Current Job</span>
+            <span>Current Jobs</span>
         @endif
     </a>
 </li>

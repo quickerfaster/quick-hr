@@ -9,7 +9,6 @@ return [
       'field_type' => 'select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -30,7 +29,6 @@ return [
       'field_type' => 'select',
       'label' => 'Shift',
       'validation' => 'required|exists:shifts,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Admin\Models\Shift',
         'type' => 'belongsTo',
@@ -51,7 +49,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Schedule Date',
       'validation' => 'required|date',
-      'reactivity' => false,
     ],
     'status' => [
       'display' => 'inline',
@@ -67,7 +64,6 @@ return [
         'completed' => 'Completed',
         'no_show' => 'No Show',
       ],
-      'reactivity' => false,
     ],
     'start_time_override' => [
       'display' => 'inline',
@@ -75,7 +71,6 @@ return [
       'field_type' => 'timepicker',
       'label' => 'Custom Start Time',
       'validation' => 'nullable',
-      'reactivity' => false,
     ],
     'end_time_override' => [
       'display' => 'inline',
@@ -83,7 +78,6 @@ return [
       'field_type' => 'timepicker',
       'label' => 'Custom End Time',
       'validation' => 'nullable|after:start_time_override',
-      'reactivity' => false,
     ],
     'actual_start_time' => [
       'display' => 'inline',
@@ -91,7 +85,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Actual Start',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'actual_end_time' => [
       'display' => 'inline',
@@ -99,7 +92,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Actual End',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'notes' => [
       'display' => 'inline',
@@ -107,7 +99,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Notes',
       'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
     ],
     'approved_by' => [
       'display' => 'inline',
@@ -115,7 +106,6 @@ return [
       'field_type' => 'string',
       'label' => 'Approved By',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'approved_at' => [
       'display' => 'inline',
@@ -123,7 +113,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Approved At',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'is_cover_required' => [
       'display' => 'inline',
@@ -131,7 +120,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Cover Required',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'cover_employee_id' => [
       'display' => 'inline',
@@ -139,7 +127,6 @@ return [
       'field_type' => 'select',
       'label' => 'Cover Employee',
       'validation' => 'nullable|exists:employees,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -160,7 +147,6 @@ return [
       'field_type' => 'select',
       'label' => 'Attendance Record',
       'validation' => 'nullable|exists:attendances,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Attendance',
         'type' => 'belongsTo',
@@ -189,7 +175,6 @@ return [
         'meeting' => 'Meeting',
         'project' => 'Project Work',
       ],
-      'reactivity' => false,
     ],
     'is_published' => [
       'display' => 'inline',
@@ -197,7 +182,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Published',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'published_at' => [
       'display' => 'inline',
@@ -205,7 +189,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Published At',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'created_from_template' => [
       'display' => 'inline',
@@ -213,7 +196,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Created from Template',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'last_modified_by' => [
       'display' => 'inline',
@@ -221,7 +203,6 @@ return [
       'field_type' => 'string',
       'label' => 'Last Modified By',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'last_modified_at' => [
       'display' => 'inline',
@@ -229,7 +210,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Last Modified At',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -274,8 +254,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'pages',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

@@ -9,7 +9,8 @@ return [
       'field_type' => 'string',
       'label' => 'Group Name',
       'validation' => 'required|string|max:255|unique:employee_groups,name',
-      'reactivity' => false,
+      'filterable' => true,
+      'searchable' => true,
     ],
     'code' => [
       'display' => 'inline',
@@ -18,15 +19,8 @@ return [
       'label' => 'Group Code',
       'validation' => 'required|string|max:50|unique:employee_groups,code',
       'autoGenerate' => true,
-      'reactivity' => false,
-    ],
-    'description' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'textarea',
-      'label' => 'Description',
-      'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
+      'filterable' => true,
+      'searchable' => true,
     ],
     'group_type' => [
       'display' => 'inline',
@@ -39,15 +33,15 @@ return [
         'dynamic' => 'Dynamic (Auto‑populated by rules)',
         'hybrid' => 'Hybrid (Manual + Dynamic)',
       ],
-      'reactivity' => false,
+      'filterable' => true,
     ],
-    'dynamic_rules' => [
+    'description' => [
       'display' => 'inline',
       'fillable' => true,
-      'field_type' => 'json',
-      'label' => 'Dynamic Rules (JSON)',
-      'validation' => 'nullable|json',
-      'reactivity' => false,
+      'field_type' => 'textarea',
+      'label' => 'Description',
+      'validation' => 'nullable|string|max:1000',
+      'searchable' => true,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -55,7 +49,14 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
+      'filterable' => true,
+    ],
+    'dynamic_rules' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'json',
+      'label' => 'Dynamic Rules (JSON)',
+      'validation' => 'nullable|json',
     ],
     'created_by' => [
       'display' => 'inline',
@@ -63,7 +64,6 @@ return [
       'field_type' => 'number',
       'label' => 'Created By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'updated_by' => [
       'display' => 'inline',
@@ -71,7 +71,6 @@ return [
       'field_type' => 'number',
       'label' => 'Updated By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -80,15 +79,22 @@ return [
       '0' => 'dynamic_rules',
       '1' => 'created_by',
       '2' => 'updated_by',
+      '3' => 'created_at',
+      '4' => 'updated_at',
+      '5' => 'deleted_at',
     ],
     'onNewForm' => [
       '0' => 'created_by',
       '1' => 'updated_by',
+      '2' => 'deleted_at',
     ],
     'onEditForm' => [
       '0' => 'updated_by',
+      '1' => 'deleted_at',
     ],
-    'onQuery' => [],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -96,8 +102,14 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'drawers',
   'includeControllers' => false,
+  'tableDefaultFields' => [
+    '0' => 'name',
+    '1' => 'code',
+    '2' => 'group_type',
+    '3' => 'is_active',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
@@ -117,6 +129,19 @@ return [
       ],
       'print' => true,
     ],
+    'perPage' => [
+      '0' => 10,
+      '1' => 25,
+      '2' => 50,
+      '3' => 100,
+    ],
+    'search' => true,
+    'showHideColumns' => true,
+    'filterColumns' => true,
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
     'bulkActions' => [
       'export' => [
         '0' => 'xls',
@@ -138,39 +163,8 @@ return [
         'confirm' => 'Deactivate selected groups?',
       ],
       'delete' => true,
-    ],
-    'perPage' => [
-      '0' => 10,
-      '1' => 25,
-      '2' => 50,
-      '3' => 100,
-    ],
-    'search' => true,
-    'showHideColumns' => true,
-    'filterColumns' => true,
-    'filters' => [
-      '0' => [
-        'field' => 'group_type',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'manual',
-          '2' => 'dynamic',
-          '3' => 'hybrid',
-        ],
-        'label' => 'Group Type',
-      ],
-      '1' => [
-        'field' => 'is_active',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Active',
-          '2' => 'Inactive',
-        ],
-        'label' => 'Status',
-        'default' => 'Active',
-      ],
+      'restore' => true,
+      'forceDelete' => true,
     ],
   ],
   'fieldGroups' => [
@@ -194,81 +188,32 @@ return [
         '1' => 'dynamic_rules',
       ],
     ],
-    'audit' => [
-      'title' => 'Audit',
-      'groupType' => 'hr',
-      'icon' => 'fas fa-history',
-      'fields' => [
-        '0' => 'created_by',
-        '1' => 'updated_by',
-      ],
-    ],
   ],
   'moreActions' => [
     '0' => [
-      'title' => 'Manage Members',
-      'icon' => 'fas fa-user-plus',
-      'route' => 'employee-groups.members',
-      'params' => [
-        'group_id' => '{id}',
-      ],
-      'requiredRole' => [
-        '0' => 'hr_admin',
-        '1' => 'manager',
-      ],
+      'title' => 'Restore',
+      'icon' => 'fas fa-trash-restore',
+      'action' => 'restore',
+      'confirm' => 'Restore this archived group?',
+      'requiredPermission' => 'restore_employee_group',
+      'condition' => 'trashed',
     ],
     '1' => [
-      'title' => 'View Assignments',
-      'icon' => 'fas fa-link',
-      'route' => 'payroll-policy-assignments.index',
-      'params' => [
-        'filters[assignable_type]' => 'employee_group',
-        'filters[assignable_id]' => '{id}',
-      ],
-      'newTab' => true,
-    ],
-    '2' => [
-      'title' => 'Sync Dynamic Group',
-      'icon' => 'fas fa-sync-alt',
-      'dispatchEvent' => true,
-      'eventName' => 'syncDynamicGroup',
-      'params' => [
-        'group_id' => '{id}',
-      ],
-      'confirm' => 'Re‑evaluate dynamic rules and update membership?',
-      'condition' => [
-        '0' => [
-          'group_type' => [
-            '0' => 'dynamic',
-            '1' => 'hybrid',
-          ],
-        ],
-      ],
-      'requiredRole' => [
-        '0' => 'hr_admin',
-      ],
+      'title' => 'Permanently Delete',
+      'icon' => 'fas fa-skull-crossbones',
+      'action' => 'forceDelete',
+      'confirm' => 'This action cannot be undone. Permanently delete this group?',
+      'requiredPermission' => 'force_delete_employee_group',
+      'condition' => 'trashed',
     ],
   ],
   'switchViews' => [
-    'default' => 'list',
-    'card' => [
-      'titleFields' => [
-        '0' => 'name',
-      ],
-      'subtitleFields' => [
-        '0' => 'code',
-        '1' => 'group_type',
-      ],
-      'contentFields' => [
-        '0' => 'description',
-      ],
-      'badgeField' => 'is_active',
-      'badgeColors' => [
-        'true' => 'success',
-        'false' => 'secondary',
-      ],
+    'default' => 'table',
+    'table' => [
+      'enabled' => true,
     ],
     'list' => [
+      'enabled' => true,
       'titleFields' => [
         '0' => 'name',
       ],
@@ -285,9 +230,8 @@ return [
         'false' => 'secondary',
       ],
     ],
-    'detail' => [
-      'layout' => 'tab',
-      'detailType' => 'record',
+    'card' => [
+      'enabled' => true,
       'titleFields' => [
         '0' => 'name',
       ],
@@ -295,43 +239,22 @@ return [
         '0' => 'code',
         '1' => 'group_type',
       ],
-      'tabs' => [
-        '0' => [
-          'title' => 'Overview',
-          'icon' => 'fas fa-info-circle',
-          'fields' => [
-            '0' => 'name',
-            '1' => 'code',
-            '2' => 'description',
-            '3' => 'group_type',
-            '4' => 'dynamic_rules',
-            '5' => 'is_active',
-          ],
-        ],
-        '1' => [
-          'title' => 'Members',
-          'icon' => 'fas fa-users',
-          'relation' => 'employees',
-          'relationLimit' => 50,
-        ],
-        '2' => [
-          'title' => 'Audit',
-          'icon' => 'fas fa-history',
-          'fields' => [
-            '0' => 'created_by',
-            '1' => 'updated_by',
-            '2' => 'created_at',
-            '3' => 'updated_at',
-          ],
-        ],
+      'contentFields' => [
+        '0' => 'description',
       ],
+      'badgeField' => 'is_active',
+      'badgeColors' => [
+        'true' => 'success',
+        'false' => 'secondary',
+      ],
+      'defaultIconClass' => 'fas fa-users',
     ],
   ],
   'relations' => [
     'employees' => [
-      'type' => 'belongsToMany',
+      'type' => 'hasMany',
       'model' => 'App\Modules\Hr\Models\Employee',
-      'foreignKey' => '',
+      'foreignKey' => 'employee_group_id',
       'localKey' => '',
     ],
   ],

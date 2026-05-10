@@ -9,7 +9,6 @@ return [
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id|unique:employee_payroll_profiles,employee_id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -30,7 +29,6 @@ return [
       'field_type' => 'select',
       'label' => 'Pay Schedule',
       'validation' => 'required|exists:pay_schedules,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PaySchedule',
         'type' => 'belongsTo',
@@ -51,7 +49,6 @@ return [
       'field_type' => 'string',
       'label' => 'Account Holder Name',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'bank_name' => [
       'display' => 'inline',
@@ -59,7 +56,6 @@ return [
       'field_type' => 'string',
       'label' => 'Bank Name',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'bank_account_number' => [
       'display' => 'inline',
@@ -67,7 +63,6 @@ return [
       'field_type' => 'string',
       'label' => 'Account Number',
       'validation' => 'nullable|string|max:50',
-      'reactivity' => false,
     ],
     'bank_routing_number' => [
       'display' => 'inline',
@@ -75,7 +70,6 @@ return [
       'field_type' => 'string',
       'label' => 'Routing Number / Sort Code',
       'validation' => 'nullable|string|max:20',
-      'reactivity' => false,
     ],
     'bank_iban' => [
       'display' => 'inline',
@@ -83,7 +77,6 @@ return [
       'field_type' => 'string',
       'label' => 'IBAN (International)',
       'validation' => 'nullable|string|max:34',
-      'reactivity' => false,
     ],
     'bank_swift' => [
       'display' => 'inline',
@@ -91,7 +84,6 @@ return [
       'field_type' => 'string',
       'label' => 'SWIFT / BIC Code',
       'validation' => 'nullable|string|max:11',
-      'reactivity' => false,
     ],
     'account_type' => [
       'display' => 'inline',
@@ -103,7 +95,6 @@ return [
         'checking' => 'Checking',
         'savings' => 'Savings',
       ],
-      'reactivity' => false,
     ],
     'payment_method' => [
       'display' => 'inline',
@@ -117,7 +108,6 @@ return [
         'cash' => 'Cash',
         'other' => 'Other',
       ],
-      'reactivity' => false,
     ],
     'tax_filing_status' => [
       'display' => 'inline',
@@ -132,7 +122,6 @@ return [
         'head_of_household' => 'Head of Household',
         'qualifying_widow' => 'Qualifying Widow(er)',
       ],
-      'reactivity' => false,
     ],
     'allowances' => [
       'display' => 'inline',
@@ -140,7 +129,6 @@ return [
       'field_type' => 'number',
       'label' => 'Withholding Allowances',
       'validation' => 'nullable|integer|min:0',
-      'reactivity' => false,
     ],
     'extra_withholding' => [
       'display' => 'inline',
@@ -148,7 +136,6 @@ return [
       'field_type' => 'number',
       'label' => 'Extra Withholding ($ per pay period)',
       'validation' => 'nullable|numeric|min:0',
-      'reactivity' => false,
     ],
     'is_exempt_from_federal_tax' => [
       'display' => 'inline',
@@ -156,7 +143,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Exempt from Federal Income Tax',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'override_country_code' => [
       'display' => 'inline',
@@ -169,7 +155,6 @@ return [
         'UK' => 'UK',
         'NG' => 'NG',
       ],
-      'reactivity' => false,
     ],
     'override_state_code' => [
       'display' => 'inline',
@@ -177,7 +162,6 @@ return [
       'field_type' => 'select',
       'label' => 'Override State/Province',
       'validation' => 'nullable|string|max:10',
-      'reactivity' => false,
     ],
     'currency_code' => [
       'display' => 'inline',
@@ -185,7 +169,6 @@ return [
       'field_type' => 'select',
       'label' => 'Currency',
       'validation' => 'nullable|string|size:3',
-      'reactivity' => false,
     ],
     'effective_date' => [
       'display' => 'inline',
@@ -193,7 +176,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Effective From',
       'validation' => 'required|date',
-      'reactivity' => false,
     ],
     'expiry_date' => [
       'display' => 'inline',
@@ -201,7 +183,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Expiry Date',
       'validation' => 'nullable|date|after:effective_date',
-      'reactivity' => false,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -209,7 +190,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'created_by' => [
       'display' => 'inline',
@@ -217,7 +197,6 @@ return [
       'field_type' => 'number',
       'label' => 'Created By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'updated_by' => [
       'display' => 'inline',
@@ -225,7 +204,6 @@ return [
       'field_type' => 'number',
       'label' => 'Updated By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -264,8 +242,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'pages',
+  'crudType' => 'pages',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

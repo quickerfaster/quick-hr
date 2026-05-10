@@ -9,7 +9,6 @@ return [
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -30,7 +29,6 @@ return [
       'field_type' => 'select',
       'label' => 'Approver',
       'validation' => 'required|exists:employees,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -51,7 +49,6 @@ return [
       'field_type' => 'number',
       'label' => 'Approval Level',
       'validation' => 'required|integer|min:1|max:3',
-      'reactivity' => false,
     ],
     'can_approve_all_types' => [
       'display' => 'inline',
@@ -63,7 +60,6 @@ return [
         'Yes' => 'Yes',
         'No' => 'No',
       ],
-      'reactivity' => false,
     ],
     'leave_type_ids' => [
       'display' => 'inline',
@@ -71,7 +67,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Leave Types',
       'validation' => 'required_if:can_approve_all_types,No|array',
-      'reactivity' => false,
     ],
     'max_approval_days' => [
       'display' => 'inline',
@@ -79,7 +74,6 @@ return [
       'field_type' => 'number',
       'label' => 'Max Approval Days',
       'validation' => 'nullable|integer|min:1',
-      'reactivity' => false,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -91,7 +85,6 @@ return [
         'Yes' => 'Yes',
         'No' => 'No',
       ],
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -110,8 +103,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'modals',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

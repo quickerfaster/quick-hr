@@ -103,7 +103,7 @@ class Company extends Model
 
     public function employees()
     {
-        return $this->hasMany(\App\Modules\Hr\Models\Employee::class, 'employee_id', 'id');
+        return $this->hasMany(\App\Modules\Hr\Models\Employee::class, 'company_id', 'id');
     }
 
     public function parentCompany()

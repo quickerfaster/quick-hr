@@ -92,6 +92,35 @@ Route::middleware([
 });
 
 
+// Routes for AttendancePolicy
+
+// Create Route
+Route::get('attendance-policies/create', function (\Illuminate\Http\Request $request) {
+    return view('hr::attendance-policies.create', [
+        'configKey' => 'hr.attendance_policy',
+        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
+    ]);
+})->name('attendance-policies.create');
+
+// Show Route
+Route::get('attendance-policies/{id}', function (\Illuminate\Http\Request $request, $id) {
+    return view('hr::attendance-policies.show', [
+        'recordId' => (int) $id,
+        'configKey' => 'hr.attendance_policy',
+        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
+    ]);
+})->name('attendance-policies.show')->where('id', '[0-9]+'); 
+
+// Edit Route
+Route::get('attendance-policies/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
+    return view('hr::attendance-policies.edit', [
+        'recordId' => (int) $id,
+        'configKey' => 'hr.attendance_policy',
+        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
+    ]);
+})->name('attendance-policies.edit')->where('id', '[0-9]+'); // And here;
+
+
 // Routes for Employee
 
 // Create Route
@@ -179,33 +208,33 @@ Route::get('employee-profiles/{id}/edit', function (\Illuminate\Http\Request $re
 })->name('employee-profiles.edit')->where('id', '[0-9]+'); // And here;
 
 
-// Routes for Document
+// Routes for WorkPattern
 
 // Create Route
-Route::get('documents/create', function (\Illuminate\Http\Request $request) {
-    return view('hr::documents.create', [
-        'configKey' => 'hr.document',
+Route::get('work-patterns/create', function (\Illuminate\Http\Request $request) {
+    return view('hr::work-patterns.create', [
+        'configKey' => 'hr.work_pattern',
         'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
     ]);
-})->name('documents.create');
+})->name('work-patterns.create');
 
 // Show Route
-Route::get('documents/{id}', function (\Illuminate\Http\Request $request, $id) {
-    return view('hr::documents.show', [
+Route::get('work-patterns/{id}', function (\Illuminate\Http\Request $request, $id) {
+    return view('hr::work-patterns.show', [
         'recordId' => (int) $id,
-        'configKey' => 'hr.document',
+        'configKey' => 'hr.work_pattern',
         'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
     ]);
-})->name('documents.show')->where('id', '[0-9]+'); 
+})->name('work-patterns.show')->where('id', '[0-9]+'); 
 
 // Edit Route
-Route::get('documents/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
-    return view('hr::documents.edit', [
+Route::get('work-patterns/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
+    return view('hr::work-patterns.edit', [
         'recordId' => (int) $id,
-        'configKey' => 'hr.document',
+        'configKey' => 'hr.work_pattern',
         'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
     ]);
-})->name('documents.edit')->where('id', '[0-9]+'); // And here;
+})->name('work-patterns.edit')->where('id', '[0-9]+'); // And here;
 
 
 // Routes for PaySchedule
@@ -353,122 +382,6 @@ Route::get('payroll-policies/{id}/edit', function (\Illuminate\Http\Request $req
 })->name('payroll-policies.edit')->where('id', '[0-9]+'); // And here;
 
 
-// Routes for PayrollRunAdjustment
-
-// Create Route
-Route::get('payroll-run-adjustments/create', function (\Illuminate\Http\Request $request) {
-    return view('hr::payroll-run-adjustments.create', [
-        'configKey' => 'hr.payroll_run_adjustment',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('payroll-run-adjustments.create');
-
-// Show Route
-Route::get('payroll-run-adjustments/{id}', function (\Illuminate\Http\Request $request, $id) {
-    return view('hr::payroll-run-adjustments.show', [
-        'recordId' => (int) $id,
-        'configKey' => 'hr.payroll_run_adjustment',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('payroll-run-adjustments.show')->where('id', '[0-9]+'); 
-
-// Edit Route
-Route::get('payroll-run-adjustments/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
-    return view('hr::payroll-run-adjustments.edit', [
-        'recordId' => (int) $id,
-        'configKey' => 'hr.payroll_run_adjustment',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('payroll-run-adjustments.edit')->where('id', '[0-9]+'); // And here;
-
-
-// Routes for EmployeeAdjustmentProfile
-
-// Create Route
-Route::get('employee-adjustment-profiles/create', function (\Illuminate\Http\Request $request) {
-    return view('hr::employee-adjustment-profiles.create', [
-        'configKey' => 'hr.employee_adjustment_profile',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('employee-adjustment-profiles.create');
-
-// Show Route
-Route::get('employee-adjustment-profiles/{id}', function (\Illuminate\Http\Request $request, $id) {
-    return view('hr::employee-adjustment-profiles.show', [
-        'recordId' => (int) $id,
-        'configKey' => 'hr.employee_adjustment_profile',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('employee-adjustment-profiles.show')->where('id', '[0-9]+'); 
-
-// Edit Route
-Route::get('employee-adjustment-profiles/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
-    return view('hr::employee-adjustment-profiles.edit', [
-        'recordId' => (int) $id,
-        'configKey' => 'hr.employee_adjustment_profile',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('employee-adjustment-profiles.edit')->where('id', '[0-9]+'); // And here;
-
-
-// Routes for PayslipItem
-
-// Create Route
-Route::get('payslip-items/create', function (\Illuminate\Http\Request $request) {
-    return view('hr::payslip-items.create', [
-        'configKey' => 'hr.payslip_item',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('payslip-items.create');
-
-// Show Route
-Route::get('payslip-items/{id}', function (\Illuminate\Http\Request $request, $id) {
-    return view('hr::payslip-items.show', [
-        'recordId' => (int) $id,
-        'configKey' => 'hr.payslip_item',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('payslip-items.show')->where('id', '[0-9]+'); 
-
-// Edit Route
-Route::get('payslip-items/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
-    return view('hr::payslip-items.edit', [
-        'recordId' => (int) $id,
-        'configKey' => 'hr.payslip_item',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('payslip-items.edit')->where('id', '[0-9]+'); // And here;
-
-
-// Routes for PayrollPolicyAssignment
-
-// Create Route
-Route::get('payroll-policy-assignments/create', function (\Illuminate\Http\Request $request) {
-    return view('hr::payroll-policy-assignments.create', [
-        'configKey' => 'hr.payroll_policy_assignment',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('payroll-policy-assignments.create');
-
-// Show Route
-Route::get('payroll-policy-assignments/{id}', function (\Illuminate\Http\Request $request, $id) {
-    return view('hr::payroll-policy-assignments.show', [
-        'recordId' => (int) $id,
-        'configKey' => 'hr.payroll_policy_assignment',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('payroll-policy-assignments.show')->where('id', '[0-9]+'); 
-
-// Edit Route
-Route::get('payroll-policy-assignments/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
-    return view('hr::payroll-policy-assignments.edit', [
-        'recordId' => (int) $id,
-        'configKey' => 'hr.payroll_policy_assignment',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('payroll-policy-assignments.edit')->where('id', '[0-9]+'); // And here;
-
-
 // Routes for EmployeePosition
 
 // Create Route
@@ -496,3 +409,90 @@ Route::get('employee-positions/{id}/edit', function (\Illuminate\Http\Request $r
         'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
     ]);
 })->name('employee-positions.edit')->where('id', '[0-9]+'); // And here;
+
+
+// Routes for LeaveRequest
+
+// Create Route
+Route::get('leave-requests/create', function (\Illuminate\Http\Request $request) {
+    return view('hr::leave-requests.create', [
+        'configKey' => 'hr.leave_request',
+        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
+    ]);
+})->name('leave-requests.create');
+
+// Show Route
+Route::get('leave-requests/{id}', function (\Illuminate\Http\Request $request, $id) {
+    return view('hr::leave-requests.show', [
+        'recordId' => (int) $id,
+        'configKey' => 'hr.leave_request',
+        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
+    ]);
+})->name('leave-requests.show')->where('id', '[0-9]+'); 
+
+// Edit Route
+Route::get('leave-requests/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
+    return view('hr::leave-requests.edit', [
+        'recordId' => (int) $id,
+        'configKey' => 'hr.leave_request',
+        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
+    ]);
+})->name('leave-requests.edit')->where('id', '[0-9]+'); // And here;
+
+
+// Routes for ShiftSchedule
+
+// Create Route
+Route::get('shift-schedules/create', function (\Illuminate\Http\Request $request) {
+    return view('hr::shift-schedules.create', [
+        'configKey' => 'hr.shift_schedule',
+        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
+    ]);
+})->name('shift-schedules.create');
+
+// Show Route
+Route::get('shift-schedules/{id}', function (\Illuminate\Http\Request $request, $id) {
+    return view('hr::shift-schedules.show', [
+        'recordId' => (int) $id,
+        'configKey' => 'hr.shift_schedule',
+        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
+    ]);
+})->name('shift-schedules.show')->where('id', '[0-9]+'); 
+
+// Edit Route
+Route::get('shift-schedules/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
+    return view('hr::shift-schedules.edit', [
+        'recordId' => (int) $id,
+        'configKey' => 'hr.shift_schedule',
+        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
+    ]);
+})->name('shift-schedules.edit')->where('id', '[0-9]+'); // And here;
+
+
+// Routes for Holiday
+
+// Create Route
+Route::get('holidays/create', function (\Illuminate\Http\Request $request) {
+    return view('hr::holidays.create', [
+        'configKey' => 'hr.holiday',
+        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
+    ]);
+})->name('holidays.create');
+
+// Show Route
+Route::get('holidays/{id}', function (\Illuminate\Http\Request $request, $id) {
+    return view('hr::holidays.show', [
+        'recordId' => (int) $id,
+        'configKey' => 'hr.holiday',
+        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
+    ]);
+})->name('holidays.show')->where('id', '[0-9]+'); 
+
+// Edit Route
+Route::get('holidays/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
+    return view('hr::holidays.edit', [
+        'recordId' => (int) $id,
+        'configKey' => 'hr.holiday',
+        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
+    ]);
+})->name('holidays.edit')->where('id', '[0-9]+'); // And here;

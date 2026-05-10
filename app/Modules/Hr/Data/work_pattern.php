@@ -9,7 +9,6 @@ return [
       'field_type' => 'string',
       'label' => 'Pattern Name',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
     ],
     'code' => [
       'display' => 'inline',
@@ -18,7 +17,6 @@ return [
       'label' => 'Pattern Code',
       'validation' => 'required|string|max:50|unique:work_patterns,code',
       'autoGenerate' => true,
-      'reactivity' => false,
     ],
     'description' => [
       'display' => 'inline',
@@ -26,7 +24,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
     ],
     'shift_id' => [
       'display' => 'inline',
@@ -34,7 +31,6 @@ return [
       'field_type' => 'select',
       'label' => 'Base Shift',
       'validation' => 'required|exists:shifts,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Admin\Models\Shift',
         'type' => 'belongsTo',
@@ -65,7 +61,6 @@ return [
         '7' => 'Sunday',
       ],
       'multiSelect' => true,
-      'reactivity' => false,
     ],
     'override_start_time' => [
       'display' => 'inline',
@@ -73,7 +68,6 @@ return [
       'field_type' => 'timepicker',
       'label' => 'Custom Start Time',
       'validation' => 'nullable',
-      'reactivity' => false,
     ],
     'override_end_time' => [
       'display' => 'inline',
@@ -81,7 +75,6 @@ return [
       'field_type' => 'timepicker',
       'label' => 'Custom End Time',
       'validation' => 'nullable|after:override_start_time',
-      'reactivity' => false,
     ],
     'pattern_type' => [
       'display' => 'inline',
@@ -94,7 +87,6 @@ return [
         'rotating' => 'Rotating (A/B Weeks)',
         'custom' => 'Custom Cycle',
       ],
-      'reactivity' => false,
     ],
     'rotation_weeks' => [
       'display' => 'inline',
@@ -102,7 +94,6 @@ return [
       'field_type' => 'number',
       'label' => 'Rotation Cycle (weeks)',
       'validation' => 'nullable|integer|min:2|max:4',
-      'reactivity' => false,
     ],
     'effective_date' => [
       'display' => 'inline',
@@ -110,7 +101,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Effective From',
       'validation' => 'required|date',
-      'reactivity' => false,
     ],
     'end_date' => [
       'display' => 'inline',
@@ -118,7 +108,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'End Date',
       'validation' => 'nullable|date|after:effective_date',
-      'reactivity' => false,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -126,7 +115,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'is_default' => [
       'display' => 'inline',
@@ -134,7 +122,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Default Pattern',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'assigned_employee_count' => [
       'display' => 'inline',
@@ -142,7 +129,6 @@ return [
       'field_type' => 'number',
       'label' => 'Assigned Employees',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'last_used_date' => [
       'display' => 'inline',
@@ -150,7 +136,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Last Used',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'created_from_template_id' => [
       'display' => 'inline',
@@ -158,7 +143,6 @@ return [
       'field_type' => 'number',
       'label' => 'Created From Template',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -191,8 +175,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'pages',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

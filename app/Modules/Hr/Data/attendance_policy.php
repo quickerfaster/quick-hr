@@ -9,7 +9,6 @@ return [
       'field_type' => 'string',
       'label' => 'Policy Name',
       'validation' => 'required|string|max:255',
-      'reactivity' => false,
     ],
     'code' => [
       'display' => 'inline',
@@ -18,7 +17,6 @@ return [
       'label' => 'Policy Code',
       'validation' => 'required|string|max:50|unique:attendance_policies,code',
       'autoGenerate' => true,
-      'reactivity' => false,
     ],
     'description' => [
       'display' => 'inline',
@@ -26,7 +24,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
     ],
     'grace_period_minutes' => [
       'display' => 'inline',
@@ -34,7 +31,6 @@ return [
       'field_type' => 'number',
       'label' => 'Late Grace Period (minutes)',
       'validation' => 'required|integer|min:0|max:60',
-      'reactivity' => false,
     ],
     'early_departure_grace_minutes' => [
       'display' => 'inline',
@@ -42,7 +38,6 @@ return [
       'field_type' => 'number',
       'label' => 'Early Departure Grace (minutes)',
       'validation' => 'required|integer|min:0|max:60',
-      'reactivity' => false,
     ],
     'overtime_daily_threshold_hours' => [
       'display' => 'inline',
@@ -50,7 +45,6 @@ return [
       'field_type' => 'number',
       'label' => 'Daily Overtime Starts After (hours)',
       'validation' => 'required|numeric|min:0|max:24',
-      'reactivity' => false,
     ],
     'overtime_weekly_threshold_hours' => [
       'display' => 'inline',
@@ -58,7 +52,6 @@ return [
       'field_type' => 'number',
       'label' => 'Weekly Overtime Starts After (hours)',
       'validation' => 'required|numeric|min:0|max:168',
-      'reactivity' => false,
     ],
     'max_daily_overtime_hours' => [
       'display' => 'inline',
@@ -66,7 +59,6 @@ return [
       'field_type' => 'number',
       'label' => 'Maximum Daily Overtime (hours)',
       'validation' => 'nullable|numeric|min:0|max:24',
-      'reactivity' => false,
     ],
     'overtime_multiplier' => [
       'display' => 'inline',
@@ -74,7 +66,6 @@ return [
       'field_type' => 'number',
       'label' => 'Overtime Pay Multiplier',
       'validation' => 'required|numeric|min:1.0|max:3.0',
-      'reactivity' => false,
     ],
     'double_time_threshold_hours' => [
       'display' => 'inline',
@@ -82,7 +73,6 @@ return [
       'field_type' => 'number',
       'label' => 'Double Time Starts After (hours)',
       'validation' => 'nullable|numeric|min:0|max:24',
-      'reactivity' => false,
     ],
     'double_time_multiplier' => [
       'display' => 'inline',
@@ -90,7 +80,6 @@ return [
       'field_type' => 'number',
       'label' => 'Double Time Multiplier',
       'validation' => 'nullable|numeric|min:1.0|max:3.0',
-      'reactivity' => false,
     ],
     'requires_break_after_hours' => [
       'display' => 'inline',
@@ -98,7 +87,6 @@ return [
       'field_type' => 'number',
       'label' => 'Break Required After (hours)',
       'validation' => 'nullable|numeric|min:0|max:24',
-      'reactivity' => false,
     ],
     'break_duration_minutes' => [
       'display' => 'inline',
@@ -106,7 +94,6 @@ return [
       'field_type' => 'number',
       'label' => 'Break Duration (minutes)',
       'validation' => 'nullable|integer|min:0|max:240',
-      'reactivity' => false,
     ],
     'unpaid_break_minutes' => [
       'display' => 'inline',
@@ -114,7 +101,6 @@ return [
       'field_type' => 'number',
       'label' => 'Daily Unpaid Break (minutes)',
       'validation' => 'required|integer|min:0|max:240',
-      'reactivity' => false,
     ],
     'country_code' => [
       'display' => 'inline',
@@ -130,7 +116,6 @@ return [
         'IN' => 'India',
         'NG' => 'Nigeria',
       ],
-      'reactivity' => false,
     ],
     'state_code' => [
       'display' => 'inline',
@@ -138,7 +123,6 @@ return [
       'field_type' => 'string',
       'label' => 'State/Province Code',
       'validation' => 'nullable|string|max:10',
-      'reactivity' => false,
     ],
     'applies_to_shift_categories' => [
       'display' => 'inline',
@@ -155,7 +139,6 @@ return [
         'training' => 'Training Shifts',
       ],
       'multiSelect' => true,
-      'reactivity' => false,
     ],
     'effective_date' => [
       'display' => 'inline',
@@ -163,7 +146,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Effective Date',
       'validation' => 'required|date',
-      'reactivity' => false,
     ],
     'expiration_date' => [
       'display' => 'inline',
@@ -171,7 +153,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Expiration Date',
       'validation' => 'nullable|date|after:effective_date',
-      'reactivity' => false,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -179,7 +160,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'is_default' => [
       'display' => 'inline',
@@ -187,7 +167,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Default Policy',
       'validation' => 'nullable|boolean',
-      'reactivity' => false,
     ],
     'version' => [
       'display' => 'inline',
@@ -195,7 +174,6 @@ return [
       'field_type' => 'number',
       'label' => 'Version',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'last_updated_by' => [
       'display' => 'inline',
@@ -203,7 +181,6 @@ return [
       'field_type' => 'string',
       'label' => 'Last Updated By',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'last_updated_at' => [
       'display' => 'inline',
@@ -211,7 +188,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Last Updated At',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -243,8 +219,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'pages',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
@@ -254,13 +231,6 @@ return [
         'type' => 'quick_add',
         'icon' => 'fas fa-plus-circle',
         'primary' => true,
-      ],
-      '1' => [
-        'label' => 'Copy Policy',
-        'type' => 'modal',
-        'icon' => 'fas fa-copy',
-        'route' => 'attendance-policies.copy',
-        'modalSize' => 'md',
       ],
     ],
     'files' => [

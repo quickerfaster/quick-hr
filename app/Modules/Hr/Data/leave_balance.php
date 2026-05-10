@@ -9,7 +9,6 @@ return [
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -30,7 +29,6 @@ return [
       'field_type' => 'select',
       'label' => 'Leave Type',
       'validation' => 'required|exists:leave_types,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\LeaveType',
         'type' => 'belongsTo',
@@ -51,7 +49,6 @@ return [
       'field_type' => 'number',
       'label' => 'Balance',
       'validation' => 'required|numeric|min:0',
-      'reactivity' => false,
     ],
     'accrual_rate' => [
       'display' => 'inline',
@@ -59,7 +56,6 @@ return [
       'field_type' => 'number',
       'label' => 'Accrual Rate',
       'validation' => 'nullable|numeric|min:0',
-      'reactivity' => false,
     ],
     'accrual_frequency' => [
       'display' => 'inline',
@@ -74,7 +70,6 @@ return [
         'Daily' => 'Daily',
         'None' => 'None',
       ],
-      'reactivity' => false,
     ],
     'year' => [
       'display' => 'inline',
@@ -82,7 +77,6 @@ return [
       'field_type' => 'number',
       'label' => 'Year',
       'validation' => 'required|integer|min:2020|max:2100',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -98,8 +92,9 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'modals',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

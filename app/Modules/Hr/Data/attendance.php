@@ -9,7 +9,6 @@ return [
       'field_type' => 'select',
       'label' => 'Employee ID',
       'validation' => 'required|exists:employees,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -30,7 +29,6 @@ return [
       'field_type' => 'string',
       'label' => 'Employee ID',
       'validation' => 'required',
-      'reactivity' => false,
     ],
     'company' => [
       'display' => 'inline',
@@ -38,7 +36,6 @@ return [
       'field_type' => 'string',
       'label' => 'Company Division',
       'validation' => 'nullable',
-      'reactivity' => false,
     ],
     'department' => [
       'display' => 'inline',
@@ -46,7 +43,6 @@ return [
       'field_type' => 'string',
       'label' => 'Department',
       'validation' => 'nullable',
-      'reactivity' => false,
     ],
     'date' => [
       'display' => 'inline',
@@ -54,7 +50,6 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Attendance Date',
       'validation' => 'required|date',
-      'reactivity' => false,
     ],
     'net_hours' => [
       'display' => 'inline',
@@ -62,7 +57,6 @@ return [
       'field_type' => 'number',
       'label' => 'Total Hours Worked',
       'validation' => 'required|numeric|min:0',
-      'reactivity' => false,
     ],
     'status' => [
       'display' => 'inline',
@@ -81,7 +75,6 @@ return [
         'holiday' => 'Holiday',
         'leave' => 'On Leave',
       ],
-      'reactivity' => false,
     ],
     'sessions' => [
       'display' => 'inline',
@@ -89,7 +82,6 @@ return [
       'field_type' => 'json',
       'label' => 'Work Sessions',
       'validation' => 'nullable|json',
-      'reactivity' => false,
     ],
     'shift_id' => [
       'display' => 'inline',
@@ -97,7 +89,6 @@ return [
       'field_type' => 'select',
       'label' => 'Shift',
       'validation' => 'required|exists:shifts,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Admin\Models\Shift',
         'type' => 'belongsTo',
@@ -126,7 +117,6 @@ return [
         'half_day' => 'Half Day',
         'excused' => 'Excused Absence',
       ],
-      'reactivity' => false,
     ],
     'is_unplanned' => [
       'display' => 'inline',
@@ -134,7 +124,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Unplanned Absence',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'absence_reason' => [
       'display' => 'inline',
@@ -142,7 +131,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Absence Reason',
       'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
     ],
     'is_paid_absence' => [
       'display' => 'inline',
@@ -150,7 +138,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Paid Absence',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'hours_deducted' => [
       'display' => 'inline',
@@ -158,7 +145,6 @@ return [
       'field_type' => 'number',
       'label' => 'Hours Deducted',
       'validation' => 'nullable|numeric|min:0|max:24',
-      'reactivity' => false,
     ],
     'is_approved' => [
       'display' => 'inline',
@@ -166,7 +152,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Approved for Payroll',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'approved_by' => [
       'display' => 'inline',
@@ -174,7 +159,6 @@ return [
       'field_type' => 'string',
       'label' => 'Approved By',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'approved_at' => [
       'display' => 'inline',
@@ -182,7 +166,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Approved At',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'notes' => [
       'display' => 'inline',
@@ -190,7 +173,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Notes',
       'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
     ],
     'needs_review' => [
       'display' => 'inline',
@@ -198,7 +180,6 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Needs Review',
       'validation' => 'boolean',
-      'reactivity' => false,
     ],
     'leave_request_id' => [
       'display' => 'inline',
@@ -206,7 +187,6 @@ return [
       'field_type' => 'select',
       'label' => 'Linked Leave Request',
       'validation' => 'nullable|exists:leave_requests,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\LeaveRequest',
         'type' => 'belongsTo',
@@ -227,7 +207,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Last Calculated',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'calculation_method' => [
       'display' => 'inline',
@@ -240,7 +219,6 @@ return [
         'manual' => 'Manually Entered',
         'adjusted' => 'Manually Adjusted',
       ],
-      'reactivity' => false,
     ],
     'regular_hours' => [
       'display' => 'inline',
@@ -248,7 +226,6 @@ return [
       'field_type' => 'number',
       'label' => 'Regular Hours',
       'validation' => 'nullable|numeric|min:0',
-      'reactivity' => false,
     ],
     'overtime_hours' => [
       'display' => 'inline',
@@ -256,7 +233,6 @@ return [
       'field_type' => 'number',
       'label' => 'Overtime Hours',
       'validation' => 'nullable|numeric|min:0',
-      'reactivity' => false,
     ],
     'double_time_hours' => [
       'display' => 'inline',
@@ -264,7 +240,6 @@ return [
       'field_type' => 'number',
       'label' => 'Double Time Hours',
       'validation' => 'nullable|numeric|min:0',
-      'reactivity' => false,
     ],
     'attendance_policy_id' => [
       'display' => 'inline',
@@ -272,7 +247,6 @@ return [
       'field_type' => 'select',
       'label' => 'Applied Policy',
       'validation' => 'nullable|string',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\AttendancePolicy',
         'type' => 'belongsTo',
@@ -293,7 +267,6 @@ return [
       'field_type' => 'select',
       'label' => 'Applied Pattern',
       'validation' => 'nullable|string',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\WorkPattern',
         'type' => 'belongsTo',
@@ -314,7 +287,6 @@ return [
       'field_type' => 'number',
       'label' => 'Minutes Late',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'minutes_early_departure' => [
       'display' => 'inline',
@@ -322,7 +294,6 @@ return [
       'field_type' => 'number',
       'label' => 'Minutes Early Departure',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'missed_break_minutes' => [
       'display' => 'inline',
@@ -330,7 +301,6 @@ return [
       'field_type' => 'number',
       'label' => 'Missed Break (min)',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'calculation_metadata' => [
       'display' => 'inline',
@@ -338,7 +308,6 @@ return [
       'field_type' => 'json',
       'label' => 'Calculation Details',
       'validation' => 'nullable|json',
-      'reactivity' => false,
     ],
     'calculation_version' => [
       'display' => 'inline',
@@ -346,7 +315,6 @@ return [
       'field_type' => 'string',
       'label' => 'Calculator Version',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -415,8 +383,9 @@ return [
     '0' => 'show',
   ],
   'isTransaction' => false,
-  'viewType' => 'modal',
+  'crudType' => 'drawers',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

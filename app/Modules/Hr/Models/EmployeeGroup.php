@@ -15,7 +15,7 @@ class EmployeeGroup extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -27,7 +27,7 @@ class EmployeeGroup extends Model
     
 
     protected $fillable = [
-        'name', 'code', 'description', 'group_type', 'dynamic_rules', 'is_active'
+        'name', 'code', 'group_type', 'description', 'is_active', 'dynamic_rules'
     ];
 
     protected $guarded = [
@@ -35,8 +35,8 @@ class EmployeeGroup extends Model
     ];
 
     protected $casts = [
-        'dynamic_rules' => 'array',
         'is_active' => 'boolean',
+        'dynamic_rules' => 'array',
         'created_by' => 'integer',
         'updated_by' => 'integer'
     ];
@@ -98,7 +98,7 @@ class EmployeeGroup extends Model
 
     public function employees()
     {
-        return $this->belongsToMany(\App\Modules\Hr\Models\Employee::class, 'employee_employee_group', 'employee_group_id', 'employee_id', 'id', 'id');
+        return $this->hasMany(\App\Modules\Hr\Models\Employee::class, 'employee_group_id', 'id');
     }
 
     /**

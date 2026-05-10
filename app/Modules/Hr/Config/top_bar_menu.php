@@ -15,7 +15,7 @@ return [
 ],
     [
     'title' => 'Employees',
-    'icon' => 'fas fa-user-friends',
+    'icon' => 'fas fa-user-tie',
     'url' => 'hr/hr/dashboard-people-overview',
     'permission' => 'view_employee',
 ],

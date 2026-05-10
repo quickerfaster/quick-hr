@@ -10,7 +10,7 @@ return [
       'label' => 'Payslip Number',
       'validation' => 'required|string|max:50|unique:payroll_payslips,payslip_number',
       'autoGenerate' => true,
-      'reactivity' => false,
+      'searchable' => true,
     ],
     'payroll_run_id' => [
       'display' => 'inline',
@@ -18,7 +18,6 @@ return [
       'field_type' => 'select',
       'label' => 'Payroll Run',
       'validation' => 'required|exists:payroll_runs,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PayrollRun',
         'type' => 'belongsTo',
@@ -39,7 +38,6 @@ return [
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
-      'reactivity' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -60,7 +58,6 @@ return [
       'field_type' => 'number',
       'label' => 'Base Salary (Period)',
       'validation' => 'required|numeric|min:0',
-      'reactivity' => false,
     ],
     'gross_pay' => [
       'display' => 'inline',
@@ -68,7 +65,6 @@ return [
       'field_type' => 'number',
       'label' => 'Gross Pay',
       'validation' => 'required|numeric|min:0',
-      'reactivity' => false,
     ],
     'total_deductions' => [
       'display' => 'inline',
@@ -76,7 +72,6 @@ return [
       'field_type' => 'number',
       'label' => 'Total Deductions',
       'validation' => 'required|numeric|min:0',
-      'reactivity' => false,
     ],
     'total_taxes' => [
       'display' => 'inline',
@@ -84,7 +79,6 @@ return [
       'field_type' => 'number',
       'label' => 'Total Taxes',
       'validation' => 'nullable|numeric|min:0',
-      'reactivity' => false,
     ],
     'total_benefit_deductions' => [
       'display' => 'inline',
@@ -92,7 +86,6 @@ return [
       'field_type' => 'number',
       'label' => 'Benefit Deductions',
       'validation' => 'nullable|numeric|min:0',
-      'reactivity' => false,
     ],
     'net_pay' => [
       'display' => 'inline',
@@ -100,7 +93,6 @@ return [
       'field_type' => 'number',
       'label' => 'Net Pay',
       'validation' => 'required|numeric|min:0',
-      'reactivity' => false,
     ],
     'payment_status' => [
       'display' => 'inline',
@@ -115,7 +107,7 @@ return [
         'failed' => 'Failed',
         'cancelled' => 'Cancelled',
       ],
-      'reactivity' => false,
+      'filterable' => true,
     ],
     'paid_at' => [
       'display' => 'inline',
@@ -123,7 +115,6 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Paid At',
       'validation' => 'nullable|date',
-      'reactivity' => false,
     ],
     'payment_reference' => [
       'display' => 'inline',
@@ -131,7 +122,6 @@ return [
       'field_type' => 'string',
       'label' => 'Payment Reference',
       'validation' => 'nullable|string|max:255',
-      'reactivity' => false,
     ],
     'bank_account_snapshot' => [
       'display' => 'inline',
@@ -139,7 +129,6 @@ return [
       'field_type' => 'json',
       'label' => 'Bank Account Snapshot',
       'validation' => 'nullable|json',
-      'reactivity' => false,
     ],
     'notes' => [
       'display' => 'inline',
@@ -147,7 +136,6 @@ return [
       'field_type' => 'textarea',
       'label' => 'Notes',
       'validation' => 'nullable|string|max:1000',
-      'reactivity' => false,
     ],
     'created_by' => [
       'display' => 'inline',
@@ -155,7 +143,6 @@ return [
       'field_type' => 'number',
       'label' => 'Created By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
     'updated_by' => [
       'display' => 'inline',
@@ -163,7 +150,6 @@ return [
       'field_type' => 'number',
       'label' => 'Updated By',
       'validation' => 'nullable|integer',
-      'reactivity' => false,
     ],
   ],
   'detailComponent' => '',
@@ -191,8 +177,9 @@ return [
     '0' => 'show',
   ],
   'isTransaction' => false,
-  'viewType' => 'pages',
+  'crudType' => 'pages',
   'includeControllers' => false,
+  'tableDefaultFields' => [],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [

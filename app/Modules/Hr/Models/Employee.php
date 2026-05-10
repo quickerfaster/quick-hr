@@ -13,6 +13,9 @@ use App\Modules\Admin\Models\Company;
 use App\Modules\Hr\Models\Document;
 use App\Modules\Hr\Models\EmployeeWorkPattern;
 use App\Models\User;
+use App\Modules\Hr\Models\EmployeeGroup;
+use App\Modules\Hr\Models\Team;
+use App\Modules\Hr\Models\Tag;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,7 +24,7 @@ class Employee extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -29,11 +32,11 @@ class Employee extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'company_id', 'employee_number', 'first_name', 'last_name', 'phone', 'hire_date', 'email', 'user_id'
+        'employee_number', 'first_name', 'last_name', 'email', 'phone', 'company_id', 'employee_group_id', 'hire_date', 'user_id', 'tag_ids'
     ];
 
     protected $guarded = [
@@ -41,7 +44,8 @@ class Employee extends Model
     ];
 
     protected $casts = [
-        'hire_date' => 'date'
+        'hire_date' => 'date',
+        'tag_ids' => 'array'
     ];
 
     protected $attributes = [
@@ -131,6 +135,21 @@ class Employee extends Model
     public function user()
     {
         return $this->belongsTo(\App\Models\User::class, 'user_id', 'id');
+    }
+
+    public function employeeGroup()
+    {
+        return $this->belongsTo(\App\Modules\Hr\Models\EmployeeGroup::class, 'employee_group_id', 'id');
+    }
+
+    public function teams()
+    {
+        return $this->belongsToMany(\App\Modules\Hr\Models\Team::class, 'employee_team', 'employee_id', 'team_id', 'id', 'id');
+    }
+
+    public function tags()
+    {
+        return $this->morphToMany(\App\Modules\Hr\Models\Tag::class, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'id', 'id');
     }
 
     /**
