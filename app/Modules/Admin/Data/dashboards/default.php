@@ -2,7 +2,7 @@
 
 return array (
   'title' => 'Organization Settings Overview',
-  'description' => 'Company structure, locations, departments, and job titles',
+  'description' => 'Company structure, locations, departments, job titles, and key metrics',
   'widgets' => 
   array (
     0 => 
@@ -62,6 +62,7 @@ return array (
       'model' => 'App\\Modules\\Admin\\Models\\Location',
       'group_by' => 'country',
       'chart_type' => 'bar',
+      'description' => 'Active locations per country',
       'aggregate' => 'count',
       'conditions' => 
       array (
@@ -82,6 +83,7 @@ return array (
       'model' => 'App\\Modules\\Admin\\Models\\Location',
       'group_by' => 'is_remote',
       'chart_type' => 'pie',
+      'description' => 'Physical vs. Remote locations',
       'aggregate' => 'count',
       'width' => 4,
     ),
@@ -93,6 +95,7 @@ return array (
       'model' => 'App\\Modules\\Admin\\Models\\Department',
       'group_by' => 'company_id',
       'chart_type' => 'bar',
+      'description' => 'Department count per company',
       'aggregate' => 'count',
       'width' => 4,
     ),
@@ -141,11 +144,11 @@ return array (
     8 => 
     array (
       'type' => 'list',
-      'title' => 'Departments',
+      'title' => 'Departments (A–Z)',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Admin\\Models\\Department',
       'icon' => 'fas fa-users',
-      'description' => 'All departments (alphabetical)',
+      'description' => 'All departments alphabetically',
       'limit' => 5,
       'sort' => 
       array (
@@ -265,11 +268,11 @@ return array (
     13 => 
     array (
       'type' => 'list',
-      'title' => 'Companies',
+      'title' => 'Active Companies',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Admin\\Models\\Company',
       'icon' => 'fas fa-flag',
-      'description' => 'Active companies in the system',
+      'description' => 'Companies with active status',
       'limit' => 5,
       'sort' => 
       array (
@@ -301,6 +304,7 @@ return array (
         array (
           'label' => 'Status',
           'field' => 'status',
+          'format' => 'text',
         ),
       ),
       'width' => 6,
@@ -310,11 +314,11 @@ return array (
     14 => 
     array (
       'type' => 'list',
-      'title' => 'Job Titles',
+      'title' => 'Recent Job Titles',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Admin\\Models\\JobTitle',
       'icon' => 'fas fa-briefcase',
-      'description' => 'Recent job titles',
+      'description' => 'Latest job titles created',
       'limit' => 5,
       'sort' => 
       array (
@@ -346,7 +350,7 @@ return array (
       'size' => 'col-12',
       'model' => 'App\\Modules\\Admin\\Models\\Location',
       'icon' => 'fas fa-check-double',
-      'description' => 'Locations with complete address',
+      'description' => 'Locations with complete address (street + city)',
       'aggregate' => 'count',
       'conditions' => 
       array (

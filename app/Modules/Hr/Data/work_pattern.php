@@ -9,6 +9,8 @@ return [
       'field_type' => 'string',
       'label' => 'Pattern Name',
       'validation' => 'required|string|max:255',
+      'filterable' => true,
+      'searchable' => true,
     ],
     'code' => [
       'display' => 'inline',
@@ -17,6 +19,8 @@ return [
       'label' => 'Pattern Code',
       'validation' => 'required|string|max:50|unique:work_patterns,code',
       'autoGenerate' => true,
+      'filterable' => true,
+      'searchable' => true,
     ],
     'description' => [
       'display' => 'inline',
@@ -24,6 +28,27 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string|max:1000',
+      'searchable' => true,
+    ],
+    'pattern_type' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Pattern Type',
+      'validation' => 'required',
+      'options' => [
+        'recurring' => 'Recurring Weekly',
+        'rotating' => 'Rotating (A/B Weeks)',
+        'custom' => 'Custom Cycle',
+      ],
+      'filterable' => true,
+    ],
+    'rotation_weeks' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'number',
+      'label' => 'Rotation Cycle (weeks)',
+      'validation' => 'nullable|integer|min:2|max:4',
     ],
     'shift_id' => [
       'display' => 'inline',
@@ -31,6 +56,8 @@ return [
       'field_type' => 'select',
       'label' => 'Base Shift',
       'validation' => 'required|exists:shifts,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Admin\Models\Shift',
         'type' => 'belongsTo',
@@ -76,31 +103,13 @@ return [
       'label' => 'Custom End Time',
       'validation' => 'nullable|after:override_start_time',
     ],
-    'pattern_type' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'select',
-      'label' => 'Pattern Type',
-      'validation' => 'required',
-      'options' => [
-        'recurring' => 'Recurring Weekly',
-        'rotating' => 'Rotating (A/B Weeks)',
-        'custom' => 'Custom Cycle',
-      ],
-    ],
-    'rotation_weeks' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'number',
-      'label' => 'Rotation Cycle (weeks)',
-      'validation' => 'nullable|integer|min:2|max:4',
-    ],
     'effective_date' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'datepicker',
       'label' => 'Effective From',
       'validation' => 'required|date',
+      'filterable' => true,
     ],
     'end_date' => [
       'display' => 'inline',
@@ -108,6 +117,7 @@ return [
       'field_type' => 'datepicker',
       'label' => 'End Date',
       'validation' => 'nullable|date|after:effective_date',
+      'filterable' => true,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -115,6 +125,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
+      'filterable' => true,
     ],
     'is_default' => [
       'display' => 'inline',
@@ -122,6 +133,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Default Pattern',
       'validation' => 'nullable|boolean',
+      'filterable' => true,
     ],
     'assigned_employee_count' => [
       'display' => 'inline',
@@ -156,18 +168,28 @@ return [
       '5' => 'assigned_employee_count',
       '6' => 'last_used_date',
       '7' => 'created_from_template_id',
+      '8' => 'created_at',
+      '9' => 'updated_at',
+      '10' => 'deleted_at',
     ],
     'onNewForm' => [
       '0' => 'assigned_employee_count',
       '1' => 'last_used_date',
       '2' => 'created_from_template_id',
+      '3' => 'created_at',
+      '4' => 'updated_at',
+      '5' => 'deleted_at',
     ],
     'onEditForm' => [
       '0' => 'assigned_employee_count',
       '1' => 'last_used_date',
       '2' => 'created_from_template_id',
+      '3' => 'updated_at',
+      '4' => 'deleted_at',
     ],
-    'onQuery' => [],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -177,18 +199,17 @@ return [
   'isTransaction' => false,
   'crudType' => 'pages',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'name',
+    '1' => 'code',
+    '2' => 'pattern_type',
+    '3' => 'shift_id',
+    '4' => 'is_active',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
-    'addButton' => [
-      '0' => [
-        'label' => 'New Pattern',
-        'type' => 'quick_add',
-        'icon' => 'fas fa-plus-circle',
-        'primary' => true,
-      ],
-    ],
+    'addButton' => true,
     'files' => [
       'export' => [
         '0' => 'xls',
@@ -197,6 +218,29 @@ return [
       ],
       'print' => true,
     ],
+    'perPage' => [
+      '0' => 10,
+      '1' => 25,
+      '2' => 50,
+      '3' => 100,
+    ],
+    'search' => true,
+    'showHideColumns' => true,
+    'filterColumns' => true,
+    'calendarView' => [
+      'enable' => true,
+      'defaultView' => 'week',
+      'views' => [
+        '0' => 'week',
+      ],
+      'titleField' => 'name',
+      'colorField' => 'is_active',
+      'statusField' => 'pattern_type',
+    ],
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
     'bulkActions' => [
       'export' => [
         '0' => 'xls',
@@ -222,69 +266,9 @@ return [
         'fieldValue' => true,
         'confirm' => 'Set selected pattern as default?',
       ],
-    ],
-    'perPage' => [
-      '0' => 10,
-      '1' => 25,
-      '2' => 50,
-      '3' => 100,
-    ],
-    'search' => true,
-    'showHideColumns' => true,
-    'filters' => [
-      '0' => [
-        'field' => 'pattern_type',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Recurring',
-          '2' => 'Rotating',
-          '3' => 'Custom',
-        ],
-        'label' => 'Pattern Type',
-      ],
-      '1' => [
-        'field' => 'is_active',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Active',
-          '2' => 'Inactive',
-        ],
-        'label' => 'Status',
-        'default' => 'Active',
-      ],
-      '2' => [
-        'field' => 'shift_id',
-        'type' => 'select',
-        'optionsFrom' => 'shifts',
-        'label' => 'Shift',
-      ],
-      '3' => [
-        'field' => 'is_default',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Default',
-          '2' => 'Not Default',
-        ],
-        'label' => 'Default Status',
-      ],
-      '4' => [
-        'field' => 'effective_date',
-        'type' => 'date_range',
-        'label' => 'Effective Date Range',
-      ],
-    ],
-    'calendarView' => [
-      'enable' => true,
-      'defaultView' => 'week',
-      'views' => [
-        '0' => 'week',
-      ],
-      'titleField' => 'name',
-      'colorField' => 'is_active',
-      'statusField' => 'pattern_type',
+      'delete' => true,
+      'restore' => true,
+      'forceDelete' => true,
     ],
   ],
   'fieldGroups' => [
@@ -333,7 +317,24 @@ return [
       ],
     ],
   ],
-  'moreActions' => [],
+  'moreActions' => [
+    '0' => [
+      'title' => 'Restore',
+      'icon' => 'fas fa-trash-restore',
+      'action' => 'restore',
+      'confirm' => 'Restore this archived work pattern?',
+      'requiredPermission' => 'restore_work_pattern',
+      'condition' => 'trashed',
+    ],
+    '1' => [
+      'title' => 'Permanently Delete',
+      'icon' => 'fas fa-skull-crossbones',
+      'action' => 'forceDelete',
+      'confirm' => 'This action cannot be undone. Permanently delete this pattern?',
+      'requiredPermission' => 'force_delete_work_pattern',
+      'condition' => 'trashed',
+    ],
+  ],
   'switchViews' => [
     'default' => 'list',
     'card' => [
@@ -377,59 +378,6 @@ return [
       'tagField' => 'is_default',
       'tagText' => 'Default',
       'tagColor' => 'warning',
-    ],
-    'detail' => [
-      'layout' => 'tab',
-      'detailType' => 'record',
-      'titleFields' => [
-        '0' => 'name',
-      ],
-      'subtitleFields' => [
-        '0' => 'code',
-        '1' => 'pattern_type',
-      ],
-      'tabs' => [
-        '0' => [
-          'title' => 'Overview',
-          'icon' => 'fas fa-info-circle',
-          'fields' => [
-            '0' => 'name',
-            '1' => 'code',
-            '2' => 'description',
-            '3' => 'pattern_type',
-            '4' => 'rotation_weeks',
-            '5' => 'is_active',
-            '6' => 'is_default',
-          ],
-        ],
-        '1' => [
-          'title' => 'Schedule',
-          'icon' => 'fas fa-clock',
-          'fields' => [
-            '0' => 'shift_id',
-            '1' => 'applicable_days',
-            '2' => 'override_start_time',
-            '3' => 'override_end_time',
-            '4' => 'effective_date',
-            '5' => 'end_date',
-          ],
-        ],
-        '2' => [
-          'title' => 'Assigned Employees',
-          'icon' => 'fas fa-users',
-          'relation' => 'employees',
-          'relationLimit' => 20,
-        ],
-        '3' => [
-          'title' => 'System Info',
-          'icon' => 'fas fa-server',
-          'fields' => [
-            '0' => 'assigned_employee_count',
-            '1' => 'last_used_date',
-            '2' => 'created_from_template_id',
-          ],
-        ],
-      ],
     ],
   ],
   'relations' => [

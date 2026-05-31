@@ -9,6 +9,8 @@ return [
       'field_type' => 'select',
       'label' => 'Attendance Policy',
       'validation' => 'required|exists:attendance_policies,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\AttendancePolicy',
         'type' => 'belongsTo',
@@ -23,30 +25,26 @@ return [
         'hintField' => '',
       ],
     ],
-    'priority' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'number',
-      'label' => 'Priority',
-      'validation' => 'integer|min:0',
-    ],
     'assignable_type' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'select',
-      'label' => 'Assign to Type',
+      'label' => 'Entity Type',
       'options' => [
         'company' => 'Company',
         'location' => 'Location',
         'department' => 'Department',
         'shift' => 'Shift',
       ],
+      'filterable' => true,
     ],
     'assignable_id' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'morph_to_select',
-      'label' => 'Assign to Entity',
+      'label' => 'Entity',
+      'filterable' => true,
+      'searchable' => true,
       'morph_relation' => 'assignable',
       'morph_map' => [
         'company' => 'App\Modules\Admin\Models\Company',
@@ -56,15 +54,34 @@ return [
       ],
       'display_field' => 'name',
     ],
+    'priority' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'number',
+      'label' => 'Priority',
+      'validation' => 'integer|min:0',
+    ],
   ],
   'detailComponent' => '',
   'hiddenFields' => [
     'onTable' => [
       '0' => 'assignable_type',
+      '1' => 'created_at',
+      '2' => 'updated_at',
+      '3' => 'deleted_at',
     ],
-    'onNewForm' => [],
-    'onEditForm' => [],
-    'onQuery' => [],
+    'onNewForm' => [
+      '0' => 'created_at',
+      '1' => 'updated_at',
+      '2' => 'deleted_at',
+    ],
+    'onEditForm' => [
+      '0' => 'updated_at',
+      '1' => 'deleted_at',
+    ],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -74,24 +91,102 @@ return [
   'isTransaction' => false,
   'crudType' => 'modals',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'attendance_policy_id',
+    '1' => 'assignable_type',
+    '2' => 'assignable_id',
+    '3' => 'priority',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
-  'controls' => 'all',
+  'controls' => [
+    'addButton' => true,
+    'files' => [
+      'export' => [
+        '0' => 'xls',
+        '1' => 'csv',
+        '2' => 'pdf',
+      ],
+      'print' => true,
+    ],
+    'perPage' => [
+      '0' => 10,
+      '1' => 25,
+      '2' => 50,
+      '3' => 100,
+    ],
+    'search' => true,
+    'showHideColumns' => true,
+    'filterColumns' => true,
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
+    'bulkActions' => [
+      'export' => [
+        '0' => 'xls',
+        '1' => 'csv',
+        '2' => 'pdf',
+      ],
+      'delete' => true,
+      'restore' => true,
+      'forceDelete' => true,
+    ],
+  ],
   'fieldGroups' => [
     'assignment' => [
       'title' => 'Policy Assignment',
       'groupType' => 'hr',
       'icon' => 'fas fa-link',
       'fields' => [
-        '0' => 'assignable_id',
-        '1' => 'attendance_policy_id',
-        '2' => 'priority',
+        '0' => 'attendance_policy_id',
+        '1' => 'assignable_type',
+        '2' => 'assignable_id',
+        '3' => 'priority',
       ],
     ],
   ],
-  'moreActions' => [],
-  'switchViews' => [],
+  'moreActions' => [
+    '0' => [
+      'title' => 'Restore',
+      'icon' => 'fas fa-trash-restore',
+      'action' => 'restore',
+      'confirm' => 'Restore this archived assignment?',
+      'requiredPermission' => 'restore_policy_assignment',
+      'condition' => 'trashed',
+    ],
+    '1' => [
+      'title' => 'Permanently Delete',
+      'icon' => 'fas fa-skull-crossbones',
+      'action' => 'forceDelete',
+      'confirm' => 'This action cannot be undone. Permanently delete this assignment?',
+      'requiredPermission' => 'force_delete_policy_assignment',
+      'condition' => 'trashed',
+    ],
+  ],
+  'switchViews' => [
+    'default' => 'list',
+    'list' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'attendancePolicy.name',
+      ],
+      'subtitleFields' => [
+        '0' => 'assignable_type',
+      ],
+      'contentFields' => [
+        '0' => 'assignable.name',
+        '1' => 'priority',
+      ],
+      'badgeField' => 'assignable_type',
+      'badgeColors' => [
+        'company' => 'primary',
+        'location' => 'info',
+        'department' => 'success',
+        'shift' => 'warning',
+      ],
+    ],
+  ],
   'relations' => [
     'attendancePolicy' => [
       'type' => 'belongsTo',

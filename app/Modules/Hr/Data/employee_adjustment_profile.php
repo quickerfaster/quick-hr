@@ -9,6 +9,8 @@ return [
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -38,9 +40,10 @@ return [
     'label' => [
       'display' => 'inline',
       'fillable' => true,
-      'field_type' => 'string',
+      'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'required|string|max:255',
+      'filterable' => true,
       'searchable' => true,
     ],
     'calculation_type' => [
@@ -53,6 +56,7 @@ return [
         'fixed' => 'Fixed Amount',
         'percentage' => 'Percentage of Base Salary',
       ],
+      'filterable' => true,
     ],
     'value' => [
       'display' => 'inline',
@@ -67,6 +71,7 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Effective From',
       'validation' => 'required|date',
+      'filterable' => true,
     ],
     'expiry_date' => [
       'display' => 'inline',
@@ -74,6 +79,7 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Expiry Date',
       'validation' => 'nullable|date|after:effective_date',
+      'filterable' => true,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -81,6 +87,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
+      'filterable' => true,
     ],
     'policy_id' => [
       'display' => 'inline',
@@ -88,6 +95,7 @@ return [
       'field_type' => 'select',
       'label' => 'Source Policy',
       'validation' => 'nullable|exists:payroll_policies,id',
+      'filterable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PayrollPolicy',
         'type' => 'belongsTo',
@@ -123,15 +131,22 @@ return [
       '0' => 'policy_id',
       '1' => 'created_by',
       '2' => 'updated_by',
+      '3' => 'created_at',
+      '4' => 'updated_at',
+      '5' => 'deleted_at',
     ],
     'onNewForm' => [
       '0' => 'created_by',
       '1' => 'updated_by',
+      '2' => 'deleted_at',
     ],
     'onEditForm' => [
       '0' => 'updated_by',
+      '1' => 'deleted_at',
     ],
-    'onQuery' => [],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -141,25 +156,18 @@ return [
   'isTransaction' => false,
   'crudType' => 'drawers',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'employee_id',
+    '1' => 'type',
+    '2' => 'label',
+    '3' => 'calculation_type',
+    '4' => 'value',
+    '5' => 'is_active',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
-    'addButton' => [
-      '0' => [
-        'label' => 'New Adjustment',
-        'type' => 'quick_add',
-        'icon' => 'fas fa-plus-circle',
-        'primary' => true,
-      ],
-      '1' => [
-        'label' => 'Bulk Import',
-        'type' => 'modal',
-        'icon' => 'fas fa-file-import',
-        'url' => '/hr/employee-adjustment-profiles/import',
-        'modalSize' => 'lg',
-      ],
-    ],
+    'addButton' => true,
     'files' => [
       'export' => [
         '0' => 'xls',
@@ -168,6 +176,19 @@ return [
       ],
       'print' => true,
     ],
+    'perPage' => [
+      '0' => 10,
+      '1' => 25,
+      '2' => 50,
+      '3' => 100,
+    ],
+    'search' => true,
+    'showHideColumns' => true,
+    'filterColumns' => true,
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
     'bulkActions' => [
       'export' => [
         '0' => 'xls',
@@ -189,59 +210,8 @@ return [
         'confirm' => 'Deactivate selected adjustments?',
       ],
       'delete' => true,
-    ],
-    'perPage' => [
-      '0' => 10,
-      '1' => 25,
-      '2' => 50,
-      '3' => 100,
-      '4' => 250,
-    ],
-    'search' => true,
-    'showHideColumns' => true,
-    'filterColumns' => true,
-    'filters' => [
-      '0' => [
-        'field' => 'type',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'earning',
-          '2' => 'deduction',
-        ],
-        'label' => 'Adjustment Type',
-      ],
-      '1' => [
-        'field' => 'is_active',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Active',
-          '2' => 'Inactive',
-        ],
-        'label' => 'Status',
-        'default' => 'Active',
-      ],
-      '2' => [
-        'field' => 'calculation_type',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'fixed',
-          '2' => 'percentage',
-        ],
-        'label' => 'Calculation Type',
-      ],
-      '3' => [
-        'field' => 'effective_date',
-        'type' => 'date_range',
-        'label' => 'Effective Date Range',
-      ],
-      '4' => [
-        'field' => 'expiry_date',
-        'type' => 'date_range',
-        'label' => 'Expiry Date Range',
-      ],
+      'restore' => true,
+      'forceDelete' => true,
     ],
   ],
   'fieldGroups' => [
@@ -278,45 +248,12 @@ return [
       ],
     ],
   ],
-  'moreActions' => [
-    '0' => [
-      'title' => 'Copy Adjustment',
-      'icon' => 'fas fa-copy',
-      'route' => 'employee-adjustment-profiles.copy',
-      'params' => [
-        'id' => '{id}',
-      ],
-      'confirm' => 'Create a copy of this adjustment?',
-      'requiredRole' => [
-        '0' => 'hr_admin',
-        '1' => 'payroll_officer',
-      ],
-    ],
-    '1' => [
-      'title' => 'View Employee Profile',
-      'icon' => 'fas fa-user',
-      'route' => 'employees.show',
-      'params' => [
-        'employee_id' => '{employee_id}',
-      ],
-      'newTab' => true,
-    ],
-    '2' => [
-      'title' => 'View Source Policy',
-      'icon' => 'fas fa-gavel',
-      'route' => 'payroll-policies.show',
-      'params' => [
-        'policy_id' => '{policy_id}',
-      ],
-      'condition' => [
-        '0' => [
-          'policy_id' => 'not null',
-        ],
-      ],
-    ],
-  ],
+  'moreActions' => [],
   'switchViews' => [
     'default' => 'list',
+    'table' => [
+      'enabled' => true,
+    ],
     'card' => [
       'titleFields' => [
         '0' => 'label',
@@ -362,44 +299,6 @@ return [
       'badgeColors' => [
         'true' => 'success',
         'false' => 'secondary',
-      ],
-    ],
-    'detail' => [
-      'layout' => 'tab',
-      'detailType' => 'record',
-      'titleFields' => [
-        '0' => 'label',
-      ],
-      'subtitleFields' => [
-        '0' => 'employee.employee_number',
-        '1' => 'type',
-      ],
-      'tabs' => [
-        '0' => [
-          'title' => 'Overview',
-          'icon' => 'fas fa-info-circle',
-          'fields' => [
-            '0' => 'employee_id',
-            '1' => 'type',
-            '2' => 'label',
-            '3' => 'calculation_type',
-            '4' => 'value',
-            '5' => 'effective_date',
-            '6' => 'expiry_date',
-            '7' => 'is_active',
-          ],
-        ],
-        '1' => [
-          'title' => 'Source & Audit',
-          'icon' => 'fas fa-history',
-          'fields' => [
-            '0' => 'policy_id',
-            '1' => 'created_by',
-            '2' => 'updated_by',
-            '3' => 'created_at',
-            '4' => 'updated_at',
-          ],
-        ],
       ],
     ],
   ],

@@ -15,7 +15,7 @@ class Permission extends SpatiePermission
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -23,7 +23,7 @@ class Permission extends SpatiePermission
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [

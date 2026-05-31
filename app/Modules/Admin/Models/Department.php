@@ -17,7 +17,7 @@ class Department extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -25,7 +25,7 @@ class Department extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [

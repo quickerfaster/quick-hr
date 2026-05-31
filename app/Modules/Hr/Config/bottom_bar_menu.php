@@ -16,11 +16,11 @@ return [
     'key' => 'saved_report',
 ],
     [
-    'title' => 'Overviews',
+    'title' => 'People Overviews',
     'icon' => 'fas fa-cube',
-    'url' => 'hr/overviews',
-    'permission' => 'view_overview',
-    'key' => 'overview',
+    'url' => 'hr/people-overviews',
+    'permission' => 'view_people_overview',
+    'key' => 'people_overview',
 ],
     [
     'title' => 'Employee Groups',
@@ -72,6 +72,13 @@ return [
     'key' => 'document',
 ],
     [
+    'title' => 'Policy Overviews',
+    'icon' => 'fas fa-cube',
+    'url' => 'hr/policy-overviews',
+    'permission' => 'view_policy_overview',
+    'key' => 'policy_overview',
+],
+    [
     'title' => 'Policy Assignments',
     'icon' => 'fas fa-tasks',
     'url' => 'hr/policy-assignments',
@@ -80,7 +87,7 @@ return [
 ],
     [
     'title' => 'Work Patterns',
-    'icon' => 'fas fa-calendar-alt',
+    'icon' => 'fas fa-calendar-week',
     'url' => 'hr/work-patterns',
     'permission' => 'view_work_pattern',
     'key' => 'work_pattern',
@@ -91,6 +98,13 @@ return [
     'url' => 'hr/employee-work-patterns',
     'permission' => 'view_employee_work_pattern',
     'key' => 'employee_work_pattern',
+],
+    [
+    'title' => 'Payroll Overviews',
+    'icon' => 'fas fa-cube',
+    'url' => 'hr/payroll-overviews',
+    'permission' => 'view_payroll_overview',
+    'key' => 'payroll_overview',
 ],
     [
     'title' => 'Pay Schedules',
@@ -163,6 +177,13 @@ return [
     'key' => 'employee_position',
 ],
     [
+    'title' => 'Leave Overviews',
+    'icon' => 'fas fa-cube',
+    'url' => 'hr/leave-overviews',
+    'permission' => 'view_leave_overview',
+    'key' => 'leave_overview',
+],
+    [
     'title' => 'Leave Types',
     'icon' => 'fas fa-tag',
     'url' => 'hr/leave-types',
@@ -189,6 +210,13 @@ return [
     'url' => 'hr/leave-approvers',
     'permission' => 'view_leave_approver',
     'key' => 'leave_approver',
+],
+    [
+    'title' => 'Attendance Overviews',
+    'icon' => 'fas fa-cube',
+    'url' => 'hr/attendance-overviews',
+    'permission' => 'view_attendance_overview',
+    'key' => 'attendance_overview',
 ],
     [
     'title' => 'Attendances',

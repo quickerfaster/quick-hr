@@ -1,8 +1,8 @@
 {{-- Bottom Bar Links for Hr --}}
 
-            <button role="link" href="hr/overviews" class="btn btn-light flex-shrink-0 text-center" style="min-width:70px;" wire:navigate>
+            <button role="link" href="hr/people-overviews" class="btn btn-light flex-shrink-0 text-center" style="min-width:70px;" wire:navigate>
                 <i class=" fas fa-user }} d-block mb-1"></i>
-                <small>Overviews</small>
+                <small>People Overviews</small>
             </button>
             <button role="link" href="hr/employee-groups" class="btn btn-light flex-shrink-0 text-center" style="min-width:70px;" wire:navigate>
                 <i class=" fas fa-layer-group }} d-block mb-1"></i>

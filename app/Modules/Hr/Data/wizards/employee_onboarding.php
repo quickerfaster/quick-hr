@@ -13,7 +13,7 @@ return array (
       'model' => 'App\\Modules\\Hr\\Models\\Employee',
       'groups' => 
       array (
-        0 => 'personal_information',
+        0 => 'identity',
         1 => 'employment_details',
       ),
       'isLinkSource' => true,
@@ -27,7 +27,6 @@ return array (
         0 => 'job_information',
         1 => 'employment_details',
         2 => 'compensation',
-        3 => 'attendance_policies',
       ),
       'requiresLink' => true,
     ),
@@ -71,12 +70,6 @@ return array (
       ),
       2 => 
       array (
-        'label' => 'Upload Documents (Full Page)',
-        'url' => '/documents/create?employee_id={id}',
-        'primary' => false,
-      ),
-      3 => 
-      array (
         'label' => 'Add Profile Data',
         'event' => 'openAddModal',
         'eventParams' => 
@@ -88,7 +81,7 @@ return array (
           ),
         ),
       ),
-      4 => 
+      3 => 
       array (
         'label' => 'Employee Directory',
         'url' => '/hr/employees',

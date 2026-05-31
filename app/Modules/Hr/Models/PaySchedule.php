@@ -16,7 +16,7 @@ class PaySchedule extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -28,7 +28,7 @@ class PaySchedule extends Model
     
 
     protected $fillable = [
-        'name', 'code', 'frequency', 'first_period_start_date', 'next_pay_date', 'payment_delay_days', 'country_code', 'state_code', 'currency_code', 'timezone', 'is_active', 'is_default', 'description'
+        'name', 'code', 'frequency', 'description', 'first_period_start_date', 'next_pay_date', 'payment_delay_days', 'country_code', 'state_code', 'currency_code', 'timezone', 'is_active', 'is_default'
     ];
 
     protected $guarded = [

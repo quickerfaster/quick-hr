@@ -9,6 +9,31 @@ return [
       'field_type' => 'string',
       'label' => 'Calendar Name',
       'validation' => 'required|string|max:100',
+      'filterable' => true,
+      'searchable' => true,
+    ],
+    'year' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Calendar Year',
+      'validation' => 'required',
+      'options' => [
+        '2026' => 2026,
+        '2027' => 2027,
+        '2028' => 2028,
+        '2029' => 2029,
+        '2030' => 2030,
+      ],
+      'filterable' => true,
+    ],
+    'description' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'textarea',
+      'label' => 'Description',
+      'validation' => 'nullable|string|max:500',
+      'searchable' => true,
     ],
     'country_code' => [
       'display' => 'inline',
@@ -24,6 +49,7 @@ return [
         'IN' => 'India',
         'NG' => 'Nigeria',
       ],
+      'filterable' => true,
     ],
     'region' => [
       'display' => 'inline',
@@ -31,27 +57,7 @@ return [
       'field_type' => 'string',
       'label' => 'Region/State',
       'validation' => 'nullable|string|max:100',
-    ],
-    'is_default' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'checkbox',
-      'label' => 'Default Calendar',
-      'validation' => 'boolean',
-    ],
-    'is_active' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'checkbox',
-      'label' => 'Active',
-      'validation' => 'boolean',
-    ],
-    'description' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'textarea',
-      'label' => 'Description',
-      'validation' => 'nullable|string|max:500',
+      'filterable' => true,
     ],
     'applicable_to' => [
       'display' => 'inline',
@@ -65,26 +71,29 @@ return [
         'specific_locations' => 'Specific Locations',
         'employee_groups' => 'Employee Groups',
       ],
+      'filterable' => true,
     ],
-    'year' => [
+    'is_default' => [
       'display' => 'inline',
       'fillable' => true,
-      'field_type' => 'select',
-      'label' => 'Calendar Year',
-      'validation' => 'required',
-      'options' => [
-        '2026' => 2026,
-        '2027' => 2027,
-        '2028' => 2028,
-        '2029' => 2029,
-        '2030' => 2030,
-      ],
+      'field_type' => 'checkbox',
+      'label' => 'Default Calendar',
+      'validation' => 'boolean',
+      'filterable' => true,
+    ],
+    'is_active' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'checkbox',
+      'label' => 'Active',
+      'validation' => 'boolean',
+      'filterable' => true,
     ],
     'holiday_count' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'number',
-      'label' => 'Number of Holidays',
+      'label' => 'Holiday Count',
       'validation' => 'nullable|integer',
     ],
     'last_updated' => [
@@ -98,21 +107,30 @@ return [
   'detailComponent' => '',
   'hiddenFields' => [
     'onTable' => [
-      '0' => 'locations',
-      '1' => 'departments',
-      '2' => 'holidays',
-      '3' => 'holiday_count',
-      '4' => 'last_updated',
+      '0' => 'region',
+      '1' => 'applicable_to',
+      '2' => 'holiday_count',
+      '3' => 'last_updated',
+      '4' => 'created_at',
+      '5' => 'updated_at',
+      '6' => 'deleted_at',
     ],
     'onNewForm' => [
       '0' => 'holiday_count',
       '1' => 'last_updated',
+      '2' => 'created_at',
+      '3' => 'updated_at',
+      '4' => 'deleted_at',
     ],
     'onEditForm' => [
       '0' => 'holiday_count',
       '1' => 'last_updated',
+      '2' => 'updated_at',
+      '3' => 'deleted_at',
     ],
-    'onQuery' => [],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -122,18 +140,17 @@ return [
   'isTransaction' => false,
   'crudType' => 'drawers',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'name',
+    '1' => 'year',
+    '2' => 'country_code',
+    '3' => 'is_active',
+    '4' => 'is_default',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
-    'addButton' => [
-      '0' => [
-        'label' => 'New Calendar',
-        'type' => 'quick_add',
-        'icon' => 'fas fa-plus-circle',
-        'primary' => true,
-      ],
-    ],
+    'addButton' => true,
     'files' => [
       'export' => [
         '0' => 'xls',
@@ -141,35 +158,6 @@ return [
         '2' => 'pdf',
       ],
       'print' => true,
-    ],
-    'bulkActions' => [
-      'export' => [
-        '0' => 'xls',
-        '1' => 'csv',
-        '2' => 'pdf',
-      ],
-      'activate' => [
-        'label' => 'Activate Selected',
-        'icon' => 'fas fa-toggle-on',
-        'updateModelField' => 'is_active',
-        'fieldValue' => true,
-        'actionName' => 'bulk_activate_calendars',
-      ],
-      'deactivate' => [
-        'label' => 'Deactivate Selected',
-        'icon' => 'fas fa-toggle-off',
-        'updateModelField' => 'is_active',
-        'fieldValue' => false,
-        'actionName' => 'bulk_deactivate_calendars',
-      ],
-      'set_default' => [
-        'label' => 'Set as Default',
-        'icon' => 'fas fa-star',
-        'updateModelField' => 'is_default',
-        'fieldValue' => true,
-        'actionName' => 'bulk_set_default_calendar',
-        'confirm' => 'Set selected calendar as default? Only one calendar can be default.',
-      ],
     ],
     'perPage' => [
       '0' => 10,
@@ -179,68 +167,7 @@ return [
     ],
     'search' => true,
     'showHideColumns' => true,
-    'filters' => [
-      '0' => [
-        'field' => 'country_code',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'US',
-          '2' => 'GB',
-          '3' => 'CA',
-          '4' => 'AU',
-          '5' => 'IN',
-          '6' => 'NG',
-        ],
-        'label' => 'Country',
-      ],
-      '1' => [
-        'field' => 'is_active',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Active',
-          '2' => 'Inactive',
-        ],
-        'label' => 'Status',
-        'default' => 'Active',
-      ],
-      '2' => [
-        'field' => 'is_default',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Default',
-          '2' => 'Not Default',
-        ],
-        'label' => 'Default Status',
-      ],
-      '3' => [
-        'field' => 'year',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 2024,
-          '2' => 2025,
-          '3' => 2026,
-          '4' => 2027,
-          '5' => 2028,
-        ],
-        'label' => 'Year',
-      ],
-      '4' => [
-        'field' => 'applicable_to',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'All Employees',
-          '2' => 'Specific Departments',
-          '3' => 'Specific Locations',
-          '4' => 'Employee Groups',
-        ],
-        'label' => 'Applicable To',
-      ],
-    ],
+    'filterColumns' => true,
     'calendarView' => [
       'enable' => true,
       'defaultView' => 'year',
@@ -252,6 +179,39 @@ return [
       'colorField' => 'is_active',
       'statusField' => 'is_default',
     ],
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
+    'bulkActions' => [
+      'export' => [
+        '0' => 'xls',
+        '1' => 'csv',
+        '2' => 'pdf',
+      ],
+      'activate' => [
+        'label' => 'Activate Selected',
+        'icon' => 'fas fa-toggle-on',
+        'updateModelField' => 'is_active',
+        'fieldValue' => true,
+      ],
+      'deactivate' => [
+        'label' => 'Deactivate Selected',
+        'icon' => 'fas fa-toggle-off',
+        'updateModelField' => 'is_active',
+        'fieldValue' => false,
+      ],
+      'set_default' => [
+        'label' => 'Set as Default',
+        'icon' => 'fas fa-star',
+        'updateModelField' => 'is_default',
+        'fieldValue' => true,
+        'confirm' => 'Set selected calendar as default? Only one calendar can be default.',
+      ],
+      'delete' => true,
+      'restore' => true,
+      'forceDelete' => true,
+    ],
   ],
   'fieldGroups' => [
     'basic_info' => [
@@ -260,11 +220,10 @@ return [
       'icon' => 'fas fa-info-circle',
       'fields' => [
         '0' => 'name',
-        '1' => 'description',
-        '2' => 'year',
-        '3' => 'holidays',
-        '4' => 'is_active',
-        '5' => 'is_default',
+        '1' => 'year',
+        '2' => 'description',
+        '3' => 'is_active',
+        '4' => 'is_default',
       ],
     ],
     'location' => [
@@ -274,7 +233,6 @@ return [
       'fields' => [
         '0' => 'country_code',
         '1' => 'region',
-        '2' => 'locations',
       ],
     ],
     'applicability' => [
@@ -283,7 +241,6 @@ return [
       'icon' => 'fas fa-user-check',
       'fields' => [
         '0' => 'applicable_to',
-        '1' => 'departments',
       ],
     ],
     'system_info' => [
@@ -296,7 +253,24 @@ return [
       ],
     ],
   ],
-  'moreActions' => [],
+  'moreActions' => [
+    '0' => [
+      'title' => 'Restore',
+      'icon' => 'fas fa-trash-restore',
+      'action' => 'restore',
+      'confirm' => 'Restore this archived holiday calendar?',
+      'requiredPermission' => 'restore_holiday_calendar',
+      'condition' => 'trashed',
+    ],
+    '1' => [
+      'title' => 'Permanently Delete',
+      'icon' => 'fas fa-skull-crossbones',
+      'action' => 'forceDelete',
+      'confirm' => 'This action cannot be undone. Permanently delete this calendar?',
+      'requiredPermission' => 'force_delete_holiday_calendar',
+      'condition' => 'trashed',
+    ],
+  ],
   'switchViews' => [
     'default' => 'list',
     'card' => [
@@ -340,54 +314,6 @@ return [
       'tagField' => 'is_default',
       'tagText' => 'Default',
       'tagColor' => 'warning',
-    ],
-    'detail' => [
-      'layout' => 'tab',
-      'detailType' => 'record',
-      'titleFields' => [
-        '0' => 'name',
-      ],
-      'subtitleFields' => [
-        '0' => 'country_code',
-        '1' => 'year',
-      ],
-      'tabs' => [
-        '0' => [
-          'title' => 'Calendar Details',
-          'icon' => 'fas fa-info-circle',
-          'fields' => [
-            '0' => 'name',
-            '1' => 'description',
-            '2' => 'country_code',
-            '3' => 'region',
-            '4' => 'year',
-            '5' => 'is_active',
-            '6' => 'is_default',
-          ],
-        ],
-        '1' => [
-          'title' => 'Holidays',
-          'icon' => 'fas fa-gift',
-          'relation' => 'holidays',
-        ],
-        '2' => [
-          'title' => 'Applicability',
-          'icon' => 'fas fa-users',
-          'fields' => [
-            '0' => 'applicable_to',
-            '1' => 'department_ids',
-            '2' => 'location_ids',
-          ],
-        ],
-        '3' => [
-          'title' => 'System Info',
-          'icon' => 'fas fa-server',
-          'fields' => [
-            '0' => 'holiday_count',
-            '1' => 'last_updated',
-          ],
-        ],
-      ],
     ],
   ],
   'relations' => [

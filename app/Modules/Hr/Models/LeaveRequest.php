@@ -17,7 +17,7 @@ class LeaveRequest extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -25,7 +25,7 @@ class LeaveRequest extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [

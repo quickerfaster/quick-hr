@@ -28,7 +28,7 @@ data-bs-placement="right" title="Overview">
 <li class="nav-item text-nowrap">
 <a href="/hr/hr/policy-assignments" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
 data-bs-placement="right" title="Policy Assignments">
-<i class="fas fa-gavel me-2"></i>
+<i class="fas fa-tasks me-2"></i>
 @if ($state === 'full')
 <span>Policy Assignments</span>
 @endif
@@ -45,10 +45,10 @@ data-bs-placement="right" title="Work Patterns">
 </li>
 <li class="nav-item text-nowrap">
     <a href="/hr/hr/employee-work-patterns" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
-        data-bs-placement="right" title="Employee Work Pattern">
-        <i class="fas fa-calendar-week me-2"></i>
+        data-bs-placement="right" title="Employee Work Patterns">
+        <i class="fas fa-user-tag me-2"></i>
         @if ($state === 'full')
-            <span>Employee Work Pattern</span>
+            <span>Employee Work Patterns</span>
         @endif
     </a>
 </li>

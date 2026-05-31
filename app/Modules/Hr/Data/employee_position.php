@@ -321,9 +321,9 @@ return [
     'onQuery' => [],
   ],
   'simpleActions' => [
-    'show' => true,
-    'edit' => true,
-    'delete' => true,
+    '0' => 'show',
+    '1' => 'edit',
+    '2' => 'delete',
   ],
   'isTransaction' => false,
   'crudType' => 'pages',
@@ -363,7 +363,13 @@ return [
         '2' => 'pdf',
       ],
       'delete' => true,
+      'restore' => true,
+      'forceDelete' => true,
     ],
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
   ],
   'fieldGroups' => [
     'job_information' => [

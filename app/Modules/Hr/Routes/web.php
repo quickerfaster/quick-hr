@@ -85,11 +85,13 @@ Route::middleware([
     Route::get('/employees/{employee}/print', [EmployeePrintController::class, 'show'])
         ->name('hr.employees.print')
         //->middleware(['auth', 'can:view,employee']);
-        ->middleware(['auth']);
+       ;
 
 
 
-});
+})->middleware(['auth']);
+
+
 
 
 // Routes for AttendancePolicy
@@ -411,62 +413,33 @@ Route::get('employee-positions/{id}/edit', function (\Illuminate\Http\Request $r
 })->name('employee-positions.edit')->where('id', '[0-9]+'); // And here;
 
 
-// Routes for LeaveRequest
+// Routes for Attendance
 
 // Create Route
-Route::get('leave-requests/create', function (\Illuminate\Http\Request $request) {
-    return view('hr::leave-requests.create', [
-        'configKey' => 'hr.leave_request',
+Route::get('attendances/create', function (\Illuminate\Http\Request $request) {
+    return view('hr::attendances.create', [
+        'configKey' => 'hr.attendance',
         'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
     ]);
-})->name('leave-requests.create');
+})->name('attendances.create');
 
 // Show Route
-Route::get('leave-requests/{id}', function (\Illuminate\Http\Request $request, $id) {
-    return view('hr::leave-requests.show', [
+Route::get('attendances/{id}', function (\Illuminate\Http\Request $request, $id) {
+    return view('hr::attendances.show', [
         'recordId' => (int) $id,
-        'configKey' => 'hr.leave_request',
+        'configKey' => 'hr.attendance',
         'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
     ]);
-})->name('leave-requests.show')->where('id', '[0-9]+'); 
+})->name('attendances.show')->where('id', '[0-9]+'); 
 
 // Edit Route
-Route::get('leave-requests/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
-    return view('hr::leave-requests.edit', [
+Route::get('attendances/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
+    return view('hr::attendances.edit', [
         'recordId' => (int) $id,
-        'configKey' => 'hr.leave_request',
+        'configKey' => 'hr.attendance',
         'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
     ]);
-})->name('leave-requests.edit')->where('id', '[0-9]+'); // And here;
-
-
-// Routes for ShiftSchedule
-
-// Create Route
-Route::get('shift-schedules/create', function (\Illuminate\Http\Request $request) {
-    return view('hr::shift-schedules.create', [
-        'configKey' => 'hr.shift_schedule',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('shift-schedules.create');
-
-// Show Route
-Route::get('shift-schedules/{id}', function (\Illuminate\Http\Request $request, $id) {
-    return view('hr::shift-schedules.show', [
-        'recordId' => (int) $id,
-        'configKey' => 'hr.shift_schedule',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('shift-schedules.show')->where('id', '[0-9]+'); 
-
-// Edit Route
-Route::get('shift-schedules/{id}/edit', function (\Illuminate\Http\Request $request, $id) {
-    return view('hr::shift-schedules.edit', [
-        'recordId' => (int) $id,
-        'configKey' => 'hr.shift_schedule',
-        'returnParams' => $request->only(['page', 'perPage', 'search', 'sort', 'activeFilters'])
-    ]);
-})->name('shift-schedules.edit')->where('id', '[0-9]+'); // And here;
+})->name('attendances.edit')->where('id', '[0-9]+'); // And here;
 
 
 // Routes for Holiday

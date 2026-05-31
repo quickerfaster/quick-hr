@@ -9,6 +9,8 @@ return [
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -29,6 +31,8 @@ return [
       'field_type' => 'select',
       'label' => 'Leave Type',
       'validation' => 'required|exists:leave_types,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\LeaveType',
         'type' => 'belongsTo',
@@ -47,14 +51,14 @@ return [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'number',
-      'label' => 'Balance',
+      'label' => 'Current Balance',
       'validation' => 'required|numeric|min:0',
     ],
     'accrual_rate' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'number',
-      'label' => 'Accrual Rate',
+      'label' => 'Accrual Rate (per period)',
       'validation' => 'nullable|numeric|min:0',
     ],
     'accrual_frequency' => [
@@ -70,6 +74,7 @@ return [
         'Daily' => 'Daily',
         'None' => 'None',
       ],
+      'filterable' => true,
     ],
     'year' => [
       'display' => 'inline',
@@ -77,14 +82,30 @@ return [
       'field_type' => 'number',
       'label' => 'Year',
       'validation' => 'required|integer|min:2020|max:2100',
+      'filterable' => true,
     ],
   ],
   'detailComponent' => '',
   'hiddenFields' => [
-    'onTable' => [],
-    'onNewForm' => [],
-    'onEditForm' => [],
-    'onQuery' => [],
+    'onTable' => [
+      '0' => 'accrual_rate',
+      '1' => 'accrual_frequency',
+      '2' => 'created_at',
+      '3' => 'updated_at',
+      '4' => 'deleted_at',
+    ],
+    'onNewForm' => [
+      '0' => 'created_at',
+      '1' => 'updated_at',
+      '2' => 'deleted_at',
+    ],
+    'onEditForm' => [
+      '0' => 'updated_at',
+      '1' => 'deleted_at',
+    ],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -94,16 +115,23 @@ return [
   'isTransaction' => false,
   'crudType' => 'modals',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'employee_id',
+    '1' => 'leave_type_id',
+    '2' => 'balance',
+    '3' => 'year',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
-    'bulkActions' => [
+    'addButton' => true,
+    'files' => [
       'export' => [
         '0' => 'xls',
         '1' => 'csv',
+        '2' => 'pdf',
       ],
-      'update' => true,
+      'print' => true,
     ],
     'perPage' => [
       '0' => 10,
@@ -113,29 +141,108 @@ return [
     ],
     'search' => true,
     'showHideColumns' => true,
+    'filterColumns' => true,
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
+    'bulkActions' => [
+      'export' => [
+        '0' => 'xls',
+        '1' => 'csv',
+        '2' => 'pdf',
+      ],
+      'delete' => true,
+      'restore' => true,
+      'forceDelete' => true,
+    ],
   ],
   'fieldGroups' => [
     'balance_info' => [
       'title' => 'Balance Information',
       'groupType' => 'hr',
+      'icon' => 'fas fa-scale-balanced',
       'fields' => [
         '0' => 'employee_id',
         '1' => 'leave_type_id',
         '2' => 'balance',
+        '3' => 'year',
       ],
     ],
     'accrual_settings' => [
       'title' => 'Accrual Settings',
       'groupType' => 'hr',
+      'icon' => 'fas fa-chart-line',
       'fields' => [
         '0' => 'accrual_rate',
         '1' => 'accrual_frequency',
-        '2' => 'year',
       ],
     ],
   ],
-  'moreActions' => [],
-  'switchViews' => [],
+  'moreActions' => [
+    '0' => [
+      'title' => 'Restore',
+      'icon' => 'fas fa-trash-restore',
+      'action' => 'restore',
+      'confirm' => 'Restore this archived leave balance?',
+      'requiredPermission' => 'restore_leave_balance',
+      'condition' => 'trashed',
+    ],
+    '1' => [
+      'title' => 'Permanently Delete',
+      'icon' => 'fas fa-skull-crossbones',
+      'action' => 'forceDelete',
+      'confirm' => 'This action cannot be undone. Permanently delete this leave balance?',
+      'requiredPermission' => 'force_delete_leave_balance',
+      'condition' => 'trashed',
+    ],
+  ],
+  'switchViews' => [
+    'default' => 'list',
+    'list' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'employee.employee_number',
+        '1' => 'employee.first_name',
+        '2' => 'employee.last_name',
+      ],
+      'subtitleFields' => [
+        '0' => 'leaveType.name',
+        '1' => 'year',
+      ],
+      'contentFields' => [
+        '0' => 'balance',
+      ],
+      'badgeField' => 'balance',
+      'badgeColors' => [
+        '0' => 'danger',
+        '1-5' => 'warning',
+        '5-10' => 'info',
+        '10+' => 'success',
+      ],
+    ],
+    'card' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'leaveType.name',
+      ],
+      'subtitleFields' => [
+        '0' => 'employee.employee_number',
+      ],
+      'contentFields' => [
+        '0' => 'balance',
+        '1' => 'year',
+      ],
+      'badgeField' => 'accrual_frequency',
+      'badgeColors' => [
+        'Monthly' => 'primary',
+        'Bi-weekly' => 'info',
+        'Weekly' => 'success',
+        'Daily' => 'warning',
+        'None' => 'secondary',
+      ],
+    ],
+  ],
   'relations' => [
     'employee' => [
       'type' => 'belongsTo',

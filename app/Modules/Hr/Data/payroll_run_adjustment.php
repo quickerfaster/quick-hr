@@ -9,6 +9,8 @@ return [
       'field_type' => 'select',
       'label' => 'Payroll Run',
       'validation' => 'required|exists:payroll_runs,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PayrollRun',
         'type' => 'belongsTo',
@@ -29,6 +31,8 @@ return [
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -64,6 +68,7 @@ return [
       'field_type' => 'string',
       'label' => 'Description',
       'validation' => 'required|string|max:255',
+      'filterable' => true,
       'searchable' => true,
     ],
     'amount' => [
@@ -92,6 +97,7 @@ return [
         'review' => 'Performance Review',
         'reimbursement' => 'Expense Reimbursement',
       ],
+      'filterable' => true,
     ],
     'source_id' => [
       'display' => 'inline',
@@ -118,22 +124,29 @@ return [
   'detailComponent' => '',
   'hiddenFields' => [
     'onTable' => [
-      '0' => 'payroll_run_id',
-      '1' => 'source_type',
-      '2' => 'source_id',
+      '0' => 'source_type',
+      '1' => 'source_id',
+      '2' => 'note',
       '3' => 'created_by',
       '4' => 'updated_by',
+      '5' => 'created_at',
+      '6' => 'updated_at',
+      '7' => 'deleted_at',
     ],
     'onNewForm' => [
       '0' => 'source_id',
       '1' => 'created_by',
       '2' => 'updated_by',
+      '3' => 'deleted_at',
     ],
     'onEditForm' => [
       '0' => 'source_id',
       '1' => 'updated_by',
+      '2' => 'deleted_at',
     ],
-    'onQuery' => [],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -143,25 +156,16 @@ return [
   'isTransaction' => false,
   'crudType' => 'drawers',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'payroll_run_id',
+    '1' => 'employee_id',
+    '2' => 'type',
+    '3' => 'label',
+    '4' => 'amount',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
-    'addButton' => [
-      '0' => [
-        'label' => 'New Adjustment',
-        'type' => 'quick_add',
-        'icon' => 'fas fa-plus-circle',
-        'primary' => true,
-      ],
-      '1' => [
-        'label' => 'Bulk Import',
-        'type' => 'modal',
-        'icon' => 'fas fa-file-import',
-        'url' => '/hr/payroll-run-adjustments/import',
-        'modalSize' => 'lg',
-      ],
-    ],
     'files' => [
       'export' => [
         '0' => 'xls',
@@ -170,6 +174,19 @@ return [
       ],
       'print' => true,
     ],
+    'perPage' => [
+      '0' => 10,
+      '1' => 25,
+      '2' => 50,
+      '3' => 100,
+    ],
+    'search' => true,
+    'showHideColumns' => true,
+    'filterColumns' => true,
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
     'bulkActions' => [
       'export' => [
         '0' => 'xls',
@@ -177,53 +194,8 @@ return [
         '2' => 'pdf',
       ],
       'delete' => true,
-    ],
-    'perPage' => [
-      '0' => 10,
-      '1' => 25,
-      '2' => 50,
-      '3' => 100,
-      '4' => 250,
-    ],
-    'search' => true,
-    'showHideColumns' => true,
-    'filterColumns' => true,
-    'filters' => [
-      '0' => [
-        'field' => 'type',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'bonus',
-          '2' => 'commission',
-          '3' => 'correction',
-          '4' => 'reimbursement',
-          '5' => 'deduction',
-        ],
-        'label' => 'Adjustment Type',
-      ],
-      '1' => [
-        'field' => 'employee_id',
-        'type' => 'select',
-        'optionsFrom' => 'employees',
-        'label' => 'Employee',
-      ],
-      '2' => [
-        'field' => 'payroll_run_id',
-        'type' => 'select',
-        'optionsFrom' => 'payroll_runs',
-        'label' => 'Payroll Run',
-      ],
-      '3' => [
-        'field' => 'amount',
-        'type' => 'number_range',
-        'label' => 'Amount Range',
-      ],
-      '4' => [
-        'field' => 'created_at',
-        'type' => 'date_range',
-        'label' => 'Created Date',
-      ],
+      'restore' => true,
+      'forceDelete' => true,
     ],
   ],
   'fieldGroups' => [
@@ -249,79 +221,12 @@ return [
         '1' => 'source_id',
       ],
     ],
-    'audit_info' => [
-      'title' => 'Audit',
-      'groupType' => 'payroll',
-      'icon' => 'fas fa-history',
-      'fields' => [
-        '0' => 'created_by',
-        '1' => 'updated_by',
-      ],
-    ],
   ],
-  'moreActions' => [
-    '0' => [
-      'title' => 'Copy Adjustment',
-      'icon' => 'fas fa-copy',
-      'route' => 'payroll-run-adjustments.copy',
-      'params' => [
-        'id' => '{id}',
-      ],
-      'confirm' => 'Create a copy of this adjustment (for another run or employee)?',
-      'requiredRole' => [
-        '0' => 'hr_admin',
-        '1' => 'payroll_officer',
-      ],
-    ],
-    '1' => [
-      'title' => 'View Payroll Run',
-      'icon' => 'fas fa-file-invoice',
-      'route' => 'payroll-runs.show',
-      'params' => [
-        'payroll_run' => '{payroll_run_id}',
-      ],
-      'newTab' => true,
-    ],
-    '2' => [
-      'title' => 'View Employee',
-      'icon' => 'fas fa-user',
-      'route' => 'employees.show',
-      'params' => [
-        'employee' => '{employee_id}',
-      ],
-      'newTab' => true,
-    ],
-  ],
+  'moreActions' => [],
   'switchViews' => [
     'default' => 'list',
-    'card' => [
-      'titleFields' => [
-        '0' => 'label',
-      ],
-      'subtitleFields' => [
-        '0' => 'type',
-        '1' => 'amount',
-      ],
-      'contentFields' => [
-        '0' => 'employee.employee_number',
-        '1' => 'note',
-      ],
-      'badgeField' => 'type',
-      'badgeColors' => [
-        'bonus' => 'success',
-        'commission' => 'info',
-        'correction' => 'warning',
-        'reimbursement' => 'primary',
-        'deduction' => 'danger',
-      ],
-      'ribbonField' => 'type',
-      'ribbonText' => [
-        'bonus' => '+',
-        'commission' => '+',
-        'correction' => '±',
-        'reimbursement' => '+',
-        'deduction' => '-',
-      ],
+    'table' => [
+      'enabled' => true,
     ],
     'list' => [
       'titleFields' => [
@@ -343,43 +248,6 @@ return [
         'correction' => 'warning',
         'reimbursement' => 'primary',
         'deduction' => 'danger',
-      ],
-    ],
-    'detail' => [
-      'layout' => 'tab',
-      'detailType' => 'record',
-      'titleFields' => [
-        '0' => 'label',
-      ],
-      'subtitleFields' => [
-        '0' => 'employee.employee_number',
-        '1' => 'type',
-      ],
-      'tabs' => [
-        '0' => [
-          'title' => 'Overview',
-          'icon' => 'fas fa-info-circle',
-          'fields' => [
-            '0' => 'payroll_run_id',
-            '1' => 'employee_id',
-            '2' => 'type',
-            '3' => 'label',
-            '4' => 'amount',
-            '5' => 'note',
-          ],
-        ],
-        '1' => [
-          'title' => 'Source & Audit',
-          'icon' => 'fas fa-history',
-          'fields' => [
-            '0' => 'source_type',
-            '1' => 'source_id',
-            '2' => 'created_by',
-            '3' => 'updated_by',
-            '4' => 'created_at',
-            '5' => 'updated_at',
-          ],
-        ],
       ],
     ],
   ],

@@ -2,7 +2,7 @@
 
 return array (
   'title' => 'HR Executive Dashboard',
-  'description' => 'Cross‑module summary of HR metrics',
+  'description' => 'Cross‑module summary of workforce, attendance, leave, payroll, and policy metrics',
   'widgets' => 
   array (
     0 => 
@@ -138,7 +138,7 @@ return array (
     7 => 
     array (
       'type' => 'stat',
-      'title' => 'Today\'s Attendance',
+      'title' => 'Present Today',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\Attendance',
       'icon' => 'fas fa-user-check',
@@ -154,8 +154,8 @@ return array (
         1 => 
         array (
           0 => 'status',
-          1 => '!=',
-          2 => 'absent',
+          1 => '=',
+          2 => 'present',
         ),
       ),
       'width' => 3,
@@ -192,6 +192,8 @@ return array (
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\Attendance',
       'group_by' => 'month',
+      'icon' => 'fas fa-chart-line',
+      'description' => 'Monthly attendance count',
       'aggregate' => 'count',
       'date_field' => 'date',
       'period' => 6,
@@ -211,7 +213,7 @@ return array (
         array (
           0 => 'status',
           1 => '=',
-          2 => 'Draft',
+          2 => 'draft',
         ),
         1 => 
         array (
@@ -240,13 +242,13 @@ return array (
       array (
         0 => 
         array (
-          'label' => 'Period',
+          'label' => 'Period Start',
           'field' => 'period_start',
           'format' => 'date',
         ),
         1 => 
         array (
-          'label' => 'End',
+          'label' => 'Period End',
           'field' => 'period_end',
           'format' => 'date',
         ),
@@ -320,11 +322,11 @@ return array (
     15 => 
     array (
       'type' => 'list',
-      'title' => 'Locations',
+      'title' => 'Top Locations by Employee Count',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Admin\\Models\\Location',
       'icon' => 'fas fa-building',
-      'description' => 'Top 5 locations by employee count',
+      'description' => 'Locations with highest headcount',
       'limit' => 5,
       'sort' => 
       array (

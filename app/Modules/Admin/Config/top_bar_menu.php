@@ -3,7 +3,7 @@
 return [
     [
     'title' => 'Users',
-    'icon' => 'fas fa-user-cog',
+    'icon' => 'fas fa-users-cog',
     'url' => 'admin/admin/users',
     'permission' => 'view_user',
 ],
@@ -20,7 +20,7 @@ return [
     'permission' => 'view_system_setting',
 ],
     [
-    'title' => 'Company  Locations',
+    'title' => 'Company Locations',
     'icon' => 'fas fa-building',
     'url' => 'admin/admin/dashboard-company-profile-overview',
     'permission' => 'view_location',

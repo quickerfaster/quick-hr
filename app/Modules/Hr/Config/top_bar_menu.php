@@ -23,7 +23,7 @@ return [
     'title' => 'Overview',
     'icon' => 'fas fa-file-invoice-dollar',
     'url' => 'hr/hr/dashboard-payroll-overview',
-    'permission' => 'view_overview',
+    'permission' => 'view_payroll_overview',
 ],
     [
     'title' => 'Leave',

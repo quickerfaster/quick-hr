@@ -15,7 +15,7 @@ class Location extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -23,7 +23,7 @@ class Location extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [

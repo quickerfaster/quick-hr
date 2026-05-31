@@ -9,6 +9,8 @@ return [
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -29,6 +31,8 @@ return [
       'field_type' => 'select',
       'label' => 'Work Pattern',
       'validation' => 'required|exists:work_patterns,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\WorkPattern',
         'type' => 'belongsTo',
@@ -49,6 +53,7 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Start Date',
       'validation' => 'required|date',
+      'filterable' => true,
     ],
     'end_date' => [
       'display' => 'inline',
@@ -56,14 +61,28 @@ return [
       'field_type' => 'datepicker',
       'label' => 'End Date',
       'validation' => 'nullable|date|after:start_date',
+      'filterable' => true,
     ],
   ],
   'detailComponent' => '',
   'hiddenFields' => [
-    'onTable' => [],
-    'onNewForm' => [],
-    'onEditForm' => [],
-    'onQuery' => [],
+    'onTable' => [
+      '0' => 'created_at',
+      '1' => 'updated_at',
+      '2' => 'deleted_at',
+    ],
+    'onNewForm' => [
+      '0' => 'created_at',
+      '1' => 'updated_at',
+      '2' => 'deleted_at',
+    ],
+    'onEditForm' => [
+      '0' => 'updated_at',
+      '1' => 'deleted_at',
+    ],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -73,10 +92,48 @@ return [
   'isTransaction' => false,
   'crudType' => 'modals',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'employee_id',
+    '1' => 'work_pattern_id',
+    '2' => 'start_date',
+    '3' => 'end_date',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
-  'controls' => 'all',
+  'controls' => [
+    'addButton' => true,
+    'files' => [
+      'export' => [
+        '0' => 'xls',
+        '1' => 'csv',
+        '2' => 'pdf',
+      ],
+      'print' => true,
+    ],
+    'perPage' => [
+      '0' => 10,
+      '1' => 25,
+      '2' => 50,
+      '3' => 100,
+    ],
+    'search' => true,
+    'showHideColumns' => true,
+    'filterColumns' => true,
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
+    'bulkActions' => [
+      'export' => [
+        '0' => 'xls',
+        '1' => 'csv',
+        '2' => 'pdf',
+      ],
+      'delete' => true,
+      'restore' => true,
+      'forceDelete' => true,
+    ],
+  ],
   'fieldGroups' => [
     'assignment' => [
       'title' => 'Assignment Details',
@@ -90,8 +147,57 @@ return [
       ],
     ],
   ],
-  'moreActions' => [],
-  'switchViews' => [],
+  'moreActions' => [
+    '0' => [
+      'title' => 'Restore',
+      'icon' => 'fas fa-trash-restore',
+      'action' => 'restore',
+      'confirm' => 'Restore this archived assignment?',
+      'requiredPermission' => 'restore_employee_work_pattern',
+      'condition' => 'trashed',
+    ],
+    '1' => [
+      'title' => 'Permanently Delete',
+      'icon' => 'fas fa-skull-crossbones',
+      'action' => 'forceDelete',
+      'confirm' => 'This action cannot be undone. Permanently delete this assignment?',
+      'requiredPermission' => 'force_delete_employee_work_pattern',
+      'condition' => 'trashed',
+    ],
+  ],
+  'switchViews' => [
+    'default' => 'list',
+    'list' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'employee.employee_number',
+        '1' => 'employee.first_name',
+        '2' => 'employee.last_name',
+      ],
+      'subtitleFields' => [
+        '0' => 'workPattern.name',
+      ],
+      'contentFields' => [
+        '0' => 'start_date',
+        '1' => 'end_date',
+      ],
+      'badgeField' => 'end_date',
+    ],
+    'card' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'workPattern.name',
+      ],
+      'subtitleFields' => [
+        '0' => 'employee.employee_number',
+      ],
+      'contentFields' => [
+        '0' => 'start_date',
+        '1' => 'end_date',
+      ],
+      'badgeField' => 'end_date',
+    ],
+  ],
   'relations' => [
     'employee' => [
       'type' => 'belongsTo',

@@ -23,7 +23,7 @@ class JobTitle extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [

@@ -30,11 +30,11 @@ return [
     'key' => 'activity_log',
 ],
     [
-    'title' => 'Overviews',
+    'title' => 'Company Profile Overviews',
     'icon' => 'fas fa-cube',
-    'url' => 'admin/overviews',
-    'permission' => 'view_overview',
-    'key' => 'overview',
+    'url' => 'admin/company-profile-overviews',
+    'permission' => 'view_company_profile_overview',
+    'key' => 'company_profile_overview',
 ],
     [
     'title' => 'System Settings',

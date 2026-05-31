@@ -2,13 +2,13 @@
 
 return array (
   'title' => 'Time & Attendance Overview',
-  'description' => 'Attendance tracking, shift schedules, and holiday management',
+  'description' => 'Monitor attendance tracking, shift schedules, holidays, and workforce availability',
   'widgets' => 
   array (
     0 => 
     array (
       'type' => 'stat',
-      'title' => 'Today\'s Attendance',
+      'title' => 'Present Today',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\Attendance',
       'icon' => 'fas fa-user-check',
@@ -24,8 +24,8 @@ return array (
         1 => 
         array (
           0 => 'status',
-          1 => '!=',
-          2 => 'absent',
+          1 => '=',
+          2 => 'present',
         ),
       ),
       'width' => 3,
@@ -119,6 +119,7 @@ return array (
       'model' => 'App\\Modules\\Hr\\Models\\Attendance',
       'group_by' => 'status',
       'chart_type' => 'pie',
+      'description' => 'Distribution of attendance records',
       'aggregate' => 'count',
       'conditions' => 
       array (
@@ -134,11 +135,12 @@ return array (
     5 => 
     array (
       'type' => 'trend',
-      'title' => 'Attendance Trend',
+      'title' => 'Attendance Trend (Last 6 Months)',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\Attendance',
       'group_by' => 'month',
       'icon' => 'fas fa-chart-line',
+      'description' => 'Monthly attendance count',
       'aggregate' => 'count',
       'date_field' => 'date',
       'period' => 6,
@@ -179,7 +181,7 @@ return array (
     7 => 
     array (
       'type' => 'list',
-      'title' => 'Recent Attendance',
+      'title' => 'Recent Attendance Records',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\Attendance',
       'icon' => 'fas fa-calendar-alt',
@@ -296,15 +298,14 @@ return array (
       ),
       'target_model' => 'App\\Modules\\Hr\\Models\\Employee',
       'target_aggregate' => 'count',
-      'target_conditions' => NULL,
       'width' => 3,
     ),
     10 => 
     array (
       'type' => 'list',
-      'title' => 'Today\'s Schedules',
+      'title' => 'Today\'s Shift Schedules',
       'size' => 'col-12',
-      'model' => 'App\\Modules\\Admin\\Models\\ShiftSchedule',
+      'model' => 'App\\Modules\\Hr\\Models\\ShiftSchedule',
       'icon' => 'fas fa-calendar-check',
       'description' => 'Shifts scheduled for today',
       'limit' => 10,
@@ -340,17 +341,18 @@ return array (
           'field' => 'status',
         ),
       ),
-      'width' => 6,
+      'width' => 9,
       'show_view_all' => true,
       'view_all_link' => '/hr/shift-schedules',
     ),
     11 => 
     array (
       'type' => 'chart',
-      'title' => 'Overtime vs Regular Hours',
+      'title' => 'Overtime vs Regular Hours (This Month)',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\Attendance',
       'chart_type' => 'bar',
+      'description' => 'Comparison of regular and overtime hours',
       'group_by' => NULL,
       'aggregates' => 
       array (
@@ -366,7 +368,49 @@ return array (
           2 => 'first day of this month',
         ),
       ),
-      'width' => 4,
+      'width' => 5,
+    ),
+    12 => 
+    array (
+      'type' => 'list',
+      'title' => 'Recent Shift Schedules',
+      'size' => 'col-12',
+      'model' => 'App\\Modules\\Hr\\Models\\ShiftSchedule',
+      'icon' => 'fas fa-calendar-alt',
+      'description' => 'Latest 5 schedule assignments',
+      'limit' => 5,
+      'sort' => 
+      array (
+        0 => 'created_at',
+        1 => 'desc',
+      ),
+      'columns' => 
+      array (
+        0 => 
+        array (
+          'label' => 'Employee',
+          'field' => 'employee.employee_number',
+        ),
+        1 => 
+        array (
+          'label' => 'Date',
+          'field' => 'schedule_date',
+          'format' => 'date',
+        ),
+        2 => 
+        array (
+          'label' => 'Shift',
+          'field' => 'shift.name',
+        ),
+        3 => 
+        array (
+          'label' => 'Status',
+          'field' => 'status',
+        ),
+      ),
+      'width' => 7,
+      'show_view_all' => true,
+      'view_all_link' => '/hr/shift-schedules',
     ),
   ),
   'roles' => 

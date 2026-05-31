@@ -7,8 +7,10 @@ return [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'string',
-      'label' => 'Title',
-      'validation' => 'required|unique:job_titles,title',
+      'label' => 'Job Title',
+      'validation' => 'required|string|max:255|unique:job_titles,title',
+      'filterable' => true,
+      'searchable' => true,
     ],
     'description' => [
       'display' => 'inline',
@@ -16,14 +18,28 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string',
+      'searchable' => true,
     ],
   ],
   'detailComponent' => '',
   'hiddenFields' => [
-    'onTable' => [],
-    'onNewForm' => [],
-    'onEditForm' => [],
-    'onQuery' => [],
+    'onTable' => [
+      '0' => 'created_at',
+      '1' => 'updated_at',
+      '2' => 'deleted_at',
+    ],
+    'onNewForm' => [
+      '0' => 'created_at',
+      '1' => 'updated_at',
+      '2' => 'deleted_at',
+    ],
+    'onEditForm' => [
+      '0' => 'updated_at',
+      '1' => 'deleted_at',
+    ],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -33,19 +49,20 @@ return [
   'isTransaction' => false,
   'crudType' => 'drawers',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'title',
+    '1' => 'description',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
     'addButton' => true,
     'search' => true,
     'perPage' => [
-      '0' => 5,
-      '1' => 10,
-      '2' => 25,
-      '3' => 50,
-      '4' => 100,
-      '5' => 500,
+      '0' => 10,
+      '1' => 25,
+      '2' => 50,
+      '3' => 100,
     ],
     'files' => [
       'export' => [
@@ -54,6 +71,15 @@ return [
         '2' => 'pdf',
       ],
       'print' => true,
+    ],
+    'showHideColumns' => true,
+    'filterColumns' => true,
+    'filters' => [
+      '0' => [
+        'field' => 'title',
+        'type' => 'text',
+        'label' => 'Job Title',
+      ],
     ],
     'softDelete' => true,
     'restore' => true,
@@ -74,6 +100,7 @@ return [
     '0' => [
       'title' => 'Job Title Information',
       'groupType' => 'hr',
+      'icon' => 'fas fa-info-circle',
       'fields' => [
         '0' => 'title',
         '1' => 'description',
@@ -85,20 +112,44 @@ return [
       'title' => 'Restore',
       'icon' => 'fas fa-trash-restore',
       'action' => 'restore',
-      'confirm' => 'Restore this record?',
-      'requiredPermission' => 'restore_employee',
+      'confirm' => 'Restore this job title?',
+      'requiredPermission' => 'restore_job_title',
       'condition' => 'trashed',
     ],
     '1' => [
       'title' => 'Permanently Delete',
       'icon' => 'fas fa-skull-crossbones',
       'action' => 'forceDelete',
-      'confirm' => 'This action cannot be undone. Permanently delete?',
-      'requiredPermission' => 'force_delete_employee',
+      'confirm' => 'This action cannot be undone. Permanently delete this job title?',
+      'requiredPermission' => 'force_delete_job_title',
       'condition' => 'trashed',
     ],
   ],
-  'switchViews' => [],
+  'switchViews' => [
+    'default' => 'list',
+    'table' => [
+      'enabled' => true,
+    ],
+    'list' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'title',
+      ],
+      'subtitleFields' => [],
+      'contentFields' => [
+        '0' => 'description',
+      ],
+    ],
+    'card' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'title',
+      ],
+      'contentFields' => [
+        '0' => 'description',
+      ],
+    ],
+  ],
   'relations' => [],
   'report' => [],
 ];

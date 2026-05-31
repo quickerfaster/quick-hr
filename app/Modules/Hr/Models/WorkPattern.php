@@ -15,7 +15,7 @@ class WorkPattern extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -23,11 +23,11 @@ class WorkPattern extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'name', 'code', 'description', 'shift_id', 'applicable_days', 'override_start_time', 'override_end_time', 'pattern_type', 'rotation_weeks', 'effective_date', 'end_date', 'is_active', 'is_default'
+        'name', 'code', 'description', 'pattern_type', 'rotation_weeks', 'shift_id', 'applicable_days', 'override_start_time', 'override_end_time', 'effective_date', 'end_date', 'is_active', 'is_default'
     ];
 
     protected $guarded = [
@@ -46,6 +46,8 @@ class WorkPattern extends Model
     ];
 
     protected $attributes = [
+        'pattern_type' => 'recurring',
+        'rotation_weeks' => 2,
         'applicable_days' => array (
   0 => 1,
   1 => 2,
@@ -53,8 +55,6 @@ class WorkPattern extends Model
   3 => 4,
   4 => 5,
 ),
-        'pattern_type' => 'recurring',
-        'rotation_weeks' => 2,
         'is_active' => true,
         'is_default' => false,
         'assigned_employee_count' => 0

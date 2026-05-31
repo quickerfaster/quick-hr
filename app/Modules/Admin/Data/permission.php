@@ -7,8 +7,10 @@ return [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'string',
-      'label' => 'Name',
+      'label' => 'Permission Name',
       'validation' => 'required|string|max:255',
+      'filterable' => true,
+      'searchable' => true,
       'wizard' => [
         'permission_setup' => true,
       ],
@@ -19,6 +21,7 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string|max:1000',
+      'searchable' => true,
     ],
     'guard_name' => [
       'display' => 'inline',
@@ -30,14 +33,27 @@ return [
         'web' => 'Web',
         'api' => 'API',
       ],
+      'filterable' => true,
     ],
   ],
   'detailComponent' => '',
   'hiddenFields' => [
-    'onTable' => [],
-    'onNewForm' => [],
-    'onEditForm' => [],
-    'onQuery' => [],
+    'onTable' => [
+      '0' => 'created_at',
+      '1' => 'updated_at',
+      '2' => 'deleted_at',
+    ],
+    'onNewForm' => [
+      '0' => 'created_at',
+      '1' => 'updated_at',
+      '2' => 'deleted_at',
+    ],
+    'onEditForm' => [
+      '0' => 'deleted_at',
+    ],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -47,7 +63,10 @@ return [
   'isTransaction' => false,
   'crudType' => 'drawers',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'name',
+    '1' => 'guard_name',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
@@ -74,11 +93,39 @@ return [
     ],
     'search' => true,
     'showHideColumns' => true,
+    'filterColumns' => true,
+    'filters' => [
+      '0' => [
+        'field' => 'guard_name',
+        'type' => 'select',
+        'options' => [
+          '0' => 'All',
+          '1' => 'web',
+          '2' => 'api',
+        ],
+        'label' => 'Guard',
+        'default' => 'web',
+      ],
+    ],
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
+    'bulkActions' => [
+      'export' => [
+        '0' => 'csv',
+        '1' => 'json',
+      ],
+      'delete' => true,
+      'restore' => true,
+      'forceDelete' => true,
+    ],
   ],
   'fieldGroups' => [
     'basic_info' => [
       'title' => 'Permission Details',
       'groupType' => 'auth',
+      'icon' => 'fas fa-info-circle',
       'fields' => [
         '0' => 'name',
         '1' => 'description',
@@ -86,8 +133,45 @@ return [
       ],
     ],
   ],
-  'moreActions' => [],
-  'switchViews' => [],
+  'moreActions' => [
+    '0' => [
+      'title' => 'Restore Permission',
+      'icon' => 'fas fa-trash-restore',
+      'action' => 'restore',
+      'confirm' => 'Restore this archived permission?',
+      'requiredPermission' => 'restore_permission',
+      'condition' => 'trashed',
+    ],
+    '1' => [
+      'title' => 'Permanently Delete',
+      'icon' => 'fas fa-skull-crossbones',
+      'action' => 'forceDelete',
+      'confirm' => 'This action cannot be undone. Permanently delete this permission?',
+      'requiredPermission' => 'force_delete_permission',
+      'condition' => 'trashed',
+    ],
+  ],
+  'switchViews' => [
+    'default' => 'list',
+    'list' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'name',
+      ],
+      'subtitleFields' => [
+        '0' => 'guard_name',
+      ],
+      'contentFields' => [
+        '0' => 'description',
+      ],
+    ],
+    'table' => [
+      'enabled' => true,
+    ],
+    'card' => [
+      'enabled' => false,
+    ],
+  ],
   'relations' => [],
   'report' => [],
 ];

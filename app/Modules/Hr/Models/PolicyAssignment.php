@@ -15,7 +15,7 @@ class PolicyAssignment extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -23,11 +23,11 @@ class PolicyAssignment extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'attendance_policy_id', 'priority', 'assignable_type', 'assignable_id'
+        'attendance_policy_id', 'assignable_type', 'assignable_id', 'priority'
     ];
 
     protected $guarded = [
@@ -35,8 +35,8 @@ class PolicyAssignment extends Model
     ];
 
     protected $casts = [
-        'priority' => 'integer',
-        'assignable_id' => 'integer'
+        'assignable_id' => 'integer',
+        'priority' => 'integer'
     ];
 
     protected $attributes = [

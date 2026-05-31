@@ -7,8 +7,10 @@ return [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'livewire-searchable-select',
-      'label' => 'Employee',
+      'label' => 'Employee (Subordinate)',
       'validation' => 'required|exists:employees,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -26,9 +28,11 @@ return [
     'approver_id' => [
       'display' => 'inline',
       'fillable' => true,
-      'field_type' => 'select',
-      'label' => 'Approver',
+      'field_type' => 'livewire-searchable-select',
+      'label' => 'Approver (Manager)',
       'validation' => 'required|exists:employees,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -49,23 +53,25 @@ return [
       'field_type' => 'number',
       'label' => 'Approval Level',
       'validation' => 'required|integer|min:1|max:3',
+      'filterable' => true,
     ],
     'can_approve_all_types' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'radio',
-      'label' => 'Can Approve All Types',
+      'label' => 'Can Approve All Leave Types',
       'validation' => 'required',
       'options' => [
-        'Yes' => 'Yes',
-        'No' => 'No',
+        '0' => 'Yes',
+        '1' => 'No',
       ],
+      'filterable' => true,
     ],
     'leave_type_ids' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'checkbox',
-      'label' => 'Leave Types',
+      'label' => 'Allowed Leave Types',
       'validation' => 'required_if:can_approve_all_types,No|array',
     ],
     'max_approval_days' => [
@@ -79,12 +85,13 @@ return [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'radio',
-      'label' => 'Is Active',
+      'label' => 'Active',
       'validation' => 'required',
       'options' => [
-        'Yes' => 'Yes',
-        'No' => 'No',
+        '0' => 'Yes',
+        '1' => 'No',
       ],
+      'filterable' => true,
     ],
   ],
   'detailComponent' => '',
@@ -92,10 +99,24 @@ return [
     'onTable' => [
       '0' => 'approval_level',
       '1' => 'can_approve_all_types',
+      '2' => 'leave_type_ids',
+      '3' => 'max_approval_days',
+      '4' => 'created_at',
+      '5' => 'updated_at',
+      '6' => 'deleted_at',
     ],
-    'onNewForm' => [],
-    'onEditForm' => [],
-    'onQuery' => [],
+    'onNewForm' => [
+      '0' => 'created_at',
+      '1' => 'updated_at',
+      '2' => 'deleted_at',
+    ],
+    'onEditForm' => [
+      '0' => 'updated_at',
+      '1' => 'deleted_at',
+    ],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -105,16 +126,24 @@ return [
   'isTransaction' => false,
   'crudType' => 'modals',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'employee_id',
+    '1' => 'approver_id',
+    '2' => 'approval_level',
+    '3' => 'can_approve_all_types',
+    '4' => 'is_active',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
-    'bulkActions' => [
+    'addButton' => true,
+    'files' => [
       'export' => [
         '0' => 'xls',
         '1' => 'csv',
+        '2' => 'pdf',
       ],
-      'delete' => true,
+      'print' => true,
     ],
     'perPage' => [
       '0' => 10,
@@ -123,11 +152,28 @@ return [
       '3' => 100,
     ],
     'search' => true,
+    'showHideColumns' => true,
+    'filterColumns' => true,
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
+    'bulkActions' => [
+      'export' => [
+        '0' => 'xls',
+        '1' => 'csv',
+        '2' => 'pdf',
+      ],
+      'delete' => true,
+      'restore' => true,
+      'forceDelete' => true,
+    ],
   ],
   'fieldGroups' => [
     'approval_relationship' => [
       'title' => 'Approval Relationship',
       'groupType' => 'hr',
+      'icon' => 'fas fa-link',
       'fields' => [
         '0' => 'employee_id',
         '1' => 'approver_id',
@@ -137,6 +183,7 @@ return [
     'approval_rules' => [
       'title' => 'Approval Rules',
       'groupType' => 'hr',
+      'icon' => 'fas fa-gavel',
       'fields' => [
         '0' => 'can_approve_all_types',
         '1' => 'leave_type_ids',
@@ -145,8 +192,67 @@ return [
       ],
     ],
   ],
-  'moreActions' => [],
-  'switchViews' => [],
+  'moreActions' => [
+    '0' => [
+      'title' => 'Restore',
+      'icon' => 'fas fa-trash-restore',
+      'action' => 'restore',
+      'confirm' => 'Restore this archived approval rule?',
+      'requiredPermission' => 'restore_leave_approver',
+      'condition' => 'trashed',
+    ],
+    '1' => [
+      'title' => 'Permanently Delete',
+      'icon' => 'fas fa-skull-crossbones',
+      'action' => 'forceDelete',
+      'confirm' => 'This action cannot be undone. Permanently delete this approval rule?',
+      'requiredPermission' => 'force_delete_leave_approver',
+      'condition' => 'trashed',
+    ],
+  ],
+  'switchViews' => [
+    'default' => 'list',
+    'list' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'employee.employee_number',
+        '1' => 'employee.first_name',
+        '2' => 'employee.last_name',
+      ],
+      'subtitleFields' => [
+        '0' => 'approver.employee_number',
+        '1' => 'approver.first_name',
+        '2' => 'approver.last_name',
+      ],
+      'contentFields' => [
+        '0' => 'approval_level',
+        '1' => 'can_approve_all_types',
+      ],
+      'badgeField' => 'is_active',
+      'badgeColors' => [
+        'true' => 'success',
+        'false' => 'secondary',
+      ],
+    ],
+    'card' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'employee.employee_number',
+      ],
+      'subtitleFields' => [
+        '0' => 'approver.employee_number',
+      ],
+      'contentFields' => [
+        '0' => 'approval_level',
+        '1' => 'can_approve_all_types',
+      ],
+      'badgeField' => 'is_active',
+      'badgeColors' => [
+        'true' => 'success',
+        'false' => 'secondary',
+      ],
+    ],
+  ],
   'relations' => [
     'employee' => [
       'type' => 'belongsTo',

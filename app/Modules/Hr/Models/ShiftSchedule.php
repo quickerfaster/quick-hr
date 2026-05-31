@@ -17,7 +17,7 @@ class ShiftSchedule extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -25,11 +25,11 @@ class ShiftSchedule extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'employee_id', 'shift_id', 'schedule_date', 'status', 'start_time_override', 'end_time_override', 'actual_start_time', 'actual_end_time', 'notes', 'approved_by', 'approved_at', 'is_cover_required', 'cover_employee_id', 'attendance_id', 'schedule_type', 'is_published', 'published_at', 'created_from_template', 'last_modified_by', 'last_modified_at'
+        'employee_id', 'shift_id', 'schedule_date', 'status', 'schedule_type', 'start_time_override', 'end_time_override', 'actual_start_time', 'actual_end_time', 'is_cover_required', 'cover_employee_id', 'is_published', 'notes', 'attendance_id', 'approved_by', 'approved_at', 'published_at', 'created_from_template', 'last_modified_by', 'last_modified_at'
     ];
 
     protected $guarded = [
@@ -40,9 +40,9 @@ class ShiftSchedule extends Model
         'schedule_date' => 'date',
         'actual_start_time' => 'datetime',
         'actual_end_time' => 'datetime',
-        'approved_at' => 'datetime',
         'is_cover_required' => 'boolean',
         'is_published' => 'boolean',
+        'approved_at' => 'datetime',
         'published_at' => 'datetime',
         'created_from_template' => 'boolean',
         'last_modified_at' => 'datetime'
@@ -50,8 +50,8 @@ class ShiftSchedule extends Model
 
     protected $attributes = [
         'status' => 'scheduled',
-        'is_cover_required' => false,
         'schedule_type' => 'regular',
+        'is_cover_required' => false,
         'is_published' => true,
         'created_from_template' => false
     ];

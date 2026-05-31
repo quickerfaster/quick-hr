@@ -16,7 +16,7 @@ class PayrollPolicy extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -28,7 +28,7 @@ class PayrollPolicy extends Model
     
 
     protected $fillable = [
-        'name', 'type', 'effect', 'country_code', 'state_code', 'calculation_logic', 'employer_ratio', 'is_statutory', 'effective_date', 'expiry_date', 'is_active', 'description', 'parent_policy_id'
+        'name', 'type', 'effect', 'description', 'country_code', 'state_code', 'calculation_logic', 'employer_ratio', 'is_statutory', 'effective_date', 'expiry_date', 'is_active', 'parent_policy_id'
     ];
 
     protected $guarded = [

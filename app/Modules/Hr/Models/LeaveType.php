@@ -15,7 +15,7 @@ class LeaveType extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -23,11 +23,11 @@ class LeaveType extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'name', 'code', 'deducts_from_balance', 'requires_approval', 'max_days_per_request', 'is_active', 'description'
+        'name', 'code', 'description', 'deducts_from_balance', 'requires_approval', 'max_days_per_request', 'is_active'
     ];
 
     protected $guarded = [

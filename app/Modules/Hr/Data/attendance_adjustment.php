@@ -9,6 +9,8 @@ return [
       'field_type' => 'select',
       'label' => 'Attendance Record',
       'validation' => 'required|exists:attendances,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Attendance',
         'type' => 'belongsTo',
@@ -36,6 +38,7 @@ return [
       'field_type' => 'string',
       'label' => 'Original Status',
       'validation' => 'nullable|string',
+      'filterable' => true,
     ],
     'adjusted_net_hours' => [
       'display' => 'inline',
@@ -58,6 +61,7 @@ return [
         'holiday' => 'Holiday',
         'leave' => 'On Leave',
       ],
+      'filterable' => true,
     ],
     'reason' => [
       'display' => 'inline',
@@ -65,6 +69,7 @@ return [
       'field_type' => 'textarea',
       'label' => 'Reason for Change',
       'validation' => 'required|string|max:500',
+      'searchable' => true,
     ],
     'adjusted_by' => [
       'display' => 'inline',
@@ -84,27 +89,45 @@ return [
   'detailComponent' => '',
   'hiddenFields' => [
     'onTable' => [
-      '0' => 'original_net_hours',
-      '1' => 'original_status',
-      '2' => 'adjusted_by',
-      '3' => 'adjusted_at',
+      '0' => 'original_status',
+      '1' => 'adjusted_by',
+      '2' => 'adjusted_at',
+      '3' => 'created_at',
+      '4' => 'updated_at',
+      '5' => 'deleted_at',
     ],
     'onNewForm' => [
       '0' => 'adjusted_by',
       '1' => 'adjusted_at',
+      '2' => 'created_at',
+      '3' => 'updated_at',
+      '4' => 'deleted_at',
     ],
     'onEditForm' => [
       '0' => 'adjusted_by',
       '1' => 'adjusted_at',
+      '2' => 'updated_at',
+      '3' => 'deleted_at',
+    ],
+    'onQuery' => [
+      '0' => 'deleted_at',
     ],
   ],
   'simpleActions' => [
     '0' => 'show',
+    '1' => 'edit',
+    '2' => 'delete',
   ],
   'isTransaction' => false,
   'crudType' => 'drawers',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'attendance_id',
+    '1' => 'original_net_hours',
+    '2' => 'adjusted_net_hours',
+    '3' => 'adjusted_status',
+    '4' => 'reason',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
@@ -120,6 +143,7 @@ return [
       'export' => [
         '0' => 'xls',
         '1' => 'csv',
+        '2' => 'pdf',
       ],
       'print' => false,
     ],
@@ -127,16 +151,24 @@ return [
       '0' => 10,
       '1' => 25,
       '2' => 50,
+      '3' => 100,
     ],
     'search' => true,
     'showHideColumns' => true,
-    'filters' => [
-      '0' => [
-        'field' => 'attendance_id',
-        'type' => 'select',
-        'optionsFrom' => 'attendances',
-        'label' => 'Attendance Record',
+    'filterColumns' => true,
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
+    'bulkActions' => [
+      'export' => [
+        '0' => 'xls',
+        '1' => 'csv',
+        '2' => 'pdf',
       ],
+      'delete' => true,
+      'restore' => true,
+      'forceDelete' => true,
     ],
   ],
   'fieldGroups' => [
@@ -154,7 +186,33 @@ return [
       ],
     ],
   ],
-  'moreActions' => [],
+  'moreActions' => [
+    '0' => [
+      'title' => 'View Attendance Record',
+      'icon' => 'fas fa-eye',
+      'route' => 'attendances.show',
+      'params' => [
+        'attendance' => '{attendance_id}',
+      ],
+      'newTab' => true,
+    ],
+    '1' => [
+      'title' => 'Restore',
+      'icon' => 'fas fa-trash-restore',
+      'action' => 'restore',
+      'confirm' => 'Restore this archived adjustment?',
+      'requiredPermission' => 'restore_attendance_adjustment',
+      'condition' => 'trashed',
+    ],
+    '2' => [
+      'title' => 'Permanently Delete',
+      'icon' => 'fas fa-skull-crossbones',
+      'action' => 'forceDelete',
+      'confirm' => 'This action cannot be undone. Permanently delete this adjustment?',
+      'requiredPermission' => 'force_delete_attendance_adjustment',
+      'condition' => 'trashed',
+    ],
+  ],
   'switchViews' => [
     'default' => 'list',
     'list' => [
@@ -167,31 +225,18 @@ return [
         '1' => 'adjusted_status',
       ],
       'contentFields' => [
-        '0' => 'adjusted_net_hours',
-        '1' => 'reason',
-        '2' => 'adjusted_by',
+        '0' => 'original_net_hours',
+        '1' => 'adjusted_net_hours',
+        '2' => 'reason',
       ],
       'badgeField' => 'adjusted_status',
-    ],
-    'detail' => [
-      'layout' => 'simple',
-      'detailType' => 'record',
-      'titleFields' => [
-        '0' => 'attendance.employee.first_name',
-        '1' => 'attendance.employee.last_name',
-      ],
-      'subtitleFields' => [
-        '0' => 'attendance.date',
-      ],
-      'fields' => [
-        '0' => 'attendance_id',
-        '1' => 'original_net_hours',
-        '2' => 'original_status',
-        '3' => 'adjusted_net_hours',
-        '4' => 'adjusted_status',
-        '5' => 'reason',
-        '6' => 'adjusted_by',
-        '7' => 'adjusted_at',
+      'badgeColors' => [
+        'present' => 'success',
+        'absent' => 'danger',
+        'late' => 'warning',
+        'half_day' => 'info',
+        'holiday' => 'primary',
+        'leave' => 'secondary',
       ],
     ],
   ],

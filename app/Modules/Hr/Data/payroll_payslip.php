@@ -10,6 +10,7 @@ return [
       'label' => 'Payslip Number',
       'validation' => 'required|string|max:50|unique:payroll_payslips,payslip_number',
       'autoGenerate' => true,
+      'filterable' => true,
       'searchable' => true,
     ],
     'payroll_run_id' => [
@@ -18,6 +19,8 @@ return [
       'field_type' => 'select',
       'label' => 'Payroll Run',
       'validation' => 'required|exists:payroll_runs,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PayrollRun',
         'type' => 'belongsTo',
@@ -38,6 +41,8 @@ return [
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -163,13 +168,19 @@ return [
       '5' => 'notes',
       '6' => 'created_by',
       '7' => 'updated_by',
+      '8' => 'created_at',
+      '9' => 'updated_at',
     ],
     'onNewForm' => [
       '0' => 'created_by',
       '1' => 'updated_by',
+      '2' => 'created_at',
+      '3' => 'updated_at',
     ],
     'onEditForm' => [
       '0' => 'updated_by',
+      '1' => 'created_at',
+      '2' => 'updated_at',
     ],
     'onQuery' => [],
   ],
@@ -179,7 +190,13 @@ return [
   'isTransaction' => false,
   'crudType' => 'pages',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'payslip_number',
+    '1' => 'employee_id',
+    '2' => 'payroll_run_id',
+    '3' => 'net_pay',
+    '4' => 'payment_status',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
@@ -192,6 +209,15 @@ return [
       ],
       'print' => true,
     ],
+    'perPage' => [
+      '0' => 10,
+      '1' => 25,
+      '2' => 50,
+      '3' => 100,
+    ],
+    'search' => true,
+    'showHideColumns' => true,
+    'filterColumns' => true,
     'bulkActions' => [
       'export' => [
         '0' => 'pdf',
@@ -211,52 +237,6 @@ return [
         'dispatchEvent' => true,
         'eventName' => 'resendPayslipEmail',
         'confirm' => 'Resend payslip emails to selected employees?',
-      ],
-    ],
-    'perPage' => [
-      '0' => 10,
-      '1' => 25,
-      '2' => 50,
-      '3' => 100,
-    ],
-    'search' => true,
-    'showHideColumns' => true,
-    'filterColumns' => true,
-    'filters' => [
-      '0' => [
-        'field' => 'payroll_run_id',
-        'type' => 'select',
-        'optionsFrom' => 'payroll_runs',
-        'label' => 'Payroll Run',
-      ],
-      '1' => [
-        'field' => 'employee_id',
-        'type' => 'select',
-        'optionsFrom' => 'employees',
-        'label' => 'Employee',
-      ],
-      '2' => [
-        'field' => 'payment_status',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'pending',
-          '2' => 'processing',
-          '3' => 'paid',
-          '4' => 'failed',
-          '5' => 'cancelled',
-        ],
-        'label' => 'Payment Status',
-      ],
-      '3' => [
-        'field' => 'net_pay',
-        'type' => 'number_range',
-        'label' => 'Net Pay Range',
-      ],
-      '4' => [
-        'field' => 'paid_at',
-        'type' => 'date_range',
-        'label' => 'Paid Date Range',
       ],
     ],
   ],
@@ -317,89 +297,13 @@ return [
         '1' => 'bank_account_snapshot',
       ],
     ],
-    'audit' => [
-      'title' => 'Audit',
-      'groupType' => 'payroll',
-      'icon' => 'fas fa-history',
-      'fields' => [
-        '0' => 'created_by',
-        '1' => 'updated_by',
-      ],
-    ],
   ],
-  'moreActions' => [
-    '0' => [
-      'title' => 'Download PDF',
-      'icon' => 'fas fa-file-pdf',
-      'route' => 'payroll-payslips.download-pdf',
-      'params' => [
-        'id' => '{id}',
-      ],
-      'newTab' => true,
-      'requiredRole' => [
-        '0' => 'employee',
-        '1' => 'manager',
-        '2' => 'hr_admin',
-        '3' => 'payroll_officer',
-      ],
-    ],
-    '1' => [
-      'title' => 'Email Payslip',
-      'icon' => 'fas fa-envelope',
-      'dispatchEvent' => true,
-      'eventName' => 'sendPayslipEmail',
-      'params' => [
-        'payslip_id' => '{id}',
-      ],
-      'confirm' => 'Send this payslip to the employee\'s email?',
-    ],
-    '2' => [
-      'title' => 'View Full Details',
-      'icon' => 'fas fa-list-ul',
-      'route' => 'payroll-payslips.show',
-      'params' => [
-        'payslip' => '{id}',
-      ],
-      'newTab' => true,
-    ],
-    '3' => [
-      'title' => 'View Employee',
-      'icon' => 'fas fa-user',
-      'route' => 'employees.show',
-      'params' => [
-        'employee' => '{employee_id}',
-      ],
-      'newTab' => true,
-    ],
-    '4' => [
-      'title' => 'View Payroll Run',
-      'icon' => 'fas fa-file-invoice-dollar',
-      'route' => 'payroll-runs.show',
-      'params' => [
-        'payroll_run' => '{payroll_run_id}',
-      ],
-      'newTab' => true,
-    ],
-    '5' => [
-      'title' => 'Reconcile Payment',
-      'icon' => 'fas fa-check-double',
-      'updateModelField' => true,
-      'fieldName' => 'payment_status',
-      'fieldValue' => 'paid',
-      'actionName' => 'reconcile_payment',
-      'confirm' => 'Mark this payslip as paid?',
-      'condition' => [
-        '0' => [
-          'payment_status' => [
-            '0' => 'pending',
-            '1' => 'processing',
-          ],
-        ],
-      ],
-    ],
-  ],
+  'moreActions' => [],
   'switchViews' => [
     'default' => 'list',
+    'table' => [
+      'enabled' => true,
+    ],
     'card' => [
       'titleFields' => [
         '0' => 'employee.employee_number',
@@ -442,61 +346,6 @@ return [
         'paid' => 'success',
         'failed' => 'danger',
         'cancelled' => 'dark',
-      ],
-    ],
-    'detail' => [
-      'layout' => 'tab',
-      'detailType' => 'record',
-      'titleFields' => [
-        '0' => 'payslip_number',
-      ],
-      'subtitleFields' => [
-        '0' => 'employee.employee_number',
-        '1' => 'employee.first_name',
-        '2' => 'employee.last_name',
-      ],
-      'tabs' => [
-        '0' => [
-          'title' => 'Summary',
-          'icon' => 'fas fa-chart-simple',
-          'fields' => [
-            '0' => 'payroll_run_id',
-            '1' => 'employee_id',
-            '2' => 'base_salary',
-            '3' => 'gross_pay',
-            '4' => 'total_deductions',
-            '5' => 'total_taxes',
-            '6' => 'total_benefit_deductions',
-            '7' => 'net_pay',
-          ],
-        ],
-        '1' => [
-          'title' => 'Payment',
-          'icon' => 'fas fa-credit-card',
-          'fields' => [
-            '0' => 'payment_status',
-            '1' => 'paid_at',
-            '2' => 'payment_reference',
-            '3' => 'bank_account_snapshot',
-          ],
-        ],
-        '2' => [
-          'title' => 'Line Items',
-          'icon' => 'fas fa-list-ul',
-          'relation' => 'items',
-          'relationLimit' => 50,
-        ],
-        '3' => [
-          'title' => 'Notes & Audit',
-          'icon' => 'fas fa-history',
-          'fields' => [
-            '0' => 'notes',
-            '1' => 'created_by',
-            '2' => 'updated_by',
-            '3' => 'created_at',
-            '4' => 'updated_at',
-          ],
-        ],
       ],
     ],
   ],

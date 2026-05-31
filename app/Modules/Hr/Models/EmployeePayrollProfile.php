@@ -16,7 +16,7 @@ class EmployeePayrollProfile extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -28,7 +28,7 @@ class EmployeePayrollProfile extends Model
     
 
     protected $fillable = [
-        'employee_id', 'pay_schedule_id', 'bank_account_holder_name', 'bank_name', 'bank_account_number', 'bank_routing_number', 'bank_iban', 'bank_swift', 'account_type', 'payment_method', 'tax_filing_status', 'allowances', 'extra_withholding', 'is_exempt_from_federal_tax', 'override_country_code', 'override_state_code', 'currency_code', 'effective_date', 'expiry_date', 'is_active'
+        'employee_id', 'pay_schedule_id', 'bank_account_holder_name', 'bank_name', 'account_type', 'bank_account_number', 'bank_routing_number', 'bank_iban', 'bank_swift', 'payment_method', 'tax_filing_status', 'allowances', 'extra_withholding', 'is_exempt_from_federal_tax', 'override_country_code', 'override_state_code', 'currency_code', 'effective_date', 'expiry_date', 'is_active'
     ];
 
     protected $guarded = [

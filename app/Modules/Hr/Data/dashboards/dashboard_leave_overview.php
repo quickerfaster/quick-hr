@@ -2,7 +2,7 @@
 
 return array (
   'title' => 'Leave Management Overview',
-  'description' => 'Leave requests, balances, and approvals',
+  'description' => 'Monitor leave requests, balances, approvals, and upcoming absences',
   'widgets' => 
   array (
     0 => 
@@ -104,17 +104,19 @@ return array (
       'model' => 'App\\Modules\\Hr\\Models\\LeaveRequest',
       'group_by' => 'status',
       'chart_type' => 'pie',
+      'description' => 'Distribution across workflow states',
       'aggregate' => 'count',
       'width' => 4,
     ),
     5 => 
     array (
       'type' => 'chart',
-      'title' => 'Requests by Leave Type',
+      'title' => 'Approved Requests by Leave Type',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\LeaveRequest',
       'group_by' => 'leave_type_id',
       'chart_type' => 'bar',
+      'description' => 'Most used leave categories',
       'aggregate' => 'count',
       'conditions' => 
       array (
@@ -130,10 +132,12 @@ return array (
     6 => 
     array (
       'type' => 'trend',
-      'title' => 'Leave Requests Trend',
+      'title' => 'Leave Requests Trend (Last 6 Months)',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\LeaveRequest',
       'group_by' => 'month',
+      'icon' => 'fas fa-chart-line',
+      'description' => 'Monthly request volume',
       'aggregate' => 'count',
       'date_field' => 'created_at',
       'period' => 6,
@@ -146,7 +150,7 @@ return array (
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\LeaveRequest',
       'icon' => 'fas fa-list-alt',
-      'description' => 'Latest 5 requests',
+      'description' => 'Latest 5 requests submitted',
       'limit' => 5,
       'sort' => 
       array (
@@ -189,7 +193,7 @@ return array (
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\LeaveRequest',
       'icon' => 'fas fa-user-check',
-      'description' => 'Requests awaiting action',
+      'description' => 'Awaiting manager action',
       'limit' => 5,
       'sort' => 
       array (
@@ -280,32 +284,52 @@ return array (
     ),
     11 => 
     array (
-      'type' => 'progress',
-      'title' => 'Leave Utilization',
+      'type' => 'action_card',
+      'title' => 'Manage Leave Types',
       'size' => 'col-12',
-      'model' => 'App\\Modules\\Hr\\Models\\LeaveBalance',
-      'icon' => 'fas fa-chart-pie',
-      'description' => 'Average balance used vs total',
-      'aggregate' => 'sum',
-      'field' => 'balance',
-      'target_model' => 'App\\Modules\\Hr\\Models\\LeaveBalance',
-      'target_aggregate' => 'sum',
-      'target_field' => 'balance',
-      'target_conditions' => 
+      'icon' => 'fas fa-tags',
+      'description' => 'Configure leave categories',
+      'actions' => 
       array (
         0 => 
         array (
-          0 => 'year',
-          1 => '=',
-          2 => 'currentYear',
+          'label' => 'Manage',
+          'event' => 'navigate',
+          'params' => 
+          array (
+            'url' => '/hr/leave-types',
+          ),
+          'style' => 'secondary',
         ),
       ),
       'width' => 3,
     ),
     12 => 
     array (
+      'type' => 'action_card',
+      'title' => 'Approval Rules',
+      'size' => 'col-12',
+      'icon' => 'fas fa-user-check',
+      'description' => 'Define manager approvals',
+      'actions' => 
+      array (
+        0 => 
+        array (
+          'label' => 'Configure',
+          'event' => 'navigate',
+          'params' => 
+          array (
+            'url' => '/hr/leave-approvers',
+          ),
+          'style' => 'secondary',
+        ),
+      ),
+      'width' => 3,
+    ),
+    13 => 
+    array (
       'type' => 'list',
-      'title' => 'Upcoming Leave',
+      'title' => 'Upcoming Leave (Next 30 Days)',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\LeaveRequest',
       'icon' => 'fas fa-calendar-week',
@@ -364,6 +388,85 @@ return array (
       'width' => 6,
       'show_view_all' => true,
       'view_all_link' => '/hr/leave-requests?status=Approved&start_date=upcoming',
+    ),
+    14 => 
+    array (
+      'type' => 'list',
+      'title' => 'Employees with Low Balance (<2 days)',
+      'size' => 'col-12',
+      'model' => 'App\\Modules\\Hr\\Models\\LeaveBalance',
+      'icon' => 'fas fa-exclamation-triangle',
+      'description' => 'Critical leave balance alert',
+      'limit' => 5,
+      'sort' => 
+      array (
+        0 => 'balance',
+        1 => 'asc',
+      ),
+      'conditions' => 
+      array (
+        0 => 
+        array (
+          0 => 'balance',
+          1 => '<',
+          2 => 2,
+        ),
+        1 => 
+        array (
+          0 => 'leave_type_id',
+          1 => '=',
+          2 => 
+          array (
+            'subquery' => 'SELECT id FROM leave_types WHERE deducts_from_balance = 1 LIMIT 1',
+          ),
+        ),
+      ),
+      'columns' => 
+      array (
+        0 => 
+        array (
+          'label' => 'Employee',
+          'field' => 'employee.employee_number',
+        ),
+        1 => 
+        array (
+          'label' => 'Leave Type',
+          'field' => 'leaveType.name',
+        ),
+        2 => 
+        array (
+          'label' => 'Balance',
+          'field' => 'balance',
+          'format' => 'decimal',
+        ),
+      ),
+      'width' => 6,
+      'show_view_all' => true,
+      'view_all_link' => '/hr/leave-balances?balance_low=true',
+    ),
+    15 => 
+    array (
+      'type' => 'progress',
+      'title' => 'Leave Utilization',
+      'size' => 'col-12',
+      'model' => 'App\\Modules\\Hr\\Models\\LeaveBalance',
+      'icon' => 'fas fa-chart-pie',
+      'description' => 'Average balance used vs total entitlement',
+      'aggregate' => 'sum',
+      'field' => 'balance',
+      'target_model' => 'App\\Modules\\Hr\\Models\\LeaveBalance',
+      'target_aggregate' => 'sum',
+      'target_field' => 'balance',
+      'target_conditions' => 
+      array (
+        0 => 
+        array (
+          0 => 'year',
+          1 => '=',
+          2 => 'currentYear',
+        ),
+      ),
+      'width' => 3,
     ),
   ),
   'roles' => 

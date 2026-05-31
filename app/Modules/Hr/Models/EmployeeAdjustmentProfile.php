@@ -16,7 +16,7 @@ class EmployeeAdjustmentProfile extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 

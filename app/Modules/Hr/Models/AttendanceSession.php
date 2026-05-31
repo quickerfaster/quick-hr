@@ -16,7 +16,7 @@ class AttendanceSession extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -24,11 +24,11 @@ class AttendanceSession extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'attendance_id', 'clock_in_event_id', 'clock_out_event_id', 'start_time', 'end_time', 'duration_hours', 'session_type', 'is_overnight', 'is_adjusted', 'adjustment_reason', 'adjusted_by', 'adjusted_at', 'calculated_duration', 'validation_status', 'validation_notes'
+        'attendance_id', 'start_time', 'end_time', 'duration_hours', 'session_type', 'is_adjusted', 'adjustment_reason', 'clock_in_event_id', 'clock_out_event_id', 'is_overnight', 'adjusted_by', 'adjusted_at', 'calculated_duration', 'validation_status', 'validation_notes'
     ];
 
     protected $guarded = [
@@ -36,13 +36,13 @@ class AttendanceSession extends Model
     ];
 
     protected $casts = [
-        'clock_in_event_id' => 'integer',
-        'clock_out_event_id' => 'integer',
         'start_time' => 'datetime',
         'end_time' => 'datetime',
         'duration_hours' => 'decimal:2',
-        'is_overnight' => 'boolean',
         'is_adjusted' => 'boolean',
+        'clock_in_event_id' => 'integer',
+        'clock_out_event_id' => 'integer',
+        'is_overnight' => 'boolean',
         'adjusted_at' => 'datetime',
         'calculated_duration' => 'decimal:2'
     ];
@@ -50,8 +50,8 @@ class AttendanceSession extends Model
     protected $attributes = [
         'duration_hours' => 0,
         'session_type' => 'work',
-        'is_overnight' => false,
         'is_adjusted' => false,
+        'is_overnight' => false,
         'validation_status' => 'valid'
     ];
 

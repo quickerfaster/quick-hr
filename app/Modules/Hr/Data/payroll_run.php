@@ -7,8 +7,10 @@ return [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'string',
-      'label' => 'Payroll Unique Title',
+      'label' => 'Payroll Title',
       'validation' => 'required|unique:payroll_runs,title',
+      'filterable' => true,
+      'searchable' => true,
     ],
     'pay_schedule_id' => [
       'display' => 'inline',
@@ -16,6 +18,8 @@ return [
       'field_type' => 'select',
       'label' => 'Pay Schedule',
       'validation' => 'required|exists:pay_schedules,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PaySchedule',
         'type' => 'belongsTo',
@@ -36,6 +40,7 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Period Start',
       'validation' => 'required|date',
+      'filterable' => true,
     ],
     'period_end' => [
       'display' => 'inline',
@@ -43,6 +48,7 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Period End',
       'validation' => 'required|date|after:period_start',
+      'filterable' => true,
     ],
     'status' => [
       'display' => 'inline',
@@ -69,6 +75,20 @@ return [
       'field_type' => 'number',
       'label' => 'Wizard Step',
       'validation' => 'nullable|integer|min:1|max:4',
+    ],
+    'calculation_status' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Calculation Status',
+      'validation' => 'nullable|in:pending,processing,completed,failed',
+      'options' => [
+        'pending' => 'Pending',
+        'processing' => 'Processing',
+        'completed' => 'Completed',
+        'failed' => 'Failed',
+      ],
+      'filterable' => true,
     ],
     'total_gross_pay' => [
       'display' => 'inline',
@@ -105,33 +125,6 @@ return [
       'label' => 'Total Cash Required',
       'validation' => 'nullable|numeric|min:0',
     ],
-    'total_employees' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'number',
-      'label' => 'Total Employees',
-      'validation' => 'nullable|integer',
-    ],
-    'processed_employees' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'number',
-      'label' => 'Processed Employees',
-      'validation' => 'nullable|integer',
-    ],
-    'calculation_status' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'select',
-      'label' => 'Calculation Status',
-      'validation' => 'nullable|in:pending,processing,completed,failed',
-      'options' => [
-        'pending' => 'Pending',
-        'processing' => 'Processing',
-        'completed' => 'Completed',
-        'failed' => 'Failed',
-      ],
-    ],
     'processed_by' => [
       'display' => 'inline',
       'fillable' => true,
@@ -159,6 +152,20 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Approved At',
       'validation' => 'nullable|date',
+    ],
+    'total_employees' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'number',
+      'label' => 'Total Employees',
+      'validation' => 'nullable|integer',
+    ],
+    'processed_employees' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'number',
+      'label' => 'Processed Employees',
+      'validation' => 'nullable|integer',
     ],
     'failed_at' => [
       'display' => 'inline',
@@ -203,14 +210,17 @@ return [
       '1' => 'total_deductions',
       '2' => 'total_taxes',
       '3' => 'total_employer_contributions',
-      '4' => 'processed_by',
-      '5' => 'processed_at',
-      '6' => 'approved_by',
-      '7' => 'approved_at',
-      '8' => 'notes',
-      '9' => 'created_by',
-      '10' => 'updated_by',
-      '11' => 'current_step',
+      '4' => 'total_cash_required',
+      '5' => 'processed_by',
+      '6' => 'processed_at',
+      '7' => 'approved_by',
+      '8' => 'approved_at',
+      '9' => 'notes',
+      '10' => 'created_by',
+      '11' => 'updated_by',
+      '12' => 'current_step',
+      '13' => 'created_at',
+      '14' => 'updated_at',
     ],
     'onNewForm' => [
       '0' => 'total_gross_pay',
@@ -225,6 +235,8 @@ return [
       '9' => 'current_step',
       '10' => 'created_by',
       '11' => 'updated_by',
+      '12' => 'created_at',
+      '13' => 'updated_at',
     ],
     'onEditForm' => [
       '0' => 'total_gross_pay',
@@ -238,6 +250,8 @@ return [
       '8' => 'approved_at',
       '9' => 'current_step',
       '10' => 'updated_by',
+      '11' => 'created_at',
+      '12' => 'updated_at',
     ],
     'onQuery' => [],
   ],
@@ -247,7 +261,13 @@ return [
   'isTransaction' => false,
   'crudType' => 'pages',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'title',
+    '1' => 'pay_schedule_id',
+    '2' => 'period_start',
+    '3' => 'period_end',
+    '4' => 'status',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
@@ -268,6 +288,15 @@ return [
       ],
       'print' => true,
     ],
+    'perPage' => [
+      '0' => 10,
+      '1' => 25,
+      '2' => 50,
+      '3' => 100,
+    ],
+    'search' => true,
+    'showHideColumns' => true,
+    'filterColumns' => true,
     'bulkActions' => [
       'export' => [
         '0' => 'xls',
@@ -324,56 +353,6 @@ return [
         ],
       ],
     ],
-    'perPage' => [
-      '0' => 10,
-      '1' => 25,
-      '2' => 50,
-      '3' => 100,
-    ],
-    'search' => true,
-    'showHideColumns' => true,
-    'filterColumns' => true,
-    'filters' => [
-      '0' => [
-        'field' => 'pay_schedule_id',
-        'type' => 'select',
-        'optionsFrom' => 'pay_schedules',
-        'label' => 'Pay Schedule',
-      ],
-      '1' => [
-        'field' => 'status',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'draft',
-          '2' => 'verification_complete',
-          '3' => 'adjustments_pending',
-          '4' => 'ready_for_review',
-          '5' => 'approved',
-          '6' => 'processing',
-          '7' => 'paid',
-          '8' => 'cancelled',
-          '9' => 'archived',
-        ],
-        'label' => 'Status',
-        'default' => 'draft,verification_complete,adjustments_pending,ready_for_review,approved,processing,paid',
-      ],
-      '2' => [
-        'field' => 'period_start',
-        'type' => 'date_range',
-        'label' => 'Period Start Range',
-      ],
-      '3' => [
-        'field' => 'period_end',
-        'type' => 'date_range',
-        'label' => 'Period End Range',
-      ],
-      '4' => [
-        'field' => 'total_cash_required',
-        'type' => 'number_range',
-        'label' => 'Total Cash Required',
-      ],
-    ],
   ],
   'fieldGroups' => [
     'schedule_period' => [
@@ -428,15 +407,6 @@ return [
         '0' => 'notes',
       ],
     ],
-    'audit' => [
-      'title' => 'Audit',
-      'groupType' => 'payroll',
-      'icon' => 'fas fa-history',
-      'fields' => [
-        '0' => 'created_by',
-        '1' => 'updated_by',
-      ],
-    ],
   ],
   'moreActions' => [
     '0' => [
@@ -444,13 +414,17 @@ return [
       'icon' => 'fas fa-edit',
       'url' => '/hr/payroll-wizard?id={id}',
       'condition' => [
-        '0' => [
-          'status' => [
-            '0' => 'draft',
-            '1' => 'verification_complete',
-            '2' => 'adjustments_pending',
-            '3' => 'ready_for_review',
-          ],
+        'status' => [
+          '0' => 'draft',
+          '1' => 'verification_complete',
+          '2' => 'adjustments_pending',
+          '3' => 'ready_for_review',
+        ],
+        'another_field' => [
+          '0' => 'draft',
+          '1' => 'verification_complete',
+          '2' => 'adjustments_pending',
+          '3' => 'ready_for_review',
         ],
       ],
       'requiredRole' => [
@@ -571,34 +545,13 @@ return [
   ],
   'switchViews' => [
     'default' => 'list',
-    'card' => [
-      'titleFields' => [
-        '0' => 'paySchedule.name',
-      ],
-      'subtitleFields' => [
-        '0' => 'period_start',
-        '1' => 'period_end',
-      ],
-      'contentFields' => [
-        '0' => 'status',
-        '1' => 'total_cash_required',
-      ],
-      'badgeField' => 'status',
-      'badgeColors' => [
-        'draft' => 'secondary',
-        'verification_complete' => 'info',
-        'adjustments_pending' => 'warning',
-        'ready_for_review' => 'primary',
-        'approved' => 'success',
-        'processing' => 'info',
-        'paid' => 'success',
-        'cancelled' => 'dark',
-        'archived' => 'secondary',
-      ],
+    'table' => [
+      'enabled' => true,
     ],
     'list' => [
       'titleFields' => [
-        '0' => 'paySchedule.name',
+        '0' => 'title',
+        '1' => 'paySchedule.name',
       ],
       'subtitleFields' => [
         '0' => 'period_start',
@@ -619,74 +572,6 @@ return [
         'paid' => 'success',
         'cancelled' => 'dark',
         'archived' => 'secondary',
-      ],
-    ],
-    'detail' => [
-      'layout' => 'tab',
-      'detailType' => 'record',
-      'titleFields' => [
-        '0' => 'paySchedule.name',
-      ],
-      'subtitleFields' => [
-        '0' => 'period_start',
-        '1' => 'period_end',
-      ],
-      'tabs' => [
-        '0' => [
-          'title' => 'Overview',
-          'icon' => 'fas fa-info-circle',
-          'fields' => [
-            '0' => 'pay_schedule_id',
-            '1' => 'period_start',
-            '2' => 'period_end',
-            '3' => 'status',
-            '4' => 'current_step',
-          ],
-        ],
-        '1' => [
-          'title' => 'Financials',
-          'icon' => 'fas fa-chart-pie',
-          'fields' => [
-            '0' => 'total_gross_pay',
-            '1' => 'total_deductions',
-            '2' => 'total_taxes',
-            '3' => 'total_employer_contributions',
-            '4' => 'total_cash_required',
-          ],
-        ],
-        '2' => [
-          'title' => 'Processing',
-          'icon' => 'fas fa-cogs',
-          'fields' => [
-            '0' => 'processed_by',
-            '1' => 'processed_at',
-            '2' => 'approved_by',
-            '3' => 'approved_at',
-            '4' => 'notes',
-          ],
-        ],
-        '3' => [
-          'title' => 'Payslips',
-          'icon' => 'fas fa-receipt',
-          'relation' => 'payslips',
-          'relationLimit' => 50,
-        ],
-        '4' => [
-          'title' => 'Adjustments',
-          'icon' => 'fas fa-edit',
-          'relation' => 'adjustments',
-          'relationLimit' => 50,
-        ],
-        '5' => [
-          'title' => 'Audit',
-          'icon' => 'fas fa-history',
-          'fields' => [
-            '0' => 'created_by',
-            '1' => 'updated_by',
-            '2' => 'created_at',
-            '3' => 'updated_at',
-          ],
-        ],
       ],
     ],
   ],

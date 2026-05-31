@@ -2,7 +2,7 @@
 
 return array (
   'title' => 'Employee Overview',
-  'description' => 'Personal dashboard for {{ employee_number }}',
+  'description' => 'Personal dashboard – your leave, attendance, documents, and key metrics at a glance',
   'widgets' => 
   array (
     0 => 
@@ -28,7 +28,7 @@ return array (
       array (
         0 => 
         array (
-          0 => 'employee_number',
+          0 => 'employee.employee_number',
           1 => '=',
           2 => '{{ employee_number }}',
         ),
@@ -180,7 +180,7 @@ return array (
       array (
         0 => 
         array (
-          0 => 'employee_number',
+          0 => 'employee.employee_number',
           1 => '=',
           2 => '{{ employee_number }}',
         ),
@@ -223,7 +223,7 @@ return array (
     7 => 
     array (
       'type' => 'list',
-      'title' => 'Recent Activity',
+      'title' => 'Recent Clock Events',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\ClockEvent',
       'icon' => 'fas fa-history',
@@ -281,11 +281,11 @@ return array (
     9 => 
     array (
       'type' => 'list',
-      'title' => 'Expiring Documents',
+      'title' => 'Expiring Documents (Next 30 Days)',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\Document',
       'icon' => 'fas fa-file-exclamation',
-      'description' => 'Documents expiring in the next 30 days',
+      'description' => 'Documents requiring attention',
       'limit' => 5,
       'sort' => 
       array (
@@ -331,12 +331,6 @@ return array (
           'field' => 'expiry_date',
           'format' => 'date',
         ),
-        3 => 
-        array (
-          'label' => 'Status',
-          'field' => 'expiry_date',
-          'custom' => true,
-        ),
       ),
       'width' => 6,
       'show_view_all' => true,
@@ -345,7 +339,7 @@ return array (
     10 => 
     array (
       'type' => 'activity_log',
-      'title' => 'Recent Activity (Location)',
+      'title' => 'Recent Location Activity',
       'size' => 'col-12',
       'icon' => 'fas fa-history',
       'log_name' => 'hr.location',

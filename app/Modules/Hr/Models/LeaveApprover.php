@@ -16,7 +16,7 @@ class LeaveApprover extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -24,7 +24,7 @@ class LeaveApprover extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [

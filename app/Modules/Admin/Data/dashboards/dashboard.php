@@ -2,7 +2,7 @@
 
 return array (
   'title' => 'User & Permission Overview',
-  'description' => 'User accounts, roles, and permissions',
+  'description' => 'Monitor user accounts, roles, permissions, and access control metrics',
   'widgets' => 
   array (
     0 => 
@@ -62,6 +62,7 @@ return array (
       'model' => 'App\\Modules\\Admin\\Models\\User',
       'group_by' => 'status',
       'chart_type' => 'pie',
+      'description' => 'Distribution of user account statuses',
       'aggregate' => 'count',
       'width' => 4,
     ),
@@ -73,6 +74,7 @@ return array (
       'model' => 'App\\Modules\\Admin\\Models\\Role',
       'group_by' => 'guard_name',
       'chart_type' => 'bar',
+      'description' => 'Web vs. API roles',
       'aggregate' => 'count',
       'width' => 4,
     ),
@@ -84,6 +86,7 @@ return array (
       'model' => 'App\\Modules\\Admin\\Models\\Permission',
       'group_by' => 'guard_name',
       'chart_type' => 'bar',
+      'description' => 'Web vs. API permissions',
       'aggregate' => 'count',
       'width' => 4,
     ),
@@ -94,7 +97,7 @@ return array (
       'size' => 'col-12',
       'model' => 'App\\Modules\\Admin\\Models\\User',
       'icon' => 'fas fa-user-plus',
-      'description' => 'Latest 5 added users',
+      'description' => 'Latest 5 registered users',
       'limit' => 5,
       'sort' => 
       array (
@@ -117,6 +120,7 @@ return array (
         array (
           'label' => 'Status',
           'field' => 'status',
+          'format' => 'text',
         ),
       ),
       'width' => 6,
@@ -126,11 +130,11 @@ return array (
     8 => 
     array (
       'type' => 'list',
-      'title' => 'Roles',
+      'title' => 'Roles (A–Z)',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Admin\\Models\\Role',
       'icon' => 'fas fa-shield-alt',
-      'description' => 'All roles (alphabetical)',
+      'description' => 'All roles alphabetically',
       'limit' => 5,
       'sort' => 
       array (
@@ -162,11 +166,11 @@ return array (
     9 => 
     array (
       'type' => 'list',
-      'title' => 'Permissions',
+      'title' => 'Recent Permissions',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Admin\\Models\\Permission',
       'icon' => 'fas fa-lock',
-      'description' => 'Recent permissions',
+      'description' => 'Latest created permissions',
       'limit' => 5,
       'sort' => 
       array (

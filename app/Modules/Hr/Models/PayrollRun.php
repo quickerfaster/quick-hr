@@ -29,7 +29,7 @@ class PayrollRun extends Model
     
 
     protected $fillable = [
-        'title', 'pay_schedule_id', 'period_start', 'period_end', 'status', 'current_step', 'total_gross_pay', 'total_deductions', 'total_taxes', 'total_employer_contributions', 'total_cash_required', 'total_employees', 'processed_employees', 'calculation_status', 'processed_by', 'processed_at', 'approved_by', 'approved_at', 'notes'
+        'title', 'pay_schedule_id', 'period_start', 'period_end', 'status', 'current_step', 'calculation_status', 'total_gross_pay', 'total_deductions', 'total_taxes', 'total_employer_contributions', 'total_cash_required', 'processed_by', 'processed_at', 'approved_by', 'approved_at', 'total_employees', 'processed_employees', 'notes'
     ];
 
     protected $guarded = [
@@ -45,10 +45,10 @@ class PayrollRun extends Model
         'total_taxes' => 'decimal:2',
         'total_employer_contributions' => 'decimal:2',
         'total_cash_required' => 'decimal:2',
-        'total_employees' => 'integer',
-        'processed_employees' => 'integer',
         'processed_at' => 'datetime',
         'approved_at' => 'datetime',
+        'total_employees' => 'integer',
+        'processed_employees' => 'integer',
         'failed_at' => 'datetime',
         'created_by' => 'integer',
         'updated_by' => 'integer'
@@ -57,14 +57,14 @@ class PayrollRun extends Model
     protected $attributes = [
         'status' => 'draft',
         'current_step' => 1,
+        'calculation_status' => 'pending',
         'total_gross_pay' => 0,
         'total_deductions' => 0,
         'total_taxes' => 0,
         'total_employer_contributions' => 0,
         'total_cash_required' => 0,
         'total_employees' => 0,
-        'processed_employees' => 0,
-        'calculation_status' => 'pending'
+        'processed_employees' => 0
     ];
 
     protected $dispatchesEvents = [

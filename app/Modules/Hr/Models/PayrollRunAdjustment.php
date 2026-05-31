@@ -16,7 +16,7 @@ class PayrollRunAdjustment extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 

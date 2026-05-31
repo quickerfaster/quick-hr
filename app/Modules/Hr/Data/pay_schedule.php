@@ -9,6 +9,7 @@ return [
       'field_type' => 'string',
       'label' => 'Schedule Name',
       'validation' => 'required|string|max:255|unique:pay_schedules,name',
+      'filterable' => true,
       'searchable' => true,
     ],
     'code' => [
@@ -18,6 +19,8 @@ return [
       'label' => 'Schedule Code',
       'validation' => 'required|string|max:50|unique:pay_schedules,code',
       'autoGenerate' => true,
+      'filterable' => true,
+      'searchable' => true,
     ],
     'frequency' => [
       'display' => 'inline',
@@ -35,12 +38,21 @@ return [
       ],
       'filterable' => true,
     ],
+    'description' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'textarea',
+      'label' => 'Description',
+      'validation' => 'nullable|string|max:1000',
+      'searchable' => true,
+    ],
     'first_period_start_date' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'datepicker',
       'label' => 'First Period Start Date',
       'validation' => 'required|date',
+      'filterable' => true,
     ],
     'next_pay_date' => [
       'display' => 'inline',
@@ -48,6 +60,7 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Next Pay Date',
       'validation' => 'required|date|after_or_equal:first_period_start_date',
+      'filterable' => true,
     ],
     'payment_delay_days' => [
       'display' => 'inline',
@@ -63,10 +76,11 @@ return [
       'label' => 'Default Country',
       'validation' => 'required|string|size:2',
       'options' => [
-        'US' => 'US',
-        'UK' => 'UK',
-        'NG' => 'NG',
+        'US' => 'United States',
+        'UK' => 'United Kingdom',
+        'NG' => 'Nigeria',
       ],
+      'filterable' => true,
     ],
     'state_code' => [
       'display' => 'inline',
@@ -75,10 +89,11 @@ return [
       'label' => 'Default State/Province',
       'validation' => 'nullable|string|max:10',
       'options' => [
-        'US' => 'US',
-        'UK' => 'UK',
-        'NG' => 'NG',
+        'US' => 'United States',
+        'UK' => 'United Kingdom',
+        'NG' => 'Nigeria',
       ],
+      'filterable' => true,
     ],
     'currency_code' => [
       'display' => 'inline',
@@ -88,9 +103,10 @@ return [
       'validation' => 'required|string|size:3',
       'options' => [
         'USD' => 'USD',
-        'BP' => 'BP',
+        'GBP' => 'GBP',
         'NGN' => 'NGN',
       ],
+      'filterable' => true,
     ],
     'timezone' => [
       'display' => 'inline',
@@ -99,11 +115,11 @@ return [
       'label' => 'Timezone',
       'validation' => 'required|string|max:64',
       'options' => [
-        'America/New_York' => 'America/New_York',
-        'Europe/London' => 'Europe/London',
-        'Africa/Lagos' => 'Africa/Lagos',
-        '' => '',
+        'America/New_York' => 'Eastern Time (ET)',
+        'Europe/London' => 'Greenwich Mean Time (GMT)',
+        'Africa/Lagos' => 'West Africa Time (WAT)',
       ],
+      'filterable' => true,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -111,6 +127,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
+      'filterable' => true,
     ],
     'is_default' => [
       'display' => 'inline',
@@ -118,13 +135,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Default Schedule',
       'validation' => 'nullable|boolean',
-    ],
-    'description' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'textarea',
-      'label' => 'Description',
-      'validation' => 'nullable|string|max:1000',
+      'filterable' => true,
     ],
     'created_by' => [
       'display' => 'inline',
@@ -146,18 +157,25 @@ return [
     'onTable' => [
       '0' => 'first_period_start_date',
       '1' => 'payment_delay_days',
-      '2' => 'created_by',
-      '3' => 'updated_by',
-      '4' => 'description',
+      '2' => 'description',
+      '3' => 'created_by',
+      '4' => 'updated_by',
+      '5' => 'created_at',
+      '6' => 'updated_at',
+      '7' => 'deleted_at',
     ],
     'onNewForm' => [
       '0' => 'created_by',
       '1' => 'updated_by',
+      '2' => 'deleted_at',
     ],
     'onEditForm' => [
       '0' => 'updated_by',
+      '1' => 'deleted_at',
     ],
-    'onQuery' => [],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -167,25 +185,17 @@ return [
   'isTransaction' => false,
   'crudType' => 'pages',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'name',
+    '1' => 'code',
+    '2' => 'frequency',
+    '3' => 'next_pay_date',
+    '4' => 'is_active',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
-    'addButton' => [
-      '0' => [
-        'label' => 'New Schedule',
-        'type' => 'quick_add',
-        'icon' => 'fas fa-plus-circle',
-        'primary' => true,
-      ],
-      '1' => [
-        'label' => 'Copy Schedule',
-        'type' => 'modal',
-        'icon' => 'fas fa-copy',
-        'url' => '/hr/pay-schedules/copy',
-        'modalSize' => 'md',
-      ],
-    ],
+    'addButton' => true,
     'files' => [
       'export' => [
         '0' => 'xls',
@@ -194,6 +204,19 @@ return [
       ],
       'print' => true,
     ],
+    'perPage' => [
+      '0' => 10,
+      '1' => 25,
+      '2' => 50,
+      '3' => 100,
+    ],
+    'search' => true,
+    'showHideColumns' => true,
+    'filterColumns' => true,
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
     'bulkActions' => [
       'export' => [
         '0' => 'xls',
@@ -222,69 +245,8 @@ return [
         'confirm' => 'Set selected schedule as the default?',
       ],
       'delete' => true,
-    ],
-    'perPage' => [
-      '0' => 10,
-      '1' => 25,
-      '2' => 50,
-      '3' => 100,
-    ],
-    'search' => true,
-    'showHideColumns' => true,
-    'filterColumns' => true,
-    'filters' => [
-      '0' => [
-        'field' => 'frequency',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'weekly',
-          '2' => 'biweekly',
-          '3' => 'semi_monthly',
-          '4' => 'monthly',
-          '5' => 'quarterly',
-          '6' => 'yearly',
-        ],
-        'label' => 'Frequency',
-      ],
-      '1' => [
-        'field' => 'is_active',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Active',
-          '2' => 'Inactive',
-        ],
-        'label' => 'Status',
-        'default' => 'Active',
-      ],
-      '2' => [
-        'field' => 'is_default',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Default',
-          '2' => 'Not Default',
-        ],
-        'label' => 'Default Schedule',
-      ],
-      '3' => [
-        'field' => 'country_code',
-        'type' => 'select',
-        'optionsFrom' => 'countries',
-        'label' => 'Country',
-      ],
-      '4' => [
-        'field' => 'currency_code',
-        'type' => 'select',
-        'optionsFrom' => 'currencies',
-        'label' => 'Currency',
-      ],
-      '5' => [
-        'field' => 'next_pay_date',
-        'type' => 'date_range',
-        'label' => 'Next Pay Date Range',
-      ],
+      'restore' => true,
+      'forceDelete' => true,
     ],
   ],
   'fieldGroups' => [
@@ -329,85 +291,12 @@ return [
         '1' => 'is_default',
       ],
     ],
-    'audit' => [
-      'title' => 'Audit',
-      'groupType' => 'payroll',
-      'icon' => 'fas fa-history',
-      'fields' => [
-        '0' => 'created_by',
-        '1' => 'updated_by',
-      ],
-    ],
   ],
-  'moreActions' => [
-    '0' => [
-      'title' => 'Copy Schedule',
-      'icon' => 'fas fa-copy',
-      'route' => 'pay-schedules.copy',
-      'params' => [
-        'id' => '{id}',
-      ],
-      'confirm' => 'Create a copy of this pay schedule?',
-      'requiredRole' => [
-        '0' => 'hr_admin',
-        '1' => 'payroll_officer',
-      ],
-    ],
-    '1' => [
-      'title' => 'View Payroll Runs',
-      'icon' => 'fas fa-file-invoice-dollar',
-      'route' => 'payroll-runs.index',
-      'params' => [
-        'filters[pay_schedule_id]' => '{id}',
-      ],
-      'newTab' => true,
-    ],
-    '2' => [
-      'title' => 'View Assigned Employees',
-      'icon' => 'fas fa-users',
-      'route' => 'employee-payroll-profiles.index',
-      'params' => [
-        'filters[pay_schedule_id]' => '{id}',
-      ],
-      'newTab' => true,
-    ],
-    '3' => [
-      'title' => 'Recalculate Next Pay Date',
-      'icon' => 'fas fa-sync-alt',
-      'dispatchStandardEvent' => true,
-      'eventClass' => 'App\Modules\System\Events\PayScheduleRecalculated',
-      'params' => [
-        'schedule_id' => '{id}',
-      ],
-      'confirm' => 'Recalculate next pay date based on frequency and first period start?',
-      'requiredRole' => [
-        '0' => 'admin',
-        '1' => 'payroll_officer',
-      ],
-    ],
-  ],
+  'moreActions' => [],
   'switchViews' => [
     'default' => 'list',
-    'card' => [
-      'titleFields' => [
-        '0' => 'name',
-      ],
-      'subtitleFields' => [
-        '0' => 'code',
-        '1' => 'frequency',
-      ],
-      'contentFields' => [
-        '0' => 'next_pay_date',
-        '1' => 'country_code',
-      ],
-      'badgeField' => 'is_active',
-      'badgeColors' => [
-        'true' => 'success',
-        'false' => 'secondary',
-      ],
-      'ribbonField' => 'is_default',
-      'ribbonText' => 'Default',
-      'ribbonColor' => 'warning',
+    'table' => [
+      'enabled' => true,
     ],
     'list' => [
       'titleFields' => [
@@ -426,72 +315,6 @@ return [
       'badgeColors' => [
         'true' => 'success',
         'false' => 'secondary',
-      ],
-    ],
-    'detail' => [
-      'layout' => 'tab',
-      'detailType' => 'record',
-      'titleFields' => [
-        '0' => 'name',
-      ],
-      'subtitleFields' => [
-        '0' => 'code',
-        '1' => 'frequency',
-      ],
-      'tabs' => [
-        '0' => [
-          'title' => 'Overview',
-          'icon' => 'fas fa-info-circle',
-          'fields' => [
-            '0' => 'name',
-            '1' => 'code',
-            '2' => 'frequency',
-            '3' => 'description',
-            '4' => 'is_active',
-            '5' => 'is_default',
-          ],
-        ],
-        '1' => [
-          'title' => 'Dates & Timing',
-          'icon' => 'fas fa-calendar-alt',
-          'fields' => [
-            '0' => 'first_period_start_date',
-            '1' => 'next_pay_date',
-            '2' => 'payment_delay_days',
-          ],
-        ],
-        '2' => [
-          'title' => 'Jurisdiction',
-          'icon' => 'fas fa-globe',
-          'fields' => [
-            '0' => 'country_code',
-            '1' => 'state_code',
-            '2' => 'currency_code',
-            '3' => 'timezone',
-          ],
-        ],
-        '3' => [
-          'title' => 'Payroll Runs',
-          'icon' => 'fas fa-file-invoice-dollar',
-          'relation' => 'payrollRuns',
-          'relationLimit' => 20,
-        ],
-        '4' => [
-          'title' => 'Assigned Employees',
-          'icon' => 'fas fa-users',
-          'relation' => 'employeeProfiles',
-          'relationLimit' => 20,
-        ],
-        '5' => [
-          'title' => 'Audit',
-          'icon' => 'fas fa-history',
-          'fields' => [
-            '0' => 'created_by',
-            '1' => 'updated_by',
-            '2' => 'created_at',
-            '3' => 'updated_at',
-          ],
-        ],
       ],
     ],
   ],

@@ -1,5 +1,9 @@
 {{-- Bottom Bar Links for Hr --}}
 
+            <button role="link" href="hr/payroll-overviews" class="btn btn-light flex-shrink-0 text-center" style="min-width:70px;" wire:navigate>
+                <i class=" fas fa-user }} d-block mb-1"></i>
+                <small>Payroll Overviews</small>
+            </button>
             <button role="link" href="hr/pay-schedules" class="btn btn-light flex-shrink-0 text-center" style="min-width:70px;" wire:navigate>
                 <i class=" fas fa-calendar-week }} d-block mb-1"></i>
                 <small>Pay Schedules</small>

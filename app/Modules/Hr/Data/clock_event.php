@@ -9,6 +9,8 @@ return [
       'field_type' => 'string',
       'label' => 'Employee ID',
       'validation' => 'required',
+      'filterable' => true,
+      'searchable' => true,
     ],
     'event_type' => [
       'display' => 'inline',
@@ -24,6 +26,7 @@ return [
         'meal_start' => 'Meal Start',
         'meal_end' => 'Meal End',
       ],
+      'filterable' => true,
     ],
     'timestamp' => [
       'display' => 'inline',
@@ -31,6 +34,7 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Event Time',
       'validation' => 'required|date',
+      'filterable' => true,
     ],
     'method' => [
       'display' => 'inline',
@@ -46,6 +50,7 @@ return [
         'api' => 'API Integration',
         'manual' => 'Manual Entry',
       ],
+      'filterable' => true,
     ],
     'latitude' => [
       'display' => 'inline',
@@ -67,6 +72,7 @@ return [
       'field_type' => 'string',
       'label' => 'Location Name',
       'validation' => 'nullable|string|max:255',
+      'searchable' => true,
     ],
     'timezone' => [
       'display' => 'inline',
@@ -125,6 +131,9 @@ return [
       '2' => 'device_name',
       '3' => 'sync_status',
       '4' => 'sync_attempts',
+      '5' => 'created_at',
+      '6' => 'updated_at',
+      '7' => 'deleted_at',
     ],
     'onNewForm' => [
       '0' => 'ip_address',
@@ -132,6 +141,9 @@ return [
       '2' => 'device_name',
       '3' => 'sync_status',
       '4' => 'sync_attempts',
+      '5' => 'created_at',
+      '6' => 'updated_at',
+      '7' => 'deleted_at',
     ],
     'onEditForm' => [
       '0' => 'ip_address',
@@ -139,16 +151,25 @@ return [
       '2' => 'device_name',
       '3' => 'sync_status',
       '4' => 'sync_attempts',
+      '5' => 'updated_at',
+      '6' => 'deleted_at',
     ],
-    'onQuery' => [],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
   ],
   'isTransaction' => false,
-  'crudType' => 'drawers',
+  'crudType' => 'modals',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'employee_id',
+    '1' => 'event_type',
+    '2' => 'timestamp',
+    '3' => 'method',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
@@ -168,36 +189,18 @@ return [
     'search' => true,
     'showHideColumns' => true,
     'filterColumns' => true,
-    'filters' => [
-      '0' => [
-        'field' => 'event_type',
-        'label' => 'Event Type',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Clock In',
-          '2' => 'Clock Out',
-          '3' => 'Break Start',
-          '4' => 'Break End',
-        ],
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
+    'bulkActions' => [
+      'export' => [
+        '0' => 'xls',
+        '1' => 'csv',
       ],
-      '1' => [
-        'field' => 'method',
-        'label' => 'Method',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Web',
-          '2' => 'Mobile',
-          '3' => 'Biometric',
-          '4' => 'Kiosk',
-        ],
-      ],
-      '2' => [
-        'field' => 'timestamp',
-        'type' => 'date_range',
-        'label' => 'Date Range',
-      ],
+      'delete' => true,
+      'restore' => true,
+      'forceDelete' => true,
     ],
   ],
   'fieldGroups' => [
@@ -236,8 +239,47 @@ return [
       ],
     ],
   ],
-  'moreActions' => [],
-  'switchViews' => [],
+  'moreActions' => [
+    '0' => [
+      'title' => 'Restore',
+      'icon' => 'fas fa-trash-restore',
+      'action' => 'restore',
+      'confirm' => 'Restore this archived clock event?',
+      'condition' => 'trashed',
+    ],
+    '1' => [
+      'title' => 'Permanently Delete',
+      'icon' => 'fas fa-skull-crossbones',
+      'action' => 'forceDelete',
+      'confirm' => 'This action cannot be undone. Permanently delete this clock event?',
+      'condition' => 'trashed',
+    ],
+  ],
+  'switchViews' => [
+    'default' => 'list',
+    'list' => [
+      'titleFields' => [
+        '0' => 'employee_id',
+      ],
+      'subtitleFields' => [
+        '0' => 'event_type',
+        '1' => 'timestamp',
+      ],
+      'contentFields' => [
+        '0' => 'method',
+        '1' => 'location_name',
+      ],
+      'badgeField' => 'event_type',
+      'badgeColors' => [
+        'clock_in' => 'success',
+        'clock_out' => 'info',
+        'break_start' => 'warning',
+        'break_end' => 'primary',
+        'meal_start' => 'secondary',
+        'meal_end' => 'dark',
+      ],
+    ],
+  ],
   'relations' => [],
   'report' => [],
 ];

@@ -16,7 +16,7 @@ class EmployeeWorkPattern extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -24,7 +24,7 @@ class EmployeeWorkPattern extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [

@@ -9,6 +9,8 @@ return [
       'field_type' => 'string',
       'label' => 'Shift Name',
       'validation' => 'required|string|max:255',
+      'filterable' => true,
+      'searchable' => true,
     ],
     'code' => [
       'display' => 'inline',
@@ -17,6 +19,32 @@ return [
       'label' => 'Shift Code',
       'validation' => 'required|string|max:50|unique:shifts,code',
       'autoGenerate' => true,
+      'filterable' => true,
+      'searchable' => true,
+    ],
+    'shift_category' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Shift Category',
+      'validation' => 'nullable',
+      'options' => [
+        'regular' => 'Regular',
+        'peak' => 'Peak/Holiday',
+        'weekend' => 'Weekend',
+        'holiday' => 'Holiday',
+        'emergency' => 'Emergency/Call',
+        'training' => 'Training',
+      ],
+      'filterable' => true,
+    ],
+    'description' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'textarea',
+      'label' => 'Description',
+      'validation' => 'nullable|string|max:1000',
+      'searchable' => true,
     ],
     'start_time' => [
       'display' => 'inline',
@@ -45,13 +73,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Overnight Shift',
       'validation' => 'nullable|boolean',
-    ],
-    'description' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'textarea',
-      'label' => 'Description',
-      'validation' => 'nullable|string|max:1000',
+      'filterable' => true,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -59,6 +81,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
+      'filterable' => true,
     ],
     'is_default' => [
       'display' => 'inline',
@@ -66,21 +89,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Default Shift',
       'validation' => 'nullable|boolean',
-    ],
-    'shift_category' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'select',
-      'label' => 'Shift Category',
-      'validation' => 'nullable',
-      'options' => [
-        'regular' => 'Regular',
-        'peak' => 'Peak/Holiday',
-        'weekend' => 'Weekend',
-        'holiday' => 'Holiday',
-        'emergency' => 'Emergency/Call',
-        'training' => 'Training',
-      ],
+      'filterable' => true,
     ],
     'created_from_template_id' => [
       'display' => 'inline',
@@ -107,37 +116,37 @@ return [
   'detailComponent' => '',
   'hiddenFields' => [
     'onTable' => [
-      '0' => 'attendanceRecords',
-      '1' => 'required_skills',
-      '2' => 'shift_category',
-      '3' => 'minimum_staffing',
-      '4' => 'is_restricted',
-      '5' => 'description',
-      '6' => 'color',
-      '7' => 'templateSource attendanceRecords',
-      '8' => 'shiftSchedules',
-      '9' => 'is_overnight',
-      '10' => 'created_from_template_id',
-      '11' => 'last_used_date',
-      '12' => 'usage_count',
+      '0' => 'description',
+      '1' => 'duration_hours',
+      '2' => 'is_overnight',
+      '3' => 'created_from_template_id',
+      '4' => 'last_used_date',
+      '5' => 'usage_count',
+      '6' => 'created_at',
+      '7' => 'updated_at',
+      '8' => 'deleted_at',
     ],
     'onNewForm' => [
-      '0' => 'attendanceRecords',
-      '1' => 'color',
-      '2' => 'is_overnight',
-      '3' => 'created_from_template_id',
-      '4' => 'last_used_date',
-      '5' => 'usage_count',
+      '0' => 'duration_hours',
+      '1' => 'is_overnight',
+      '2' => 'created_from_template_id',
+      '3' => 'last_used_date',
+      '4' => 'usage_count',
+      '5' => 'created_at',
+      '6' => 'updated_at',
+      '7' => 'deleted_at',
     ],
     'onEditForm' => [
-      '0' => 'attendanceRecords',
-      '1' => 'color',
-      '2' => 'is_overnight',
-      '3' => 'created_from_template_id',
-      '4' => 'last_used_date',
-      '5' => 'usage_count',
+      '0' => 'duration_hours',
+      '1' => 'is_overnight',
+      '2' => 'created_from_template_id',
+      '3' => 'last_used_date',
+      '4' => 'usage_count',
+      '5' => 'deleted_at',
     ],
-    'onQuery' => [],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -147,18 +156,18 @@ return [
   'isTransaction' => false,
   'crudType' => 'drawers',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'name',
+    '1' => 'code',
+    '2' => 'shift_category',
+    '3' => 'start_time',
+    '4' => 'end_time',
+    '5' => 'is_active',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
-    'addButton' => [
-      '0' => [
-        'label' => 'New Shift',
-        'type' => 'quick_add',
-        'icon' => 'fas fa-plus-circle',
-        'primary' => true,
-      ],
-    ],
+    'addButton' => true,
     'files' => [
       'export' => [
         '0' => 'xls',
@@ -166,13 +175,6 @@ return [
         '2' => 'pdf',
       ],
       'print' => true,
-    ],
-    'bulkActions' => [
-      'export' => [
-        '0' => 'xls',
-        '1' => 'csv',
-        '2' => 'pdf',
-      ],
     ],
     'perPage' => [
       '0' => 10,
@@ -224,6 +226,20 @@ return [
         'label' => 'Created Date',
       ],
     ],
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
+    'bulkActions' => [
+      'export' => [
+        '0' => 'xls',
+        '1' => 'csv',
+        '2' => 'pdf',
+      ],
+      'delete' => true,
+      'restore' => true,
+      'forceDelete' => true,
+    ],
   ],
   'fieldGroups' => [
     'basic_info' => [
@@ -234,8 +250,7 @@ return [
         '0' => 'name',
         '1' => 'code',
         '2' => 'shift_category',
-        '3' => 'color',
-        '4' => 'description',
+        '3' => 'description',
       ],
     ],
     'timing' => [
@@ -250,7 +265,7 @@ return [
       ],
     ],
     'applicability' => [
-      'title' => 'Applicability & Restrictions',
+      'title' => 'Applicability',
       'groupType' => 'hr',
       'icon' => 'fas fa-user-check',
       'fields' => [
@@ -269,7 +284,24 @@ return [
       ],
     ],
   ],
-  'moreActions' => [],
+  'moreActions' => [
+    '0' => [
+      'title' => 'Restore',
+      'icon' => 'fas fa-trash-restore',
+      'action' => 'restore',
+      'confirm' => 'Restore this archived shift?',
+      'requiredPermission' => 'restore_shift',
+      'condition' => 'trashed',
+    ],
+    '1' => [
+      'title' => 'Permanently Delete',
+      'icon' => 'fas fa-skull-crossbones',
+      'action' => 'forceDelete',
+      'confirm' => 'This action cannot be undone. Permanently delete this shift?',
+      'requiredPermission' => 'force_delete_shift',
+      'condition' => 'trashed',
+    ],
+  ],
   'switchViews' => [
     'default' => 'list',
     'card' => [
@@ -310,64 +342,6 @@ return [
       'badgeColors' => [
         'true' => 'success',
         'false' => 'secondary',
-      ],
-    ],
-    'detail' => [
-      'layout' => 'tab',
-      'detailType' => 'record',
-      'titleFields' => [
-        '0' => 'name',
-      ],
-      'subtitleFields' => [
-        '0' => 'code',
-        '1' => 'shift_category',
-      ],
-      'tabs' => [
-        '0' => [
-          'title' => 'Overview',
-          'icon' => 'fas fa-info-circle',
-          'fields' => [
-            '0' => 'name',
-            '1' => 'code',
-            '2' => 'description',
-            '3' => 'color',
-            '4' => 'shift_category',
-            '5' => 'is_active',
-            '6' => 'is_default',
-          ],
-        ],
-        '1' => [
-          'title' => 'Timing',
-          'icon' => 'fas fa-clock',
-          'fields' => [
-            '0' => 'start_time',
-            '1' => 'end_time',
-            '2' => 'duration_hours',
-            '3' => 'is_overnight',
-          ],
-        ],
-        '2' => [
-          'title' => 'Rules & Policies',
-          'icon' => 'fas fa-gavel',
-          'fields' => '',
-        ],
-        '3' => [
-          'title' => 'Applicability',
-          'icon' => 'fas fa-building',
-          'fields' => [
-            '0' => 'department_ids',
-          ],
-        ],
-        '4' => [
-          'title' => 'Usage & History',
-          'icon' => 'fas fa-chart-line',
-          'fields' => [
-            '0' => 'last_used_date',
-            '1' => 'usage_count',
-          ],
-          'relation' => 'shiftSchedules',
-          'relationLimit' => 10,
-        ],
       ],
     ],
   ],

@@ -4,7 +4,7 @@ return [
     'context_groups' => [
         'Users & Permissions' => [
             'label' => 'Users & Permissions',
-            'icon' => 'fas fa-user-cog',
+            'icon' => 'fas fa-users-cog',
             'order' => 2,
             'route' => NULL,
             'url' => 'admin/users',
@@ -36,10 +36,10 @@ return [
             [
                 'key' => 'user',
                 'label' => 'Users',
-                'icon' => 'fas fa-user-cog',
+                'icon' => 'fas fa-users-cog',
                 'route' => '/admin/users',
                 'permission' => 'view_user',
-                'order' => 999,
+                'order' => 1,
                 'page_title' => NULL,
             ],
             [
@@ -48,7 +48,7 @@ return [
                 'icon' => 'fas fa-user-shield',
                 'route' => '/admin/roles',
                 'permission' => 'view_role',
-                'order' => 999,
+                'order' => 2,
                 'page_title' => NULL,
             ],
             [
@@ -57,7 +57,7 @@ return [
                 'icon' => 'fas fa-user-lock',
                 'route' => '/admin/access-control-management',
                 'permission' => 'view_permission',
-                'order' => 999,
+                'order' => 3,
                 'page_title' => NULL,
             ],
         ],
@@ -74,11 +74,11 @@ return [
         ],
         'Company Profile' => [
             [
-                'key' => 'overview',
+                'key' => 'company_profile_overview',
                 'label' => 'Overview',
                 'icon' => 'fas fa-chart-bar',
                 'route' => '/admin/dashboard-company-profile-overview',
-                'permission' => 'view_overview',
+                'permission' => 'view_company_profile_overview',
                 'order' => 1,
                 'page_title' => NULL,
             ],
@@ -88,7 +88,7 @@ return [
                 'icon' => 'fas fa-map-marker-alt',
                 'route' => '/admin/locations',
                 'permission' => 'view_location',
-                'order' => 999,
+                'order' => 2,
                 'page_title' => NULL,
             ],
             [
@@ -97,7 +97,7 @@ return [
                 'icon' => 'fas fa-building',
                 'route' => '/admin/companies',
                 'permission' => 'manage-system',
-                'order' => 999,
+                'order' => 3,
                 'page_title' => NULL,
             ],
             [
@@ -106,7 +106,7 @@ return [
                 'icon' => 'fas fa-sitemap',
                 'route' => '/admin/departments',
                 'permission' => 'view_department',
-                'order' => 999,
+                'order' => 4,
                 'page_title' => NULL,
             ],
             [
@@ -115,7 +115,7 @@ return [
                 'icon' => 'fas fa-briefcase',
                 'route' => '/admin/job-titles',
                 'permission' => 'view_job_title',
-                'order' => 999,
+                'order' => 5,
                 'page_title' => NULL,
             ],
             [
@@ -124,7 +124,7 @@ return [
                 'icon' => 'fas fa-calendar-day',
                 'route' => '/admin/shifts',
                 'permission' => 'view_shift',
-                'order' => 999,
+                'order' => 6,
                 'page_title' => NULL,
             ],
         ],

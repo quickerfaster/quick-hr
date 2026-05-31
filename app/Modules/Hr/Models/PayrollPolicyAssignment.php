@@ -15,7 +15,7 @@ class PayrollPolicyAssignment extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 

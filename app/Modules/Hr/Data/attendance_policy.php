@@ -9,6 +9,8 @@ return [
       'field_type' => 'string',
       'label' => 'Policy Name',
       'validation' => 'required|string|max:255',
+      'filterable' => true,
+      'searchable' => true,
     ],
     'code' => [
       'display' => 'inline',
@@ -17,6 +19,8 @@ return [
       'label' => 'Policy Code',
       'validation' => 'required|string|max:50|unique:attendance_policies,code',
       'autoGenerate' => true,
+      'filterable' => true,
+      'searchable' => true,
     ],
     'description' => [
       'display' => 'inline',
@@ -24,6 +28,7 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string|max:1000',
+      'searchable' => true,
     ],
     'grace_period_minutes' => [
       'display' => 'inline',
@@ -116,6 +121,7 @@ return [
         'IN' => 'India',
         'NG' => 'Nigeria',
       ],
+      'filterable' => true,
     ],
     'state_code' => [
       'display' => 'inline',
@@ -123,6 +129,7 @@ return [
       'field_type' => 'string',
       'label' => 'State/Province Code',
       'validation' => 'nullable|string|max:10',
+      'filterable' => true,
     ],
     'applies_to_shift_categories' => [
       'display' => 'inline',
@@ -146,6 +153,7 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Effective Date',
       'validation' => 'required|date',
+      'filterable' => true,
     ],
     'expiration_date' => [
       'display' => 'inline',
@@ -153,6 +161,7 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Expiration Date',
       'validation' => 'nullable|date|after:effective_date',
+      'filterable' => true,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -160,6 +169,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
+      'filterable' => true,
     ],
     'is_default' => [
       'display' => 'inline',
@@ -167,6 +177,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Default Policy',
       'validation' => 'nullable|boolean',
+      'filterable' => true,
     ],
     'version' => [
       'display' => 'inline',
@@ -200,18 +211,28 @@ return [
       '4' => 'version',
       '5' => 'last_updated_by',
       '6' => 'last_updated_at',
+      '7' => 'created_at',
+      '8' => 'updated_at',
+      '9' => 'deleted_at',
     ],
     'onNewForm' => [
       '0' => 'version',
       '1' => 'last_updated_by',
       '2' => 'last_updated_at',
+      '3' => 'created_at',
+      '4' => 'updated_at',
+      '5' => 'deleted_at',
     ],
     'onEditForm' => [
       '0' => 'version',
       '1' => 'last_updated_by',
       '2' => 'last_updated_at',
+      '3' => 'updated_at',
+      '4' => 'deleted_at',
     ],
-    'onQuery' => [],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -221,7 +242,13 @@ return [
   'isTransaction' => false,
   'crudType' => 'pages',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'name',
+    '1' => 'code',
+    '2' => 'country_code',
+    '3' => 'is_active',
+    '4' => 'effective_date',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
@@ -241,6 +268,19 @@ return [
       ],
       'print' => true,
     ],
+    'perPage' => [
+      '0' => 10,
+      '1' => 25,
+      '2' => 50,
+      '3' => 100,
+    ],
+    'search' => true,
+    'showHideColumns' => true,
+    'filterColumns' => true,
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
     'bulkActions' => [
       'export' => [
         '0' => 'xls',
@@ -266,56 +306,9 @@ return [
         'fieldValue' => true,
         'confirm' => 'Set selected policy as default?',
       ],
-    ],
-    'perPage' => [
-      '0' => 10,
-      '1' => 25,
-      '2' => 50,
-      '3' => 100,
-    ],
-    'search' => true,
-    'showHideColumns' => true,
-    'filters' => [
-      '0' => [
-        'field' => 'is_active',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Active',
-          '2' => 'Inactive',
-        ],
-        'label' => 'Status',
-        'default' => 'Active',
-      ],
-      '1' => [
-        'field' => 'country_code',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'US',
-          '2' => 'GB',
-          '3' => 'CA',
-          '4' => 'AU',
-          '5' => 'IN',
-          '6' => 'NG',
-        ],
-        'label' => 'Country',
-      ],
-      '2' => [
-        'field' => 'is_default',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Default',
-          '2' => 'Not Default',
-        ],
-        'label' => 'Default Status',
-      ],
-      '3' => [
-        'field' => 'effective_date',
-        'type' => 'date_range',
-        'label' => 'Effective Date Range',
-      ],
+      'delete' => true,
+      'restore' => true,
+      'forceDelete' => true,
     ],
   ],
   'fieldGroups' => [
@@ -379,7 +372,24 @@ return [
       ],
     ],
   ],
-  'moreActions' => [],
+  'moreActions' => [
+    '0' => [
+      'title' => 'Restore',
+      'icon' => 'fas fa-trash-restore',
+      'action' => 'restore',
+      'confirm' => 'Restore this archived attendance policy?',
+      'requiredPermission' => 'restore_attendance_policy',
+      'condition' => 'trashed',
+    ],
+    '1' => [
+      'title' => 'Permanently Delete',
+      'icon' => 'fas fa-skull-crossbones',
+      'action' => 'forceDelete',
+      'confirm' => 'This action cannot be undone. Permanently delete this policy?',
+      'requiredPermission' => 'force_delete_attendance_policy',
+      'condition' => 'trashed',
+    ],
+  ],
   'switchViews' => [
     'default' => 'list',
     'card' => [
@@ -424,73 +434,6 @@ return [
       'tagField' => 'is_default',
       'tagText' => 'Default',
       'tagColor' => 'warning',
-    ],
-    'detail' => [
-      'layout' => 'tab',
-      'detailType' => 'record',
-      'titleFields' => [
-        '0' => 'name',
-      ],
-      'subtitleFields' => [
-        '0' => 'code',
-        '1' => 'country_code',
-      ],
-      'tabs' => [
-        '0' => [
-          'title' => 'Overview',
-          'icon' => 'fas fa-info-circle',
-          'fields' => [
-            '0' => 'name',
-            '1' => 'code',
-            '2' => 'description',
-            '3' => 'country_code',
-            '4' => 'state_code',
-            '5' => 'is_active',
-            '6' => 'is_default',
-          ],
-        ],
-        '1' => [
-          'title' => 'Attendance Rules',
-          'icon' => 'fas fa-user-clock',
-          'fields' => [
-            '0' => 'grace_period_minutes',
-            '1' => 'early_departure_grace_minutes',
-            '2' => 'requires_break_after_hours',
-            '3' => 'break_duration_minutes',
-            '4' => 'unpaid_break_minutes',
-          ],
-        ],
-        '2' => [
-          'title' => 'Overtime Settings',
-          'icon' => 'fas fa-money-bill-wave',
-          'fields' => [
-            '0' => 'overtime_daily_threshold_hours',
-            '1' => 'overtime_weekly_threshold_hours',
-            '2' => 'max_daily_overtime_hours',
-            '3' => 'overtime_multiplier',
-            '4' => 'double_time_threshold_hours',
-            '5' => 'double_time_multiplier',
-          ],
-        ],
-        '3' => [
-          'title' => 'Applicability',
-          'icon' => 'fas fa-check-circle',
-          'fields' => [
-            '0' => 'applies_to_shift_categories',
-            '1' => 'effective_date',
-            '2' => 'expiration_date',
-          ],
-        ],
-        '4' => [
-          'title' => 'System Info',
-          'icon' => 'fas fa-server',
-          'fields' => [
-            '0' => 'version',
-            '1' => 'last_updated_by',
-            '2' => 'last_updated_at',
-          ],
-        ],
-      ],
     ],
   ],
   'relations' => [],

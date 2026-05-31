@@ -15,7 +15,7 @@ class Role extends SpatieRole
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -23,11 +23,11 @@ class Role extends SpatieRole
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'name', 'description', 'editable', 'guard_name'
+        'name', 'description', 'guard_name', 'editable'
     ];
 
     protected $guarded = [

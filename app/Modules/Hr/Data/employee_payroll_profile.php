@@ -9,6 +9,8 @@ return [
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id|unique:employee_payroll_profiles,employee_id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -29,6 +31,8 @@ return [
       'field_type' => 'select',
       'label' => 'Pay Schedule',
       'validation' => 'required|exists:pay_schedules,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PaySchedule',
         'type' => 'belongsTo',
@@ -49,6 +53,7 @@ return [
       'field_type' => 'string',
       'label' => 'Account Holder Name',
       'validation' => 'nullable|string|max:255',
+      'searchable' => true,
     ],
     'bank_name' => [
       'display' => 'inline',
@@ -56,6 +61,19 @@ return [
       'field_type' => 'string',
       'label' => 'Bank Name',
       'validation' => 'nullable|string|max:255',
+      'searchable' => true,
+    ],
+    'account_type' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Account Type',
+      'validation' => 'nullable|in:checking,savings',
+      'options' => [
+        'checking' => 'Checking',
+        'savings' => 'Savings',
+      ],
+      'filterable' => true,
     ],
     'bank_account_number' => [
       'display' => 'inline',
@@ -85,17 +103,6 @@ return [
       'label' => 'SWIFT / BIC Code',
       'validation' => 'nullable|string|max:11',
     ],
-    'account_type' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'select',
-      'label' => 'Account Type',
-      'validation' => 'nullable|in:checking,savings',
-      'options' => [
-        'checking' => 'Checking',
-        'savings' => 'Savings',
-      ],
-    ],
     'payment_method' => [
       'display' => 'inline',
       'fillable' => true,
@@ -108,6 +115,7 @@ return [
         'cash' => 'Cash',
         'other' => 'Other',
       ],
+      'filterable' => true,
     ],
     'tax_filing_status' => [
       'display' => 'inline',
@@ -122,6 +130,7 @@ return [
         'head_of_household' => 'Head of Household',
         'qualifying_widow' => 'Qualifying Widow(er)',
       ],
+      'filterable' => true,
     ],
     'allowances' => [
       'display' => 'inline',
@@ -143,6 +152,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Exempt from Federal Income Tax',
       'validation' => 'nullable|boolean',
+      'filterable' => true,
     ],
     'override_country_code' => [
       'display' => 'inline',
@@ -151,10 +161,11 @@ return [
       'label' => 'Override Country',
       'validation' => 'nullable|string|size:2',
       'options' => [
-        'US' => 'US',
-        'UK' => 'UK',
-        'NG' => 'NG',
+        'US' => 'United States',
+        'UK' => 'United Kingdom',
+        'NG' => 'Nigeria',
       ],
+      'filterable' => true,
     ],
     'override_state_code' => [
       'display' => 'inline',
@@ -162,6 +173,12 @@ return [
       'field_type' => 'select',
       'label' => 'Override State/Province',
       'validation' => 'nullable|string|max:10',
+      'options' => [
+        'US' => 'United States',
+        'UK' => 'United Kingdom',
+        'NG' => 'Nigeria',
+      ],
+      'filterable' => true,
     ],
     'currency_code' => [
       'display' => 'inline',
@@ -169,6 +186,12 @@ return [
       'field_type' => 'select',
       'label' => 'Currency',
       'validation' => 'nullable|string|size:3',
+      'options' => [
+        'USD' => 'USD',
+        'GBP' => 'GBP',
+        'NGN' => 'NGN',
+      ],
+      'filterable' => true,
     ],
     'effective_date' => [
       'display' => 'inline',
@@ -176,6 +199,7 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Effective From',
       'validation' => 'required|date',
+      'filterable' => true,
     ],
     'expiry_date' => [
       'display' => 'inline',
@@ -183,6 +207,7 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Expiry Date',
       'validation' => 'nullable|date|after:effective_date',
+      'filterable' => true,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -190,6 +215,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
+      'filterable' => true,
     ],
     'created_by' => [
       'display' => 'inline',
@@ -216,25 +242,31 @@ return [
       '4' => 'bank_iban',
       '5' => 'bank_swift',
       '6' => 'account_type',
-      '7' => 'payment_method',
-      '8' => 'extra_withholding',
-      '9' => 'is_exempt_from_federal_tax',
-      '10' => 'override_country_code',
-      '11' => 'override_state_code',
-      '12' => 'currency_code',
-      '13' => 'effective_date',
-      '14' => 'expiry_date',
-      '15' => 'created_by',
-      '16' => 'updated_by',
+      '7' => 'extra_withholding',
+      '8' => 'is_exempt_from_federal_tax',
+      '9' => 'override_country_code',
+      '10' => 'override_state_code',
+      '11' => 'currency_code',
+      '12' => 'effective_date',
+      '13' => 'expiry_date',
+      '14' => 'created_by',
+      '15' => 'updated_by',
+      '16' => 'created_at',
+      '17' => 'updated_at',
+      '18' => 'deleted_at',
     ],
     'onNewForm' => [
       '0' => 'created_by',
       '1' => 'updated_by',
+      '2' => 'deleted_at',
     ],
     'onEditForm' => [
       '0' => 'updated_by',
+      '1' => 'deleted_at',
     ],
-    'onQuery' => [],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -244,25 +276,16 @@ return [
   'isTransaction' => false,
   'crudType' => 'pages',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'employee_id',
+    '1' => 'pay_schedule_id',
+    '2' => 'payment_method',
+    '3' => 'is_active',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
-    'addButton' => [
-      '0' => [
-        'label' => 'New Profile',
-        'type' => 'quick_add',
-        'icon' => 'fas fa-plus-circle',
-        'primary' => true,
-      ],
-      '1' => [
-        'label' => 'Bulk Import',
-        'type' => 'modal',
-        'icon' => 'fas fa-file-import',
-        'url' => '/hr/employee-payroll-profiles/import',
-        'modalSize' => 'lg',
-      ],
-    ],
+    'addButton' => true,
     'files' => [
       'export' => [
         '0' => 'xls',
@@ -271,6 +294,19 @@ return [
       ],
       'print' => true,
     ],
+    'perPage' => [
+      '0' => 10,
+      '1' => 25,
+      '2' => 50,
+      '3' => 100,
+    ],
+    'search' => true,
+    'showHideColumns' => true,
+    'filterColumns' => true,
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
     'bulkActions' => [
       'export' => [
         '0' => 'xls',
@@ -292,65 +328,8 @@ return [
         'confirm' => 'Deactivate selected profiles?',
       ],
       'delete' => true,
-    ],
-    'perPage' => [
-      '0' => 10,
-      '1' => 25,
-      '2' => 50,
-      '3' => 100,
-      '4' => 250,
-    ],
-    'search' => true,
-    'showHideColumns' => true,
-    'filterColumns' => true,
-    'filters' => [
-      '0' => [
-        'field' => 'employee_id',
-        'type' => 'select',
-        'optionsFrom' => 'employees',
-        'label' => 'Employee',
-      ],
-      '1' => [
-        'field' => 'pay_schedule_id',
-        'type' => 'select',
-        'optionsFrom' => 'pay_schedules',
-        'label' => 'Pay Schedule',
-      ],
-      '2' => [
-        'field' => 'is_active',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Active',
-          '2' => 'Inactive',
-        ],
-        'label' => 'Status',
-        'default' => 'Active',
-      ],
-      '3' => [
-        'field' => 'payment_method',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'bank_transfer',
-          '2' => 'cheque',
-          '3' => 'cash',
-          '4' => 'other',
-        ],
-        'label' => 'Payment Method',
-      ],
-      '4' => [
-        'field' => 'override_country_code',
-        'type' => 'select',
-        'optionsFrom' => 'countries',
-        'label' => 'Override Country',
-      ],
-      '5' => [
-        'field' => 'currency_code',
-        'type' => 'select',
-        'optionsFrom' => 'currencies',
-        'label' => 'Currency',
-      ],
+      'restore' => true,
+      'forceDelete' => true,
     ],
   ],
   'fieldGroups' => [
@@ -370,11 +349,11 @@ return [
       'fields' => [
         '0' => 'bank_account_holder_name',
         '1' => 'bank_name',
-        '2' => 'bank_account_number',
-        '3' => 'bank_routing_number',
-        '4' => 'bank_iban',
-        '5' => 'bank_swift',
-        '6' => 'account_type',
+        '2' => 'account_type',
+        '3' => 'bank_account_number',
+        '4' => 'bank_routing_number',
+        '5' => 'bank_iban',
+        '6' => 'bank_swift',
         '7' => 'payment_method',
       ],
     ],
@@ -409,61 +388,13 @@ return [
         '2' => 'is_active',
       ],
     ],
-    'audit' => [
-      'title' => 'Audit',
-      'groupType' => 'payroll',
-      'icon' => 'fas fa-history',
-      'fields' => [
-        '0' => 'created_by',
-        '1' => 'updated_by',
-      ],
-    ],
   ],
-  'moreActions' => [
-    '0' => [
-      'title' => 'Copy Profile',
-      'icon' => 'fas fa-copy',
-      'route' => 'employee-payroll-profiles.copy',
-      'params' => [
-        'id' => '{id}',
-      ],
-      'confirm' => 'Create a copy of this profile (for another employee)?',
-      'requiredRole' => [
-        '0' => 'hr_admin',
-        '1' => 'payroll_officer',
-      ],
-    ],
-    '1' => [
-      'title' => 'View Employee',
-      'icon' => 'fas fa-user',
-      'route' => 'employees.show',
-      'params' => [
-        'employee' => '{employee_id}',
-      ],
-      'newTab' => true,
-    ],
-    '2' => [
-      'title' => 'View Pay Schedule',
-      'icon' => 'fas fa-calendar-alt',
-      'route' => 'pay-schedules.show',
-      'params' => [
-        'pay_schedule' => '{pay_schedule_id}',
-      ],
-      'newTab' => true,
-    ],
-    '3' => [
-      'title' => 'Generate Direct Deposit Form',
-      'icon' => 'fas fa-file-pdf',
-      'dispatchEvent' => true,
-      'eventName' => 'generateDirectDepositForm',
-      'params' => [
-        'profile_id' => '{id}',
-      ],
-      'confirm' => 'Generate a pre‑filled direct deposit authorisation form?',
-    ],
-  ],
+  'moreActions' => [],
   'switchViews' => [
     'default' => 'list',
+    'table' => [
+      'enabled' => true,
+    ],
     'card' => [
       'titleFields' => [
         '0' => 'employee.employee_number',
@@ -501,78 +432,6 @@ return [
       'badgeColors' => [
         'true' => 'success',
         'false' => 'secondary',
-      ],
-    ],
-    'detail' => [
-      'layout' => 'tab',
-      'detailType' => 'record',
-      'titleFields' => [
-        '0' => 'employee.employee_number',
-        '1' => 'employee.first_name',
-        '2' => 'employee.last_name',
-      ],
-      'subtitleFields' => [
-        '0' => 'paySchedule.name',
-      ],
-      'tabs' => [
-        '0' => [
-          'title' => 'Overview',
-          'icon' => 'fas fa-info-circle',
-          'fields' => [
-            '0' => 'employee_id',
-            '1' => 'pay_schedule_id',
-            '2' => 'payment_method',
-            '3' => 'is_active',
-          ],
-        ],
-        '1' => [
-          'title' => 'Bank Account',
-          'icon' => 'fas fa-university',
-          'fields' => [
-            '0' => 'bank_account_holder_name',
-            '1' => 'bank_name',
-            '2' => 'bank_account_number',
-            '3' => 'bank_routing_number',
-            '4' => 'bank_iban',
-            '5' => 'bank_swift',
-            '6' => 'account_type',
-          ],
-        ],
-        '2' => [
-          'title' => 'Tax Withholding',
-          'icon' => 'fas fa-file-invoice-dollar',
-          'fields' => [
-            '0' => 'tax_filing_status',
-            '1' => 'allowances',
-            '2' => 'extra_withholding',
-            '3' => 'is_exempt_from_federal_tax',
-          ],
-        ],
-        '3' => [
-          'title' => 'Jurisdiction & Currency',
-          'icon' => 'fas fa-globe',
-          'fields' => [
-            '0' => 'override_country_code',
-            '1' => 'override_state_code',
-            '2' => 'currency_code',
-          ],
-        ],
-        '4' => [
-          'title' => 'Validity',
-          'icon' => 'fas fa-calendar-alt',
-          'fields' => [
-            '0' => 'effective_date',
-            '1' => 'expiry_date',
-          ],
-        ],
-        '5' => [
-          'title' => 'Audit',
-          'icon' => 'fas fa-history',
-          'fields' => [
-            '0' => 'created_by',
-            '1' => 'updated_by',
-          ],
-        ],
       ],
     ],
   ],

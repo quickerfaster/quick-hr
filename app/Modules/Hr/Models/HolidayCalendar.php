@@ -17,7 +17,7 @@ class HolidayCalendar extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -25,11 +25,11 @@ class HolidayCalendar extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'name', 'country_code', 'region', 'is_default', 'is_active', 'description', 'applicable_to', 'year', 'holiday_count', 'last_updated'
+        'name', 'year', 'description', 'country_code', 'region', 'applicable_to', 'is_default', 'is_active', 'holiday_count', 'last_updated'
     ];
 
     protected $guarded = [
@@ -44,10 +44,10 @@ class HolidayCalendar extends Model
     ];
 
     protected $attributes = [
+        'year' => 2026,
+        'applicable_to' => 'all_employees',
         'is_default' => false,
         'is_active' => true,
-        'applicable_to' => 'all_employees',
-        'year' => 2026,
         'holiday_count' => 0
     ];
 

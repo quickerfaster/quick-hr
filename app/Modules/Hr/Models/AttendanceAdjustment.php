@@ -15,7 +15,7 @@ class AttendanceAdjustment extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -23,7 +23,7 @@ class AttendanceAdjustment extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [

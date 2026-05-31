@@ -16,7 +16,7 @@ class LeaveBalance extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -24,7 +24,7 @@ class LeaveBalance extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [

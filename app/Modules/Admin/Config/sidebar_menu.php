@@ -3,21 +3,24 @@
 return [
     [
     'title' => 'Users',
-    'icon' => 'fas fa-user-cog',
+    'icon' => 'fas fa-users-cog',
     'url' => 'admin/admin/users',
     'permission' => 'view_user',
+    'order' => 1,
 ],
     [
     'title' => 'Roles',
     'icon' => 'fas fa-user-shield',
     'url' => 'admin/admin/roles',
     'permission' => 'view_role',
+    'order' => 2,
 ],
     [
     'title' => 'Permissions',
     'icon' => 'fas fa-user-lock',
     'url' => 'admin/admin/access-control-management',
     'permission' => 'view_permission',
+    'order' => 3,
 ],
     [
     'itemType' => 'item-separator',
@@ -36,7 +39,7 @@ return [
     'title' => 'Overview',
     'icon' => 'fas fa-chart-bar',
     'url' => 'admin/admin/dashboard-company-profile-overview',
-    'permission' => 'view_overview',
+    'permission' => 'view_company_profile_overview',
     'order' => 1,
 ],
     [
@@ -50,6 +53,7 @@ return [
     'icon' => 'fas fa-map-marker-alt',
     'url' => 'admin/admin/locations',
     'permission' => 'view_location',
+    'order' => 2,
 ],
     [
     'itemType' => 'item-separator',
@@ -62,6 +66,7 @@ return [
     'url' => 'admin/admin/companies',
     'permission' => 'manage-system',
     'groupTitle' => 'Settings',
+    'order' => 3,
 ],
     [
     'itemType' => 'item-separator',
@@ -74,6 +79,7 @@ return [
     'url' => 'admin/admin/departments',
     'permission' => 'view_department',
     'groupTitle' => 'Organization',
+    'order' => 4,
 ],
     [
     'title' => 'Job Titles',
@@ -81,6 +87,7 @@ return [
     'url' => 'admin/admin/job-titles',
     'permission' => 'view_job_title',
     'groupTitle' => 'Organization',
+    'order' => 5,
 ],
     [
     'itemType' => 'item-separator',
@@ -93,5 +100,6 @@ return [
     'url' => 'admin/admin/shifts',
     'permission' => 'view_shift',
     'groupTitle' => 'Scheduling',
+    'order' => 6,
 ],
 ];

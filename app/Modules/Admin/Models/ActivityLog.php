@@ -27,7 +27,7 @@ class ActivityLog extends Model
     
 
     protected $fillable = [
-        'causer_type', 'causer_id', 'subject_type', 'subject_id', 'log_name', 'action', 'description', 'old_values', 'new_values', 'properties', 'created_at', 'updated_at'
+        'log_name', 'action', 'description'
     ];
 
     protected $guarded = [
@@ -35,12 +35,12 @@ class ActivityLog extends Model
     ];
 
     protected $casts = [
-        'causer_id' => 'integer',
+        'created_at' => 'datetime',
         'subject_id' => 'integer',
+        'causer_id' => 'integer',
         'old_values' => 'array',
         'new_values' => 'array',
         'properties' => 'array',
-        'created_at' => 'datetime',
         'updated_at' => 'datetime'
     ];
 

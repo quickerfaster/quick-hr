@@ -38,7 +38,7 @@ data-bs-placement="right" title="Attendance">
 <li class="nav-item text-nowrap">
 <a href="/hr/hr/shift-schedules" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
 data-bs-placement="right" title="Shift Schedules">
-<i class="fas fa-calendar-alt me-2"></i>
+<i class="fas fa-calendar-check me-2"></i>
 @if ($state === 'full')
 <span>Shift Schedules</span>
 @endif

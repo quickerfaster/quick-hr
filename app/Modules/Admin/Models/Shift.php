@@ -17,7 +17,7 @@ class Shift extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -25,11 +25,11 @@ class Shift extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'name', 'code', 'start_time', 'end_time', 'duration_hours', 'is_overnight', 'description', 'is_active', 'is_default', 'shift_category', 'created_from_template_id', 'last_used_date', 'usage_count'
+        'name', 'code', 'shift_category', 'description', 'start_time', 'end_time', 'duration_hours', 'is_overnight', 'is_active', 'is_default', 'created_from_template_id', 'last_used_date', 'usage_count'
     ];
 
     protected $guarded = [
@@ -47,10 +47,10 @@ class Shift extends Model
     ];
 
     protected $attributes = [
+        'shift_category' => 'regular',
         'is_overnight' => false,
         'is_active' => true,
         'is_default' => false,
-        'shift_category' => 'regular',
         'usage_count' => 0
     ];
 

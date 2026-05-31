@@ -15,7 +15,7 @@ class Holiday extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -23,11 +23,11 @@ class Holiday extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'calendar_id', 'name', 'description', 'date', 'observed_date', 'is_recurring', 'recurrence_pattern', 'recurrence_rule', 'holiday_type', 'is_paid_holiday', 'affects_payroll', 'business_impact', 'eligible_employee_types', 'holiday_pay_rate', 'minimum_hours_for_pay', 'country_code', 'region_code', 'is_active', 'is_half_day', 'half_day_end_time', 'year', 'generated_from_template', 'override_id', 'last_synced_at'
+        'calendar_id', 'name', 'description', 'date', 'observed_date', 'is_recurring', 'recurrence_pattern', 'recurrence_rule', 'holiday_type', 'is_paid_holiday', 'affects_payroll', 'business_impact', 'eligible_employee_types', 'holiday_pay_rate', 'minimum_hours_for_pay', 'country_code', 'region_code', 'is_half_day', 'half_day_end_time', 'is_active', 'year', 'generated_from_template', 'override_id', 'last_synced_at'
     ];
 
     protected $guarded = [
@@ -42,8 +42,8 @@ class Holiday extends Model
         'affects_payroll' => 'boolean',
         'holiday_pay_rate' => 'decimal:2',
         'minimum_hours_for_pay' => 'decimal:2',
-        'is_active' => 'boolean',
         'is_half_day' => 'boolean',
+        'is_active' => 'boolean',
         'year' => 'integer',
         'generated_from_template' => 'boolean',
         'override_id' => 'integer',
@@ -63,8 +63,8 @@ class Holiday extends Model
 ),
         'holiday_pay_rate' => 1,
         'minimum_hours_for_pay' => 8,
-        'is_active' => true,
         'is_half_day' => false,
+        'is_active' => true,
         'generated_from_template' => false
     ];
 

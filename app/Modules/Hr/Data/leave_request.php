@@ -9,6 +9,8 @@ return [
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -32,6 +34,8 @@ return [
       'field_type' => 'select',
       'label' => 'Leave Type',
       'validation' => 'required|exists:leave_types,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\LeaveType',
         'type' => 'belongsTo',
@@ -55,6 +59,7 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Start Date',
       'validation' => 'required|date|after_or_equal:today',
+      'filterable' => true,
       'wizard' => [
         'employee_self_service' => true,
       ],
@@ -65,6 +70,7 @@ return [
       'field_type' => 'datepicker',
       'label' => 'End Date',
       'validation' => 'required|date|after_or_equal:start_date',
+      'filterable' => true,
       'wizard' => [
         'employee_self_service' => true,
       ],
@@ -75,6 +81,7 @@ return [
       'field_type' => 'textarea',
       'label' => 'Reason',
       'validation' => 'nullable|string|max:1000',
+      'searchable' => true,
       'wizard' => [
         'employee_self_service' => true,
       ],
@@ -91,6 +98,7 @@ return [
         'Denied' => 'Denied',
         'Cancelled' => 'Cancelled',
       ],
+      'filterable' => true,
     ],
     'approved_by' => [
       'display' => 'inline',
@@ -98,6 +106,8 @@ return [
       'field_type' => 'select',
       'label' => 'Approved By',
       'validation' => 'nullable|exists:employees,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -153,6 +163,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Retroactive Request',
       'validation' => 'boolean',
+      'filterable' => true,
     ],
     'reported_after_absence' => [
       'display' => 'inline',
@@ -174,6 +185,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Overlaps Company Holiday',
       'validation' => 'boolean',
+      'filterable' => true,
     ],
   ],
   'detailComponent' => '',
@@ -181,20 +193,41 @@ return [
     'onTable' => [
       '0' => 'reason',
       '1' => 'denial_reason',
+      '2' => 'attendance_synced',
+      '3' => 'attendance_records_count',
+      '4' => 'last_sync_at',
+      '5' => 'reported_after_absence',
+      '6' => 'created_at',
+      '7' => 'updated_at',
+      '8' => 'deleted_at',
     ],
     'onNewForm' => [
       '0' => 'status',
       '1' => 'approved_by',
       '2' => 'approved_at',
       '3' => 'denial_reason',
+      '4' => 'attendance_synced',
+      '5' => 'attendance_records_count',
+      '6' => 'last_sync_at',
+      '7' => 'reported_after_absence',
+      '8' => 'workdays_count',
+      '9' => 'overlap_with_holiday',
+      '10' => 'created_at',
+      '11' => 'updated_at',
+      '12' => 'deleted_at',
     ],
     'onEditForm' => [
       '0' => 'employee_id',
       '1' => 'leave_type_id',
       '2' => 'start_date',
       '3' => 'end_date',
+      '4' => 'created_at',
+      '5' => 'updated_at',
+      '6' => 'deleted_at',
     ],
-    'onQuery' => [],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -202,13 +235,33 @@ return [
     '2' => 'delete',
   ],
   'isTransaction' => false,
-  'crudType' => 'pages',
+  'crudType' => 'drawers',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'employee_id',
+    '1' => 'leave_type_id',
+    '2' => 'start_date',
+    '3' => 'end_date',
+    '4' => 'status',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
-    'addButton' => false,
+    'addButton' => [
+      '0' => [
+        'label' => 'Request Leave',
+        'type' => 'wizard',
+        'url' => '/hr/leave-request',
+        'wizard' => 'employee_self_service',
+        'icon' => 'fas fa-plus',
+        'primary' => true,
+      ],
+      '1' => [
+        'label' => 'Quick Request',
+        'type' => 'quick_add',
+        'icon' => 'fas fa-bolt',
+      ],
+    ],
     'files' => [
       'export' => [
         '0' => 'xls',
@@ -217,47 +270,63 @@ return [
       ],
       'print' => true,
     ],
+    'perPage' => [
+      '0' => 5,
+      '1' => 10,
+      '2' => 25,
+      '3' => 50,
+    ],
+    'search' => true,
+    'showHideColumns' => true,
+    'filterColumns' => true,
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
     'bulkActions' => [
       'export' => [
         '0' => 'xls',
         '1' => 'csv',
         '2' => 'pdf',
       ],
-      'approve' => true,
-      'deny' => true,
-    ],
-    'perPage' => [
-      '0' => 5,
-      '1' => 10,
-      '2' => 25,
-      '3' => 50,
-      '4' => 100,
-    ],
-    'search' => true,
-    'showHideColumns' => true,
-    'filters' => [
-      '0' => [
-        'field' => 'status',
-        'type' => 'select',
-        'options' => 'Pending, Approved, Denied, Cancelled',
+      'approve' => [
+        'label' => 'Approve Selected',
+        'icon' => 'fas fa-check-circle',
+        'updateModelField' => 'status',
+        'fieldValue' => 'Approved',
+        'confirm' => 'Approve selected leave requests?',
+        'condition' => [
+          '0' => [
+            'status' => [
+              '0' => 'Pending',
+            ],
+          ],
+        ],
       ],
-      '1' => [
-        'field' => 'leave_type_id',
-        'type' => 'select',
-        'optionsFrom' => 'leave_types',
-        'label' => 'Leave Type',
+      'deny' => [
+        'label' => 'Deny Selected',
+        'icon' => 'fas fa-times-circle',
+        'updateModelField' => 'status',
+        'fieldValue' => 'Denied',
+        'confirm' => 'Deny selected leave requests?',
+        'condition' => [
+          '0' => [
+            'status' => [
+              '0' => 'Pending',
+            ],
+          ],
+        ],
       ],
-      '2' => [
-        'field' => 'start_date',
-        'type' => 'date_range',
-        'label' => 'Date Range',
-      ],
+      'delete' => true,
+      'restore' => true,
+      'forceDelete' => true,
     ],
   ],
   'fieldGroups' => [
     'request_details' => [
       'title' => 'Request Details',
       'groupType' => 'hr',
+      'icon' => 'fas fa-file-alt',
       'fields' => [
         '0' => 'employee_id',
         '1' => 'leave_type_id',
@@ -269,6 +338,7 @@ return [
     'approval_info' => [
       'title' => 'Approval Information',
       'groupType' => 'hr',
+      'icon' => 'fas fa-check-circle',
       'fields' => [
         '0' => 'status',
         '1' => 'approved_by',
@@ -279,6 +349,7 @@ return [
     'system_sync_status' => [
       'title' => 'System Sync Status',
       'groupType' => 'leave',
+      'icon' => 'fas fa-sync-alt',
       'fields' => [
         '0' => 'attendance_synced',
         '1' => 'attendance_records_count',
@@ -288,6 +359,7 @@ return [
     'absenteeism_analytics' => [
       'title' => 'Absence Analytics',
       'groupType' => 'leave',
+      'icon' => 'fas fa-chart-line',
       'fields' => [
         '0' => 'is_retroactive',
         '1' => 'reported_after_absence',
@@ -296,7 +368,24 @@ return [
       ],
     ],
   ],
-  'moreActions' => [],
+  'moreActions' => [
+    '0' => [
+      'title' => 'Restore',
+      'icon' => 'fas fa-trash-restore',
+      'action' => 'restore',
+      'confirm' => 'Restore this archived leave request?',
+      'requiredPermission' => 'restore_leave_request',
+      'condition' => 'trashed',
+    ],
+    '1' => [
+      'title' => 'Permanently Delete',
+      'icon' => 'fas fa-skull-crossbones',
+      'action' => 'forceDelete',
+      'confirm' => 'This action cannot be undone. Permanently delete this leave request?',
+      'requiredPermission' => 'force_delete_leave_request',
+      'condition' => 'trashed',
+    ],
+  ],
   'switchViews' => [
     'default' => 'list',
     'card' => [
@@ -339,23 +428,6 @@ return [
         'Approved' => 'success',
         'Denied' => 'danger',
         'Cancelled' => 'secondary',
-      ],
-    ],
-    'detail' => [
-      'layout' => 'single',
-      'detailType' => 'record',
-      'icon' => 'fas fa-calendar-check',
-      'titleFields' => [
-        '0' => 'employee.first_name',
-        '1' => 'employee.last_name',
-      ],
-      'subtitleFields' => [
-        '0' => 'leaveType.name',
-      ],
-      'contentFields' => [
-        '0' => 'start_date',
-        '1' => 'end_date',
-        '2' => 'reason',
       ],
     ],
   ],

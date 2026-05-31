@@ -2,7 +2,7 @@
 
 return array (
   'title' => 'Policies & Work Patterns Overview',
-  'description' => 'Attendance policies, work patterns, and assignments',
+  'description' => 'Manage attendance policies, work patterns, and organisational assignments',
   'widgets' => 
   array (
     0 => 
@@ -61,16 +61,62 @@ return array (
       'model' => 'App\\Modules\\Hr\\Models\\EmployeeWorkPattern',
       'icon' => 'fas fa-user-tag',
       'aggregate' => 'count',
+      'distinct' => 'employee_id',
       'width' => 3,
     ),
     4 => 
+    array (
+      'type' => 'chart',
+      'title' => 'Policies by Country',
+      'size' => 'col-12',
+      'model' => 'App\\Modules\\Hr\\Models\\AttendancePolicy',
+      'group_by' => 'country_code',
+      'chart_type' => 'bar',
+      'description' => 'Active policies per jurisdiction',
+      'aggregate' => 'count',
+      'conditions' => 
+      array (
+        0 => 
+        array (
+          0 => 'is_active',
+          1 => '=',
+          2 => true,
+        ),
+      ),
+      'width' => 4,
+    ),
+    5 => 
+    array (
+      'type' => 'chart',
+      'title' => 'Work Patterns by Type',
+      'size' => 'col-12',
+      'model' => 'App\\Modules\\Hr\\Models\\WorkPattern',
+      'group_by' => 'pattern_type',
+      'chart_type' => 'pie',
+      'description' => 'Distribution of pattern types',
+      'aggregate' => 'count',
+      'width' => 4,
+    ),
+    6 => 
+    array (
+      'type' => 'chart',
+      'title' => 'Policy Assignments by Entity',
+      'size' => 'col-12',
+      'model' => 'App\\Modules\\Hr\\Models\\PolicyAssignment',
+      'group_by' => 'assignable_type',
+      'chart_type' => 'bar',
+      'description' => 'Where policies are applied',
+      'aggregate' => 'count',
+      'width' => 4,
+    ),
+    7 => 
     array (
       'type' => 'list',
       'title' => 'Recent Attendance Policies',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\AttendancePolicy',
       'icon' => 'fas fa-file-contract',
-      'description' => 'Latest 5 policies',
+      'description' => 'Latest 5 policies added',
       'limit' => 5,
       'sort' => 
       array (
@@ -105,14 +151,14 @@ return array (
       'show_view_all' => true,
       'view_all_link' => '/hr/attendance-policies',
     ),
-    5 => 
+    8 => 
     array (
       'type' => 'list',
       'title' => 'Top Work Patterns',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\WorkPattern',
       'icon' => 'fas fa-chart-simple',
-      'description' => 'Most assigned patterns',
+      'description' => 'Most frequently assigned patterns',
       'limit' => 5,
       'sort' => 
       array (
@@ -146,69 +192,7 @@ return array (
       'show_view_all' => true,
       'view_all_link' => '/hr/work-patterns',
     ),
-    6 => 
-    array (
-      'type' => 'chart',
-      'title' => 'Policies by Country',
-      'size' => 'col-12',
-      'model' => 'App\\Modules\\Hr\\Models\\AttendancePolicy',
-      'group_by' => 'country_code',
-      'chart_type' => 'bar',
-      'aggregate' => 'count',
-      'conditions' => 
-      array (
-        0 => 
-        array (
-          0 => 'is_active',
-          1 => '=',
-          2 => true,
-        ),
-      ),
-      'width' => 4,
-    ),
-    7 => 
-    array (
-      'type' => 'chart',
-      'title' => 'Work Patterns by Type',
-      'size' => 'col-12',
-      'model' => 'App\\Modules\\Hr\\Models\\WorkPattern',
-      'group_by' => 'pattern_type',
-      'chart_type' => 'pie',
-      'aggregate' => 'count',
-      'width' => 4,
-    ),
-    8 => 
-    array (
-      'type' => 'chart',
-      'title' => 'Policy Assignments by Entity',
-      'size' => 'col-12',
-      'model' => 'App\\Modules\\Hr\\Models\\PolicyAssignment',
-      'chart_type' => 'bar',
-      'group_by' => NULL,
-      'aggregates' => 
-      array (
-        'company' => 'COUNT(company_id)',
-        'location' => 'COUNT(location_id)',
-        'department' => 'COUNT(department_id)',
-        'shift' => 'COUNT(shift_id)',
-      ),
-      'width' => 4,
-    ),
     9 => 
-    array (
-      'type' => 'progress',
-      'title' => 'Work Pattern Coverage',
-      'size' => 'col-12',
-      'model' => 'App\\Modules\\Hr\\Models\\EmployeeWorkPattern',
-      'icon' => 'fas fa-calendar-check',
-      'description' => 'Employees with active work pattern',
-      'aggregate' => 'count',
-      'distinct' => 'employee_id',
-      'target_model' => 'App\\Modules\\Hr\\Models\\Employee',
-      'target_aggregate' => 'count',
-      'width' => 3,
-    ),
-    10 => 
     array (
       'type' => 'action_card',
       'title' => 'Create New Policy',
@@ -230,13 +214,13 @@ return array (
       ),
       'width' => 3,
     ),
-    11 => 
+    10 => 
     array (
       'type' => 'action_card',
       'title' => 'Manage Assignments',
       'size' => 'col-12',
       'icon' => 'fas fa-tasks',
-      'description' => 'Assign policies to companies, locations, etc.',
+      'description' => 'Assign policies to entities',
       'actions' => 
       array (
         0 => 
@@ -252,20 +236,65 @@ return array (
       ),
       'width' => 3,
     ),
+    11 => 
+    array (
+      'type' => 'action_card',
+      'title' => 'Create Work Pattern',
+      'size' => 'col-12',
+      'icon' => 'fas fa-calendar-plus',
+      'description' => 'Define a new work schedule',
+      'actions' => 
+      array (
+        0 => 
+        array (
+          'label' => 'Create',
+          'event' => 'openWorkPatternWizard',
+          'params' => 
+          array (
+            'type' => 'pattern',
+          ),
+          'style' => 'secondary',
+        ),
+      ),
+      'width' => 3,
+    ),
     12 => 
     array (
+      'type' => 'action_card',
+      'title' => 'Bulk Assign Patterns',
+      'size' => 'col-12',
+      'icon' => 'fas fa-users',
+      'description' => 'Assign patterns to multiple employees',
+      'actions' => 
+      array (
+        0 => 
+        array (
+          'label' => 'Bulk Assign',
+          'event' => 'openBulkPatternAssignment',
+          'params' => 
+          array (
+            'type' => 'bulk',
+          ),
+          'style' => 'secondary',
+        ),
+      ),
+      'width' => 3,
+    ),
+    13 => 
+    array (
       'type' => 'trend',
-      'title' => 'New Policy Assignments',
+      'title' => 'New Policy Assignments Trend',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\PolicyAssignment',
       'group_by' => 'month',
       'icon' => 'fas fa-chart-line',
+      'description' => 'Last 6 months',
       'aggregate' => 'count',
       'date_field' => 'created_at',
       'period' => 6,
       'width' => 6,
     ),
-    13 => 
+    14 => 
     array (
       'type' => 'list',
       'title' => 'Upcoming Expiring Policies',
@@ -317,10 +346,24 @@ return array (
       'show_view_all' => true,
       'view_all_link' => '/hr/attendance-policies?filter[expiration]=upcoming',
     ),
-    14 => 
+    15 => 
+    array (
+      'type' => 'progress',
+      'title' => 'Work Pattern Coverage',
+      'size' => 'col-12',
+      'model' => 'App\\Modules\\Hr\\Models\\EmployeeWorkPattern',
+      'icon' => 'fas fa-calendar-check',
+      'description' => 'Employees with active work pattern assignment',
+      'aggregate' => 'count',
+      'distinct' => 'employee_id',
+      'target_model' => 'App\\Modules\\Hr\\Models\\Employee',
+      'target_aggregate' => 'count',
+      'width' => 3,
+    ),
+    16 => 
     array (
       'type' => 'list',
-      'title' => 'Recent Employee Work Pattern Assignments',
+      'title' => 'Recent Employee Pattern Assignments',
       'size' => 'col-12',
       'model' => 'App\\Modules\\Hr\\Models\\EmployeeWorkPattern',
       'icon' => 'fas fa-user-clock',
@@ -356,7 +399,7 @@ return array (
           'format' => 'date',
         ),
       ),
-      'width' => 6,
+      'width' => 9,
       'show_view_all' => true,
       'view_all_link' => '/hr/employee-work-patterns',
     ),

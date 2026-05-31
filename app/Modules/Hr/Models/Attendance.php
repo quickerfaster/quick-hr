@@ -13,8 +13,6 @@ use App\Modules\Hr\Models\LeaveRequest;
 use App\Modules\Admin\Models\Shift;
 use App\Modules\Hr\Models\AttendancePolicy;
 use App\Modules\Hr\Models\WorkPattern;
-use App\Modules\Hr\Observers\UserObserver;
-use App\Modules\Hr\Observers\AnotherObserver;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,7 +21,7 @@ class Attendance extends Model
 {
     use HasFactory;
     
-    
+    use SoftDeletes;
 
     
 
@@ -31,11 +29,11 @@ class Attendance extends Model
     
     
     
-    
+    public $timestamps = true;
     
 
     protected $fillable = [
-        'employee_id', 'employee_number', 'company', 'department', 'date', 'net_hours', 'status', 'sessions', 'shift_id', 'absence_type', 'is_unplanned', 'absence_reason', 'is_paid_absence', 'hours_deducted', 'is_approved', 'approved_by', 'approved_at', 'notes', 'needs_review', 'leave_request_id', 'last_calculated_at', 'calculation_method', 'regular_hours', 'overtime_hours', 'double_time_hours', 'attendance_policy_id', 'work_pattern_id', 'minutes_late', 'minutes_early_departure', 'missed_break_minutes', 'calculation_metadata', 'calculation_version'
+        'employee_id', 'date', 'shift_id', 'status', 'net_hours', 'regular_hours', 'overtime_hours', 'double_time_hours', 'absence_type', 'absence_reason', 'leave_request_id', 'is_paid_absence', 'hours_deducted', 'is_approved', 'needs_review', 'notes', 'minutes_late', 'minutes_early_departure', 'missed_break_minutes', 'sessions', 'approved_by', 'approved_at', 'last_calculated_at', 'calculation_method', 'attendance_policy_id', 'work_pattern_id', 'is_unplanned', 'calculation_metadata', 'calculation_version'
     ];
 
     protected $guarded = [
@@ -45,37 +43,37 @@ class Attendance extends Model
     protected $casts = [
         'date' => 'date',
         'net_hours' => 'decimal:2',
-        'sessions' => 'array',
-        'is_unplanned' => 'boolean',
-        'is_paid_absence' => 'boolean',
-        'hours_deducted' => 'decimal:2',
-        'is_approved' => 'boolean',
-        'approved_at' => 'datetime',
-        'needs_review' => 'boolean',
-        'last_calculated_at' => 'datetime',
         'regular_hours' => 'decimal:2',
         'overtime_hours' => 'decimal:2',
         'double_time_hours' => 'decimal:2',
+        'is_paid_absence' => 'boolean',
+        'hours_deducted' => 'decimal:2',
+        'is_approved' => 'boolean',
+        'needs_review' => 'boolean',
         'minutes_late' => 'integer',
         'minutes_early_departure' => 'integer',
         'missed_break_minutes' => 'integer',
+        'sessions' => 'array',
+        'approved_at' => 'datetime',
+        'last_calculated_at' => 'datetime',
+        'is_unplanned' => 'boolean',
         'calculation_metadata' => 'array'
     ];
 
     protected $attributes = [
         'status' => 'present',
-        'is_unplanned' => false,
+        'regular_hours' => 0,
+        'overtime_hours' => 0,
+        'double_time_hours' => 0,
         'is_paid_absence' => true,
         'hours_deducted' => 0,
         'is_approved' => false,
         'needs_review' => true,
-        'calculation_method' => 'auto',
-        'regular_hours' => 0,
-        'overtime_hours' => 0,
-        'double_time_hours' => 0,
         'minutes_late' => 0,
         'minutes_early_departure' => 0,
-        'missed_break_minutes' => 0
+        'missed_break_minutes' => 0,
+        'calculation_method' => 'auto',
+        'is_unplanned' => false
     ];
 
     protected $dispatchesEvents = [
@@ -169,15 +167,5 @@ class Attendance extends Model
     protected static function newFactory()
     {
         return \App\Modules\Hr\Database\Factories\AttendanceFactory::new();
-    }
-
-    /**
-     * The "booted" method of the model.
-     */
-    protected static function booted()
-    {
-        static::observe(\App\Modules\Hr\Observers\UserObserver::class);
-        static::observe(\App\Modules\Hr\Observers\AnotherObserver::class);
-
     }
 }

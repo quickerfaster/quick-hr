@@ -9,6 +9,8 @@ return [
       'field_type' => 'select',
       'label' => 'Holiday Calendar',
       'validation' => 'required|exists:holiday_calendars,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\HolidayCalendar',
         'type' => 'belongsTo',
@@ -29,6 +31,8 @@ return [
       'field_type' => 'string',
       'label' => 'Holiday Name',
       'validation' => 'required|string|max:100',
+      'filterable' => true,
+      'searchable' => true,
     ],
     'description' => [
       'display' => 'inline',
@@ -43,6 +47,7 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Holiday Date',
       'validation' => 'required|date',
+      'filterable' => true,
     ],
     'observed_date' => [
       'display' => 'inline',
@@ -50,6 +55,7 @@ return [
       'field_type' => 'datepicker',
       'label' => 'Observed Date',
       'validation' => 'nullable|date|after_or_equal:date',
+      'filterable' => true,
     ],
     'is_recurring' => [
       'display' => 'inline',
@@ -57,6 +63,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Recurring Holiday',
       'validation' => 'boolean',
+      'filterable' => true,
     ],
     'recurrence_pattern' => [
       'display' => 'inline',
@@ -91,6 +98,7 @@ return [
         'observance' => 'Observance',
         'optional' => 'Optional Holiday',
       ],
+      'filterable' => true,
     ],
     'is_paid_holiday' => [
       'display' => 'inline',
@@ -98,6 +106,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Paid Holiday',
       'validation' => 'boolean',
+      'filterable' => true,
     ],
     'affects_payroll' => [
       'display' => 'inline',
@@ -105,6 +114,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Affects Payroll',
       'validation' => 'boolean',
+      'filterable' => true,
     ],
     'business_impact' => [
       'display' => 'inline',
@@ -119,6 +129,7 @@ return [
         'remote_only' => 'Remote Work Only',
         'essential_only' => 'Essential Staff Only',
       ],
+      'filterable' => true,
     ],
     'eligible_employee_types' => [
       'display' => 'inline',
@@ -156,6 +167,7 @@ return [
       'field_type' => 'string',
       'label' => 'Country Code',
       'validation' => 'nullable|string|size:2',
+      'filterable' => true,
     ],
     'region_code' => [
       'display' => 'inline',
@@ -163,13 +175,7 @@ return [
       'field_type' => 'string',
       'label' => 'Region/State Code',
       'validation' => 'nullable|string|max:10',
-    ],
-    'is_active' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'checkbox',
-      'label' => 'Active',
-      'validation' => 'boolean',
+      'filterable' => true,
     ],
     'is_half_day' => [
       'display' => 'inline',
@@ -177,6 +183,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Half Day Holiday',
       'validation' => 'boolean',
+      'filterable' => true,
     ],
     'half_day_end_time' => [
       'display' => 'inline',
@@ -184,6 +191,14 @@ return [
       'field_type' => 'timepicker',
       'label' => 'Half Day End Time',
       'validation' => 'required_if:is_half_day,true',
+    ],
+    'is_active' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'checkbox',
+      'label' => 'Active',
+      'validation' => 'boolean',
+      'filterable' => true,
     ],
     'year' => [
       'display' => 'inline',
@@ -196,54 +211,61 @@ return [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'checkbox',
-      'label' => 'Generated from Template',
+      'label' => 'Generated From Template',
       'validation' => 'nullable|boolean',
     ],
     'override_id' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'number',
-      'label' => 'Override ID',
+      'label' => 'Override',
       'validation' => 'nullable|integer',
     ],
     'last_synced_at' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'datetimepicker',
-      'label' => 'Last Synced',
+      'label' => 'Last Synced At',
       'validation' => 'nullable|date',
     ],
   ],
   'detailComponent' => '',
   'hiddenFields' => [
     'onTable' => [
-      '0' => 'attendanceRecords',
-      '1' => 'description',
-      '2' => 'recurrence_rule',
-      '3' => 'region_code',
-      '4' => 'holiday_pay_rate',
-      '5' => 'minimum_hours_for_pay',
-      '6' => 'half_day_end_time',
-      '7' => 'year',
-      '8' => 'generated_from_template',
-      '9' => 'override_id',
-      '10' => 'last_synced_at',
+      '0' => 'description',
+      '1' => 'recurrence_rule',
+      '2' => 'region_code',
+      '3' => 'holiday_pay_rate',
+      '4' => 'minimum_hours_for_pay',
+      '5' => 'half_day_end_time',
+      '6' => 'year',
+      '7' => 'generated_from_template',
+      '8' => 'override_id',
+      '9' => 'last_synced_at',
+      '10' => 'created_at',
+      '11' => 'updated_at',
+      '12' => 'deleted_at',
     ],
     'onNewForm' => [
-      '0' => 'attendanceRecords',
-      '1' => 'year',
-      '2' => 'generated_from_template',
-      '3' => 'override_id',
-      '4' => 'last_synced_at',
+      '0' => 'year',
+      '1' => 'generated_from_template',
+      '2' => 'override_id',
+      '3' => 'last_synced_at',
+      '4' => 'created_at',
+      '5' => 'updated_at',
+      '6' => 'deleted_at',
     ],
     'onEditForm' => [
-      '0' => 'attendanceRecords',
-      '1' => 'year',
-      '2' => 'generated_from_template',
-      '3' => 'override_id',
-      '4' => 'last_synced_at',
+      '0' => 'year',
+      '1' => 'generated_from_template',
+      '2' => 'override_id',
+      '3' => 'last_synced_at',
+      '4' => 'updated_at',
+      '5' => 'deleted_at',
     ],
-    'onQuery' => [],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -253,32 +275,17 @@ return [
   'isTransaction' => false,
   'crudType' => 'pages',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'name',
+    '1' => 'date',
+    '2' => 'holiday_type',
+    '3' => 'is_paid_holiday',
+    '4' => 'is_active',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
-    'addButton' => [
-      '0' => [
-        'label' => 'Add Holiday',
-        'type' => 'quick_add',
-        'icon' => 'fas fa-plus-circle',
-        'primary' => true,
-      ],
-      '1' => [
-        'label' => 'Add Recurring Holiday',
-        'type' => 'modal',
-        'icon' => 'fas fa-redo',
-        'url' => '/hr/holidays/create-recurring',
-        'modalSize' => 'lg',
-      ],
-      '2' => [
-        'label' => 'Import Holidays',
-        'type' => 'modal',
-        'icon' => 'fas fa-file-import',
-        'url' => '/hr/holidays/import',
-        'modalSize' => 'lg',
-      ],
-    ],
+    'addButton' => true,
     'files' => [
       'export' => [
         '0' => 'xls',
@@ -286,13 +293,6 @@ return [
         '2' => 'pdf',
       ],
       'print' => true,
-    ],
-    'bulkActions' => [
-      'export' => [
-        '0' => 'xls',
-        '1' => 'csv',
-        '2' => 'pdf',
-      ],
     ],
     'perPage' => [
       '0' => 10,
@@ -302,87 +302,7 @@ return [
     ],
     'search' => true,
     'showHideColumns' => true,
-    'filters' => [
-      '0' => [
-        'field' => 'calendar_id',
-        'type' => 'select',
-        'optionsFrom' => 'holiday_calendars',
-        'label' => 'Calendar',
-      ],
-      '1' => [
-        'field' => 'year',
-        'type' => 'select',
-        'optionsFrom' => 'query',
-        'query' => 'SELECT DISTINCT YEAR(date) as year FROM holidays ORDER BY year DESC',
-        'label' => 'Year',
-      ],
-      '2' => [
-        'field' => 'holiday_type',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Public',
-          '2' => 'Company',
-          '3' => 'Regional',
-          '4' => 'Observance',
-          '5' => 'Optional',
-        ],
-        'label' => 'Holiday Type',
-      ],
-      '3' => [
-        'field' => 'is_active',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Active',
-          '2' => 'Inactive',
-        ],
-        'label' => 'Status',
-        'default' => 'Active',
-      ],
-      '4' => [
-        'field' => 'is_paid_holiday',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Paid',
-          '2' => 'Unpaid',
-        ],
-        'label' => 'Paid Status',
-      ],
-      '5' => [
-        'field' => 'business_impact',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'Office Closed',
-          '2' => 'Reduced Staff',
-          '3' => 'Normal Operations',
-          '4' => 'Remote Only',
-          '5' => 'Essential Only',
-        ],
-        'label' => 'Business Impact',
-      ],
-      '6' => [
-        'field' => 'date',
-        'type' => 'date_range',
-        'label' => 'Date Range',
-      ],
-      '7' => [
-        'field' => 'country_code',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'US',
-          '2' => 'GB',
-          '3' => 'CA',
-          '4' => 'AU',
-          '5' => 'IN',
-          '6' => 'NG',
-        ],
-        'label' => 'Country',
-      ],
-    ],
+    'filterColumns' => true,
     'calendarView' => [
       'enable' => true,
       'defaultView' => 'month',
@@ -395,6 +315,20 @@ return [
       'titleField' => 'name',
       'colorField' => 'holiday_type',
       'statusField' => 'business_impact',
+    ],
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
+    'bulkActions' => [
+      'export' => [
+        '0' => 'xls',
+        '1' => 'csv',
+        '2' => 'pdf',
+      ],
+      'delete' => true,
+      'restore' => true,
+      'forceDelete' => true,
     ],
   ],
   'fieldGroups' => [
@@ -458,7 +392,24 @@ return [
       ],
     ],
   ],
-  'moreActions' => [],
+  'moreActions' => [
+    '0' => [
+      'title' => 'Restore',
+      'icon' => 'fas fa-trash-restore',
+      'action' => 'restore',
+      'confirm' => 'Restore this archived holiday?',
+      'requiredPermission' => 'restore_holiday',
+      'condition' => 'trashed',
+    ],
+    '1' => [
+      'title' => 'Permanently Delete',
+      'icon' => 'fas fa-skull-crossbones',
+      'action' => 'forceDelete',
+      'confirm' => 'This action cannot be undone. Permanently delete this holiday?',
+      'requiredPermission' => 'force_delete_holiday',
+      'condition' => 'trashed',
+    ],
+  ],
   'switchViews' => [
     'default' => 'list',
     'card' => [
@@ -493,7 +444,6 @@ return [
       'contentFields' => [
         '0' => 'holiday_type',
         '1' => 'business_impact',
-        '2' => 'eligible_employee_types',
       ],
       'badgeField' => 'is_active',
       'badgeColors' => [
@@ -503,70 +453,6 @@ return [
       'tagField' => 'is_paid_holiday',
       'tagText' => 'Paid',
       'tagColor' => 'success',
-    ],
-    'detail' => [
-      'layout' => 'tab',
-      'detailType' => 'record',
-      'titleFields' => [
-        '0' => 'name',
-      ],
-      'subtitleFields' => [
-        '0' => 'date',
-        '1' => 'calendar.name',
-      ],
-      'tabs' => [
-        '0' => [
-          'title' => 'Overview',
-          'icon' => 'fas fa-info-circle',
-          'fields' => [
-            '0' => 'name',
-            '1' => 'description',
-            '2' => 'date',
-            '3' => 'observed_date',
-            '4' => 'holiday_type',
-            '5' => 'is_active',
-            '6' => 'is_half_day',
-            '7' => 'half_day_end_time',
-          ],
-        ],
-        '1' => [
-          'title' => 'Recurrence',
-          'icon' => 'fas fa-redo',
-          'fields' => [
-            '0' => 'is_recurring',
-            '1' => 'recurrence_pattern',
-            '2' => 'recurrence_rule',
-          ],
-        ],
-        '2' => [
-          'title' => 'Business Impact',
-          'icon' => 'fas fa-building',
-          'fields' => [
-            '0' => 'business_impact',
-            '1' => 'eligible_employee_types',
-            '2' => 'country_code',
-            '3' => 'region_code',
-          ],
-        ],
-        '3' => [
-          'title' => 'Payroll Settings',
-          'icon' => 'fas fa-money-check',
-          'fields' => [
-            '0' => 'is_paid_holiday',
-            '1' => 'affects_payroll',
-            '2' => 'holiday_pay_rate',
-            '3' => 'minimum_hours_for_pay',
-          ],
-        ],
-        '4' => [
-          'title' => 'System Information',
-          'icon' => 'fas fa-server',
-          'fields' => [
-            '0' => 'generated_from_template',
-            '1' => 'last_synced_at',
-          ],
-        ],
-      ],
     ],
   ],
   'relations' => [

@@ -9,6 +9,8 @@ return [
       'field_type' => 'select',
       'label' => 'Payslip',
       'validation' => 'required|exists:payroll_payslips,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\PayrollPayslip',
         'type' => 'belongsTo',
@@ -43,6 +45,7 @@ return [
       'field_type' => 'string',
       'label' => 'Description',
       'validation' => 'required|string|max:255',
+      'filterable' => true,
       'searchable' => true,
     ],
     'amount' => [
@@ -127,12 +130,17 @@ return [
       '1' => 'adjustment_id',
       '2' => 'employee_adjustment_profile_id',
       '3' => 'calculation_metadata',
+      '4' => 'created_at',
+      '5' => 'updated_at',
     ],
     'onNewForm' => [
       '0' => 'calculation_metadata',
+      '1' => 'created_at',
+      '2' => 'updated_at',
     ],
     'onEditForm' => [
       '0' => 'calculation_metadata',
+      '1' => 'updated_at',
     ],
     'onQuery' => [],
   ],
@@ -142,10 +150,15 @@ return [
   'isTransaction' => false,
   'crudType' => 'modals',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'type',
+    '1' => 'label',
+    '2' => 'amount',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
+    'addButton' => false,
     'files' => [
       'export' => [
         '0' => 'xls',
@@ -153,13 +166,6 @@ return [
         '2' => 'pdf',
       ],
       'print' => true,
-    ],
-    'bulkActions' => [
-      'export' => [
-        '0' => 'xls',
-        '1' => 'csv',
-        '2' => 'pdf',
-      ],
     ],
     'perPage' => [
       '0' => 10,
@@ -170,28 +176,11 @@ return [
     'search' => true,
     'showHideColumns' => true,
     'filterColumns' => true,
-    'filters' => [
-      '0' => [
-        'field' => 'type',
-        'type' => 'select',
-        'options' => [
-          '0' => 'All',
-          '1' => 'earning',
-          '2' => 'deduction',
-          '3' => 'tax',
-          '4' => 'reimbursement',
-        ],
-        'label' => 'Item Type',
-      ],
-      '1' => [
-        'field' => 'amount',
-        'type' => 'number_range',
-        'label' => 'Amount Range',
-      ],
-      '2' => [
-        'field' => 'created_at',
-        'type' => 'date_range',
-        'label' => 'Created Date',
+    'bulkActions' => [
+      'export' => [
+        '0' => 'xls',
+        '1' => 'csv',
+        '2' => 'pdf',
       ],
     ],
   ],
@@ -229,36 +218,26 @@ return [
   'moreActions' => [],
   'switchViews' => [
     'default' => 'list',
-    'detail' => [
-      'layout' => 'tab',
-      'detailType' => 'record',
+    'table' => [
+      'enabled' => true,
+    ],
+    'list' => [
+      'enabled' => true,
       'titleFields' => [
         '0' => 'label',
-        '1' => 'type',
       ],
       'subtitleFields' => [
+        '0' => 'type',
+      ],
+      'contentFields' => [
         '0' => 'amount',
       ],
-      'tabs' => [
-        '0' => [
-          'title' => 'Overview',
-          'icon' => 'fas fa-info-circle',
-          'fields' => [
-            '0' => 'payslip_id',
-            '1' => 'type',
-            '2' => 'label',
-            '3' => 'amount',
-          ],
-        ],
-        '1' => [
-          'title' => 'Traceability',
-          'icon' => 'fas fa-link',
-          'fields' => [
-            '0' => 'policy_id',
-            '1' => 'adjustment_id',
-            '2' => 'employee_adjustment_profile_id',
-          ],
-        ],
+      'badgeField' => 'type',
+      'badgeColors' => [
+        'earning' => 'success',
+        'deduction' => 'danger',
+        'tax' => 'warning',
+        'reimbursement' => 'primary',
       ],
     ],
   ],

@@ -9,6 +9,8 @@ return [
       'field_type' => 'string',
       'label' => 'Department Name',
       'validation' => 'required|string|max:255',
+      'filterable' => true,
+      'searchable' => true,
     ],
     'code' => [
       'display' => 'inline',
@@ -17,6 +19,8 @@ return [
       'label' => 'Department Code',
       'validation' => 'required|string|max:50|unique:departments,code',
       'autoGenerate' => true,
+      'filterable' => true,
+      'searchable' => true,
     ],
     'description' => [
       'display' => 'inline',
@@ -24,13 +28,16 @@ return [
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string',
+      'searchable' => true,
     ],
     'company_id' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'select',
       'label' => 'Company',
-      'validation' => 'required|integer',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Admin\Models\Company',
         'type' => 'belongsTo',
@@ -50,7 +57,9 @@ return [
       'fillable' => true,
       'field_type' => 'select',
       'label' => 'Parent Department',
-      'validation' => 'nullable|string',
+      'validation' => 'nullable|integer|exists:departments,id',
+      'filterable' => true,
+      'searchable' => true,
       'relationship' => [
         'model' => 'App\Modules\Admin\Models\Department',
         'type' => 'belongsTo',
@@ -71,21 +80,38 @@ return [
       'field_type' => 'string',
       'label' => 'Cost Center',
       'validation' => 'nullable|string|max:255',
+      'searchable' => true,
     ],
     'is_active' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'checkbox',
-      'label' => 'Is Active',
+      'label' => 'Active',
       'validation' => 'nullable|boolean',
+      'filterable' => true,
     ],
   ],
   'detailComponent' => '',
   'hiddenFields' => [
-    'onTable' => [],
-    'onNewForm' => [],
-    'onEditForm' => [],
-    'onQuery' => [],
+    'onTable' => [
+      '0' => 'created_at',
+      '1' => 'updated_at',
+      '2' => 'deleted_at',
+      '3' => 'cost_center',
+      '4' => 'description',
+    ],
+    'onNewForm' => [
+      '0' => 'created_at',
+      '1' => 'updated_at',
+      '2' => 'deleted_at',
+    ],
+    'onEditForm' => [
+      '0' => 'updated_at',
+      '1' => 'deleted_at',
+    ],
+    'onQuery' => [
+      '0' => 'deleted_at',
+    ],
   ],
   'simpleActions' => [
     '0' => 'show',
@@ -95,14 +121,54 @@ return [
   'isTransaction' => false,
   'crudType' => 'drawers',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'name',
+    '1' => 'code',
+    '2' => 'company_id',
+    '3' => 'parent_department_id',
+    '4' => 'is_active',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
-  'controls' => 'all',
+  'controls' => [
+    'addButton' => true,
+    'search' => true,
+    'perPage' => [
+      '0' => 10,
+      '1' => 25,
+      '2' => 50,
+      '3' => 100,
+    ],
+    'files' => [
+      'export' => [
+        '0' => 'xls',
+        '1' => 'csv',
+        '2' => 'pdf',
+      ],
+      'print' => true,
+    ],
+    'showHideColumns' => true,
+    'filterColumns' => true,
+    'softDelete' => true,
+    'restore' => true,
+    'forceDelete' => true,
+    'trashView' => true,
+    'bulkActions' => [
+      'export' => [
+        '0' => 'xls',
+        '1' => 'csv',
+        '2' => 'pdf',
+      ],
+      'delete' => true,
+      'restore' => true,
+      'forceDelete' => true,
+    ],
+  ],
   'fieldGroups' => [
     'department_information' => [
       'title' => 'Department Information',
       'groupType' => 'hr',
+      'icon' => 'fas fa-info-circle',
       'fields' => [
         '0' => 'name',
         '1' => 'code',
@@ -113,6 +179,7 @@ return [
     'department_structure' => [
       'title' => 'Department Structure',
       'groupType' => 'hr',
+      'icon' => 'fas fa-sitemap',
       'fields' => [
         '0' => 'company_id',
         '1' => 'parent_department_id',
@@ -120,8 +187,49 @@ return [
       ],
     ],
   ],
-  'moreActions' => [],
-  'switchViews' => [],
+  'moreActions' => [
+    '0' => [
+      'title' => 'Restore',
+      'icon' => 'fas fa-trash-restore',
+      'action' => 'restore',
+      'confirm' => 'Restore this archived department?',
+      'requiredPermission' => 'restore_department',
+      'condition' => 'trashed',
+    ],
+    '1' => [
+      'title' => 'Permanently Delete',
+      'icon' => 'fas fa-skull-crossbones',
+      'action' => 'forceDelete',
+      'confirm' => 'This action cannot be undone. Permanently delete this department?',
+      'requiredPermission' => 'force_delete_department',
+      'condition' => 'trashed',
+    ],
+  ],
+  'switchViews' => [
+    'default' => 'table',
+    'table' => [
+      'enabled' => true,
+    ],
+    'list' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'name',
+      ],
+      'subtitleFields' => [
+        '0' => 'code',
+        '1' => 'company.name',
+      ],
+      'contentFields' => [
+        '0' => 'parent_department.name',
+        '1' => 'cost_center',
+      ],
+      'badgeField' => 'is_active',
+      'badgeColors' => [
+        'true' => 'success',
+        'false' => 'secondary',
+      ],
+    ],
+  ],
   'relations' => [
     'parentDepartment' => [
       'type' => 'belongsTo',
