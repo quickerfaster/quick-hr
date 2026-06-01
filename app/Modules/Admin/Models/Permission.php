@@ -19,6 +19,7 @@ class Permission extends SpatiePermission
 
     
 
+    
     protected $table = 'permissions';
     
     

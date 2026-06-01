@@ -19,6 +19,7 @@ class PayrollPolicyAssignment extends Model
 
     
 
+    
     protected $table = 'payroll_policy_assignments';
     
     

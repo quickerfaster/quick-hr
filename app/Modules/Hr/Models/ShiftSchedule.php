@@ -21,6 +21,7 @@ class ShiftSchedule extends Model
 
     
 
+    
     protected $table = 'shift_schedules';
     
     

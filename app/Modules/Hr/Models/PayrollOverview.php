@@ -19,6 +19,7 @@ class PayrollOverview extends Model
 
     
 
+    
     protected $table = 'payroll_overviews';
     
     

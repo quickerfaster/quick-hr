@@ -19,6 +19,7 @@ class CompanyProfileOverview extends Model
 
     
 
+    
     protected $table = 'company_profile_overviews';
     
     

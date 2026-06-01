@@ -21,6 +21,7 @@ class Shift extends Model
 
     
 
+    
     protected $table = 'shifts';
     
     

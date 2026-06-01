@@ -21,6 +21,7 @@ class HolidayCalendar extends Model
 
     
 
+    
     protected $table = 'holiday_calendars';
     
     

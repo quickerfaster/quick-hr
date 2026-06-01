@@ -19,6 +19,7 @@ class SystemSetting extends Model
 
     
 
+    
     protected $table = 'system_settings';
     
     

@@ -20,6 +20,7 @@ class LeaveApprover extends Model
 
     
 
+    
     protected $table = 'leave_approvers';
     
     

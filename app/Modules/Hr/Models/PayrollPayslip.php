@@ -21,6 +21,7 @@ class PayrollPayslip extends Model
 
     
 
+    
     protected $table = 'payroll_payslips';
     
     

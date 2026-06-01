@@ -19,6 +19,7 @@ class AttendancePolicy extends Model
 
     
 
+    
     protected $table = 'attendance_policies';
     
     

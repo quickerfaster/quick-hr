@@ -20,6 +20,7 @@ class EmployeeWorkPattern extends Model
 
     
 
+    
     protected $table = 'employee_work_patterns';
     
     

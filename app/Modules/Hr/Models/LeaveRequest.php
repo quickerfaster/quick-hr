@@ -21,6 +21,7 @@ class LeaveRequest extends Model
 
     
 
+    
     protected $table = 'leave_requests';
     
     

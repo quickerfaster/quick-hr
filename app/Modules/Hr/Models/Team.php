@@ -19,6 +19,7 @@ class Team extends Model
 
     
 
+    
     protected $table = 'teams';
     
     

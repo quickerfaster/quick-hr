@@ -19,6 +19,7 @@ class LeaveType extends Model
 
     
 
+    
     protected $table = 'leave_types';
     
     

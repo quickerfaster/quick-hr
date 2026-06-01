@@ -19,6 +19,7 @@ class LeaveOverview extends Model
 
     
 
+    
     protected $table = 'leave_overviews';
     
     

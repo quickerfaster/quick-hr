@@ -20,6 +20,7 @@ class PaySchedule extends Model
 
     
 
+    
     protected $table = 'pay_schedules';
     
     

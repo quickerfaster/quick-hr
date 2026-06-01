@@ -19,6 +19,7 @@ class EmployeeJobHistory extends Model
 
     
 
+    
     protected $table = 'employee_job_histories';
     
     

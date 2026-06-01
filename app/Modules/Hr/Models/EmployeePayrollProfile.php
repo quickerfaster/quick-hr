@@ -20,6 +20,7 @@ class EmployeePayrollProfile extends Model
 
     
 
+    
     protected $table = 'employee_payroll_profiles';
     
     

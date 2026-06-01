@@ -20,6 +20,7 @@ class PayrollRunAdjustment extends Model
 
     
 
+    
     protected $table = 'payroll_run_adjustments';
     
     

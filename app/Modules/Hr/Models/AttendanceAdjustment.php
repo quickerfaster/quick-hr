@@ -19,6 +19,7 @@ class AttendanceAdjustment extends Model
 
     
 
+    
     protected $table = 'attendance_adjustments';
     
     

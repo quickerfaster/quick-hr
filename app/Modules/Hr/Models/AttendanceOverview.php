@@ -19,6 +19,7 @@ class AttendanceOverview extends Model
 
     
 
+    
     protected $table = 'attendance_overviews';
     
     

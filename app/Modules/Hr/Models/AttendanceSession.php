@@ -20,6 +20,7 @@ class AttendanceSession extends Model
 
     
 
+    
     protected $table = 'attendance_sessions';
     
     

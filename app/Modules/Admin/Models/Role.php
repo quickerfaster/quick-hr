@@ -19,6 +19,7 @@ class Role extends SpatieRole
 
     
 
+    
     protected $table = 'roles';
     
     

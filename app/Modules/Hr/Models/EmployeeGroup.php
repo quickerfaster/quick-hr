@@ -19,6 +19,7 @@ class EmployeeGroup extends Model
 
     
 
+    
     protected $table = 'employee_groups';
     
     

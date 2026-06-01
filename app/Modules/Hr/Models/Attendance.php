@@ -25,6 +25,7 @@ class Attendance extends Model
 
     
 
+    
     protected $table = 'attendances';
     
     

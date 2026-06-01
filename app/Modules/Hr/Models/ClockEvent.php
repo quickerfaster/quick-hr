@@ -19,6 +19,7 @@ class ClockEvent extends Model
 
     
 
+    
     protected $table = 'clock_events';
     
     

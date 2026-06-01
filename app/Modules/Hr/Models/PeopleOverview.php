@@ -19,6 +19,7 @@ class PeopleOverview extends Model
 
     
 
+    
     protected $table = 'people_overviews';
     
     

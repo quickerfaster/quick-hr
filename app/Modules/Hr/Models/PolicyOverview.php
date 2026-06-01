@@ -19,6 +19,7 @@ class PolicyOverview extends Model
 
     
 
+    
     protected $table = 'policy_overviews';
     
     

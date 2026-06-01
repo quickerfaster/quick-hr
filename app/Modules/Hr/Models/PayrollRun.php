@@ -21,6 +21,7 @@ class PayrollRun extends Model
 
     
 
+    
     protected $table = 'payroll_runs';
     
     

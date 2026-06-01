@@ -6,12 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-
+use App\Modules\Hr\Models\ShiftSchedule;
+use App\Modules\Hr\Models\Attendance;
+use App\Modules\Admin\Models\Shift;
 
 use Illuminate\Database\Eloquent\Model;
 
 
-class JobTitle extends Model 
+class Shift extends Model 
 {
     use HasFactory;
     
@@ -19,8 +21,7 @@ class JobTitle extends Model
 
     
 
-    
-    protected $table = 'job_titles';
+    protected $table = 'shifts';
     
     
     
@@ -28,7 +29,7 @@ class JobTitle extends Model
     
 
     protected $fillable = [
-        'title', 'description'
+        'name', 'code', 'shift_category', 'description', 'start_time', 'end_time', 'duration_hours', 'is_overnight', 'is_active', 'is_default', 'created_from_template_id', 'last_used_date', 'usage_count'
     ];
 
     protected $guarded = [
@@ -36,11 +37,21 @@ class JobTitle extends Model
     ];
 
     protected $casts = [
-        
+        'duration_hours' => 'decimal:2',
+        'is_overnight' => 'boolean',
+        'is_active' => 'boolean',
+        'is_default' => 'boolean',
+        'created_from_template_id' => 'integer',
+        'last_used_date' => 'date',
+        'usage_count' => 'integer'
     ];
 
     protected $attributes = [
-        
+        'shift_category' => 'regular',
+        'is_overnight' => false,
+        'is_active' => true,
+        'is_default' => false,
+        'usage_count' => 0
     ];
 
     protected $dispatchesEvents = [
@@ -93,13 +104,26 @@ class JobTitle extends Model
         return parent::save($options);
     }
 
-    
+    public function shiftSchedules()
+    {
+        return $this->hasMany(\App\Modules\Hr\Models\ShiftSchedule::class, 'shift_id', 'id');
+    }
+
+    public function attendanceRecords()
+    {
+        return $this->hasMany(\App\Modules\Hr\Models\Attendance::class, 'shift_id', 'id');
+    }
+
+    public function templateSource()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Shift::class, 'created_from_template_id', 'id');
+    }
 
     /**
      * Create a new factory instance for the model.
      */
     protected static function newFactory()
     {
-        return \App\Modules\Admin\Database\Factories\JobTitleFactory::new();
+        return \App\Modules\Admin\Database\Factories\ShiftFactory::new();
     }
 }

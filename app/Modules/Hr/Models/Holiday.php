@@ -19,6 +19,7 @@ class Holiday extends Model
 
     
 
+    
     protected $table = 'holidays';
     
     

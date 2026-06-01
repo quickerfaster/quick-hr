@@ -20,6 +20,7 @@ class LeaveBalance extends Model
 
     
 
+    
     protected $table = 'leave_balances';
     
     

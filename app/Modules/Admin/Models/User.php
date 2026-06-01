@@ -8,17 +8,21 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
 use App\Modules\Hr\Models\Employee;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-use App\Models\User As DefaultUser;
 
-
-class User extends DefaultUser 
+class User extends Authenticatable 
 {
     use HasFactory;
-    
+    use HasRoles, Notifiable;
     use SoftDeletes;
 
     
+
+    protected $guard_name = 'web';
+
 
     protected $table = 'users';
     

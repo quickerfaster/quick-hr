@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Models\Role;
+use App\Modules\Hr\Models\Employee;
+
+use App\Models\User As DefaultUser;
 
 
-use Illuminate\Database\Eloquent\Model;
-
-
-class JobTitle extends Model 
+class User extends DefaultUser 
 {
     use HasFactory;
     
@@ -19,8 +20,7 @@ class JobTitle extends Model
 
     
 
-    
-    protected $table = 'job_titles';
+    protected $table = 'users';
     
     
     
@@ -28,15 +28,14 @@ class JobTitle extends Model
     
 
     protected $fillable = [
-        'title', 'description'
+        'name', 'email', 'status', 'password'
     ];
 
-    protected $guarded = [
-        
-    ];
+    protected $guard_name = 'web'; 
+
 
     protected $casts = [
-        
+        'email_verified_at' => 'datetime'
     ];
 
     protected $attributes = [
@@ -93,13 +92,16 @@ class JobTitle extends Model
         return parent::save($options);
     }
 
-    
+    public function employee()
+    {
+        return $this->hasOne(\App\Modules\Hr\Models\Employee::class, 'user_id', 'id');
+    }
 
     /**
      * Create a new factory instance for the model.
      */
     protected static function newFactory()
     {
-        return \App\Modules\Admin\Database\Factories\JobTitleFactory::new();
+        return \App\Modules\Admin\Database\Factories\UserFactory::new();
     }
 }

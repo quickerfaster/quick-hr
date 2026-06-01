@@ -6,12 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-
+use App\Modules\Admin\Models\Department;
+use App\Modules\Hr\Models\EmployeePosition;
+use App\Modules\Admin\Models\Company;
 
 use Illuminate\Database\Eloquent\Model;
 
 
-class JobTitle extends Model 
+class Department extends Model 
 {
     use HasFactory;
     
@@ -19,8 +21,7 @@ class JobTitle extends Model
 
     
 
-    
-    protected $table = 'job_titles';
+    protected $table = 'departments';
     
     
     
@@ -28,7 +29,7 @@ class JobTitle extends Model
     
 
     protected $fillable = [
-        'title', 'description'
+        'name', 'code', 'description', 'company_id', 'parent_department_id', 'cost_center', 'is_active'
     ];
 
     protected $guarded = [
@@ -36,11 +37,11 @@ class JobTitle extends Model
     ];
 
     protected $casts = [
-        
+        'is_active' => 'boolean'
     ];
 
     protected $attributes = [
-        
+        'is_active' => true
     ];
 
     protected $dispatchesEvents = [
@@ -93,13 +94,26 @@ class JobTitle extends Model
         return parent::save($options);
     }
 
-    
+    public function parentDepartment()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Department::class, 'parent_department_id', 'id');
+    }
+
+    public function employeePositions()
+    {
+        return $this->hasMany(\App\Modules\Hr\Models\EmployeePosition::class, 'department_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
+    }
 
     /**
      * Create a new factory instance for the model.
      */
     protected static function newFactory()
     {
-        return \App\Modules\Admin\Database\Factories\JobTitleFactory::new();
+        return \App\Modules\Admin\Database\Factories\DepartmentFactory::new();
     }
 }

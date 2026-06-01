@@ -19,6 +19,7 @@ class PolicyAssignment extends Model
 
     
 
+    
     protected $table = 'policy_assignments';
     
     

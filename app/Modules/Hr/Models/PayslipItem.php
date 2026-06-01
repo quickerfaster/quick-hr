@@ -22,6 +22,7 @@ class PayslipItem extends Model
 
     
 
+    
     protected $table = 'payslip_items';
     
     
