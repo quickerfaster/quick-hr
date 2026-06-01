@@ -59,10 +59,10 @@ data-bs-placement="right" title="Payslips">
 </li>
 <li class="nav-item text-nowrap">
 <a href="/hr/hr/payroll-policies" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
-data-bs-placement="right" title="Policies">
+data-bs-placement="right" title="Payroll Policies">
 <i class="fas fa-gavel me-2"></i>
 @if ($state === 'full')
-<span>Policies</span>
+<span>Payroll Policies</span>
 @endif
 </a>
 </li>

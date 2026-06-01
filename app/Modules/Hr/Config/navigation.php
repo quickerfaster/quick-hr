@@ -235,7 +235,7 @@ return [
             ],
             [
                 'key' => 'payroll_policy',
-                'label' => 'Policies',
+                'label' => 'Payroll Policies',
                 'icon' => 'fas fa-gavel',
                 'route' => '/hr/payroll-policies',
                 'permission' => 'view_payroll_policy',

@@ -150,7 +150,7 @@ return [
     'order' => 5,
 ],
     [
-    'title' => 'Policies',
+    'title' => 'Payroll Policies',
     'icon' => 'fas fa-gavel',
     'url' => 'hr/hr/payroll-policies',
     'permission' => 'view_payroll_policy',
