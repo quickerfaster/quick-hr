@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('employee_id')->constrained('employees', 'id')->onDelete('cascade');
             $table->string('type');
-            $table->text('label');
+            $table->string('label');
             $table->string('calculation_type');
             $table->decimal('value', 12, 2);
             $table->date('effective_date');

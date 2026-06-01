@@ -40,7 +40,7 @@ return [
     'label' => [
       'display' => 'inline',
       'fillable' => true,
-      'field_type' => 'textarea',
+      'field_type' => 'string',
       'label' => 'Description',
       'validation' => 'required|string|max:255',
       'filterable' => true,

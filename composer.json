@@ -68,7 +68,6 @@
 
 
     "repositories": [
-        
         {
             "type": "vcs",
             "url": "https://github.com/quickerfaster/ui-library"
