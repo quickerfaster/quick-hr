@@ -17,7 +17,7 @@ return [
       'fillable' => true,
       'field_type' => 'string',
       'label' => 'Subdomain',
-      'validation' => 'required|string|alpha_dash|min:3|max:63|unique:companies,subdomain|regex:/^[a-z][a-z0-9-]{1,61}[a-z0-9]$/',
+      'validation' => 'nullable|string|max:255',
       'searchable' => true,
     ],
     'level' => [
@@ -120,12 +120,13 @@ return [
       'label' => 'City',
       'validation' => 'required|string|max:255',
     ],
-    'billing_state_province' => [
+    'billing_state_code' => [
       'display' => 'inline',
       'fillable' => true,
-      'field_type' => 'string',
-      'label' => 'State / Province',
-      'validation' => 'nullable|string|max:255',
+      'field_type' => 'select',
+      'label' => 'State/Province',
+      'validation' => 'nullable|string|max:20',
+      'options' => [],
     ],
     'billing_postal_code' => [
       'display' => 'inline',
@@ -323,7 +324,7 @@ return [
         '0' => 'billing_address_line_1',
         '1' => 'billing_address_line_2',
         '2' => 'billing_city',
-        '3' => 'billing_state_province',
+        '3' => 'billing_state_code',
         '4' => 'billing_postal_code',
         '5' => 'billing_country_code',
       ],

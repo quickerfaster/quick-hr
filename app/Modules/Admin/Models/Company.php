@@ -30,7 +30,7 @@ class Company extends Model
     
 
     protected $fillable = [
-        'name', 'subdomain', 'level', 'parent_company_id', 'location_id', 'status', 'billing_email', 'billing_address_line_1', 'billing_address_line_2', 'billing_city', 'billing_state_province', 'billing_postal_code', 'billing_country_code', 'timezone', 'currency_code', 'is_placeholder'
+        'name', 'subdomain', 'level', 'parent_company_id', 'location_id', 'status', 'billing_email', 'billing_address_line_1', 'billing_address_line_2', 'billing_city', 'billing_state_code', 'billing_postal_code', 'billing_country_code', 'timezone', 'currency_code', 'is_placeholder'
     ];
 
     protected $guarded = [

@@ -28,7 +28,7 @@ class Location extends Model
     
 
     protected $fillable = [
-        'name', 'code', 'address_line_1', 'address_line_2', 'city', 'state_province', 'postal_code', 'country', 'phone', 'email', 'website', 'timezone', 'is_active', 'is_remote', 'is_headquarters', 'capacity', 'opening_hours', 'opening_date', 'closing_date', 'latitude', 'longitude', 'geofence_radius'
+        'name', 'code', 'address_line_1', 'address_line_2', 'city', 'country_code', 'state_code', 'postal_code', 'phone', 'email', 'website', 'timezone', 'is_active', 'is_remote', 'is_headquarters', 'capacity', 'opening_hours', 'opening_date', 'closing_date', 'latitude', 'longitude', 'geofence_radius'
     ];
 
     protected $guarded = [
@@ -51,7 +51,7 @@ class Location extends Model
     ];
 
     protected $attributes = [
-        'country' => 'US',
+        'country_code' => 'US',
         'timezone' => 'America/New_York',
         'is_active' => true,
         'is_remote' => false,

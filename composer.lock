@@ -2721,16 +2721,16 @@
         },
         {
             "name": "livewire/livewire",
-            "version": "v3.8.0",
+            "version": "v3.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/livewire.git",
-                "reference": "d81d269243c3f18d302663c0ce5672990df08ca1"
+                "reference": "0a7c2ec6c5c958cab32870ce5a7836a2fca0b459"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/livewire/zipball/d81d269243c3f18d302663c0ce5672990df08ca1",
-                "reference": "d81d269243c3f18d302663c0ce5672990df08ca1",
+                "url": "https://api.github.com/repos/livewire/livewire/zipball/0a7c2ec6c5c958cab32870ce5a7836a2fca0b459",
+                "reference": "0a7c2ec6c5c958cab32870ce5a7836a2fca0b459",
                 "shasum": ""
             },
             "require": {
@@ -2785,7 +2785,7 @@
             "description": "A front-end framework for Laravel.",
             "support": {
                 "issues": "https://github.com/livewire/livewire/issues",
-                "source": "https://github.com/livewire/livewire/tree/v3.8.0"
+                "source": "https://github.com/livewire/livewire/tree/v3.8.1"
             },
             "funding": [
                 {
@@ -2793,7 +2793,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-04-30T23:56:43+00:00"
+            "time": "2026-06-02T08:18:44+00:00"
         },
         {
             "name": "maatwebsite/excel",
@@ -4600,12 +4600,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/quickerfaster/ui-library.git",
-                "reference": "cab7ec3bd8b6fb062ae9f21badbacc5fd3cf1524"
+                "reference": "ebf674351298056358056e425095b17006e4d9e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quickerfaster/ui-library/zipball/cab7ec3bd8b6fb062ae9f21badbacc5fd3cf1524",
-                "reference": "cab7ec3bd8b6fb062ae9f21badbacc5fd3cf1524",
+                "url": "https://api.github.com/repos/quickerfaster/ui-library/zipball/ebf674351298056358056e425095b17006e4d9e4",
+                "reference": "ebf674351298056358056e425095b17006e4d9e4",
                 "shasum": ""
             },
             "require": {
@@ -4632,7 +4632,7 @@
                 "source": "https://github.com/quickerfaster/ui-library/tree/main",
                 "issues": "https://github.com/quickerfaster/ui-library/issues"
             },
-            "time": "2026-06-01T22:20:08+00:00"
+            "time": "2026-06-02T11:37:40+00:00"
         },
         {
             "name": "ralouphie/getallheaders",

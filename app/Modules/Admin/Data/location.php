@@ -47,29 +47,12 @@ return [
       'filterable' => true,
       'searchable' => true,
     ],
-    'state_province' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'string',
-      'label' => 'State/Province',
-      'validation' => 'nullable|string|max:100',
-      'filterable' => true,
-      'searchable' => true,
-    ],
-    'postal_code' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'string',
-      'label' => 'Postal Code',
-      'validation' => 'nullable|string|max:20',
-      'searchable' => true,
-    ],
-    'country' => [
+    'country_code' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'select',
       'label' => 'Country',
-      'validation' => 'nullable',
+      'validation' => 'required|string|size:2',
       'options' => [
         'US' => 'United States',
         'GB' => 'United Kingdom',
@@ -83,6 +66,24 @@ return [
         'CN' => 'China',
       ],
       'filterable' => true,
+    ],
+    'state_code' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'State/Province',
+      'validation' => 'nullable|string|max:20',
+      'options' => [],
+      'filterable' => true,
+      'searchable' => true,
+    ],
+    'postal_code' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'string',
+      'label' => 'Postal Code',
+      'validation' => 'nullable|string|max:20',
+      'searchable' => true,
     ],
     'phone' => [
       'display' => 'inline',
@@ -284,7 +285,7 @@ return [
     '0' => 'name',
     '1' => 'code',
     '2' => 'city',
-    '3' => 'country',
+    '3' => 'country_code',
     '4' => 'is_active',
     '5' => 'is_headquarters',
   ],
@@ -366,9 +367,9 @@ return [
         '0' => 'address_line_1',
         '1' => 'address_line_2',
         '2' => 'city',
-        '3' => 'state_province',
+        '3' => 'state_code',
         '4' => 'postal_code',
-        '5' => 'country',
+        '5' => 'country_code',
       ],
     ],
     'contact' => [
@@ -441,7 +442,7 @@ return [
       ],
       'subtitleFields' => [
         '0' => 'city',
-        '1' => 'country',
+        '1' => 'country_code',
       ],
       'contentFields' => [
         '0' => 'code',
@@ -462,7 +463,7 @@ return [
       ],
       'subtitleFields' => [
         '0' => 'city',
-        '1' => 'country',
+        '1' => 'country_code',
       ],
       'contentFields' => [
         '0' => 'code',
