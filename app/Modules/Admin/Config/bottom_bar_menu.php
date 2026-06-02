@@ -23,6 +23,13 @@ return [
     'key' => 'permission',
 ],
     [
+    'title' => 'Assign User Roles',
+    'icon' => 'fas fa-cube',
+    'url' => 'admin/assign-user-roles',
+    'permission' => 'view_assign_user_role',
+    'key' => 'assign_user_role',
+],
+    [
     'title' => 'Activity Logs',
     'icon' => 'fas fa-cube',
     'url' => 'admin/activity-logs',

@@ -5,6 +5,7 @@
 {{-- Generated Links --}}
 {{-- Generated Links --}}
 {{-- Generated Links --}}
+{{-- Generated Links --}}
 <li class="nav-item text-nowrap">
 <a href="/admin/admin/users" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
 data-bs-placement="right" title="Users">
@@ -24,11 +25,20 @@ data-bs-placement="right" title="Roles">
 </a>
 </li>
 <li class="nav-item text-nowrap">
-    <a href="/admin/admin/access-control-management" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
-        data-bs-placement="right" title="Permissions">
-        <i class="fas fa-user-lock me-2"></i>
+<a href="/admin/admin/access-control-management" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
+data-bs-placement="right" title="Assign Permissions">
+<i class="fas fa-user-lock me-2"></i>
+@if ($state === 'full')
+<span>Assign Permissions</span>
+@endif
+</a>
+</li>
+<li class="nav-item text-nowrap">
+    <a href="/admin/admin/role-assignment" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
+        data-bs-placement="right" title="Assign Roles">
+        <i class="fas fa-user-tag me-2"></i>
         @if ($state === 'full')
-            <span>Permissions</span>
+            <span>Assign Roles</span>
         @endif
     </a>
 </li>
