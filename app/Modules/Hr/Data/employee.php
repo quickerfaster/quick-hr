@@ -159,6 +159,7 @@ return [
         'morph_name' => 'taggable',
         'parent_key' => 'id',
         'related_key' => 'id',
+        'inlineAdd' => true,
       ],
       'multiSelect' => true,
     ],
