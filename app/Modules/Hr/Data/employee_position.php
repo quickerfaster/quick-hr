@@ -102,7 +102,7 @@ return [
     'reports_to' => [
       'display' => 'inline',
       'fillable' => true,
-      'field_type' => 'select',
+      'field_type' => 'livewire-searchable-select',
       'label' => 'Reports To (Secondary)',
       'validation' => 'nullable|integer|exists:employees,id',
       'filterable' => true,

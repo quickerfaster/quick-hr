@@ -81,15 +81,8 @@ return [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'policy_calculation_builder',
-      'label' => 'Calculation Logic (JSON)',
+      'label' => 'Calculation Rules',
       'validation' => 'required|json',
-    ],
-    'employer_ratio' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'number',
-      'label' => 'Employer Contribution (%)',
-      'validation' => 'nullable|numeric|min:0|max:100',
     ],
     'is_statutory' => [
       'display' => 'inline',
@@ -164,12 +157,11 @@ return [
     'onTable' => [
       '0' => 'parent_policy_id',
       '1' => 'description',
-      '2' => 'employer_ratio',
-      '3' => 'created_by',
-      '4' => 'updated_by',
-      '5' => 'created_at',
-      '6' => 'updated_at',
-      '7' => 'deleted_at',
+      '2' => 'created_by',
+      '3' => 'updated_by',
+      '4' => 'created_at',
+      '5' => 'updated_at',
+      '6' => 'deleted_at',
     ],
     'onNewForm' => [
       '0' => 'created_by',
@@ -277,7 +269,6 @@ return [
       'icon' => 'fas fa-calculator',
       'fields' => [
         '0' => 'calculation_logic',
-        '1' => 'employer_ratio',
       ],
     ],
     'validity' => [
@@ -316,7 +307,6 @@ return [
       ],
       'contentFields' => [
         '0' => 'effective_date',
-        '1' => 'employer_ratio',
       ],
       'badgeField' => 'is_active',
       'badgeColors' => [

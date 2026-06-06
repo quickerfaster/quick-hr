@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('country_code')->default('US');
             $table->string('state_code')->nullable();
             $table->string('calculation_logic');
-            $table->decimal('employer_ratio', 5, 2)->nullable();
             $table->boolean('is_statutory')->default(false);
             $table->date('effective_date');
             $table->date('expiry_date')->nullable();
