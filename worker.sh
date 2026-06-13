@@ -14,3 +14,9 @@ log() { echo "$(date '+%Y-%m-%d %H:%M:%S') - $*" >> "$LOG"; }
     $PHP_BIN "$ARTISAN" queue:work --max-time=55 --sleep=3 --tries=3 --quiet
     log "Worker finished (time limit reached or no jobs)"
 ) 200>"$LOCKFILE"
+
+###### Add cron jobs ######
+### running worker ###
+# * * * * * /home/quickerf/quick_hr/worker.sh >> /dev/null 2>&1
+### cpanel's 2 minutes process restriction limit  test ###
+# * * * * * /usr/local/bin/php -r "sleep(120); echo 'done';" >> ~/sleep-test.log 2>&1
