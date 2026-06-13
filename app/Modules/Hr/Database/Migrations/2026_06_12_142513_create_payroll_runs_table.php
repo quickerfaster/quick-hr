@@ -24,7 +24,17 @@ return new class extends Migration
             $table->decimal('total_cash_required', 15, 2)->default(0)->nullable();
             $table->string('processed_by')->nullable();
             $table->datetime('processed_at')->nullable();
-            $table->string('approved_by')->nullable();
+            $table->string('base_currency')->default('USD')->nullable();
+            $table->date('payment_date')->nullable();
+            $table->string('reconciliation_status')->default('pending')->nullable();
+            $table->datetime('reconciled_at')->nullable();
+            $table->string('payment_batch_id')->nullable();
+            $table->decimal('total_employee_contributions', 15, 2)->default(0)->nullable();
+            $table->decimal('total_income_tax', 15, 2)->default(0)->nullable();
+            $table->decimal('total_bonus', 15, 2)->default(0)->nullable();
+            $table->decimal('total_commission', 15, 2)->default(0)->nullable();
+            $table->decimal('total_reimbursement', 15, 2)->default(0)->nullable();
+            $table->foreignId('approved_by_user_id')->nullable()->constrained('users', 'id')->onDelete('set null');
             $table->datetime('approved_at')->nullable();
             $table->integer('total_employees')->default(0)->nullable();
             $table->integer('processed_employees')->default(0)->nullable();

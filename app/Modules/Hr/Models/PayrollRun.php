@@ -9,14 +9,15 @@ use Illuminate\Validation\ValidationException;
 use App\Modules\Hr\Models\PaySchedule;
 use App\Modules\Hr\Models\PayrollPayslip;
 use App\Modules\Hr\Models\PayrollRunAdjustment;
-
+use App\Modules\Admin\Models\User;
+use QuickerFaster\UILibrary\Traits\Approvals\HasApproval;
 use Illuminate\Database\Eloquent\Model;
 
 
 class PayrollRun extends Model 
 {
     use HasFactory;
-    
+    use HasApproval;
     
 
     
@@ -30,7 +31,7 @@ class PayrollRun extends Model
     
 
     protected $fillable = [
-        'title', 'pay_schedule_id', 'period_start', 'period_end', 'status', 'current_step', 'calculation_status', 'total_gross_pay', 'total_deductions', 'total_taxes', 'total_employer_contributions', 'total_cash_required', 'processed_by', 'processed_at', 'approved_by', 'approved_at', 'total_employees', 'processed_employees', 'notes'
+        'title', 'pay_schedule_id', 'period_start', 'period_end', 'status', 'current_step', 'calculation_status', 'total_gross_pay', 'total_deductions', 'total_taxes', 'total_employer_contributions', 'total_cash_required', 'processed_by', 'processed_at', 'base_currency', 'payment_date', 'reconciliation_status', 'reconciled_at', 'payment_batch_id', 'total_employee_contributions', 'total_income_tax', 'total_bonus', 'total_commission', 'total_reimbursement', 'approved_by_user_id', 'approved_at', 'total_employees', 'processed_employees', 'notes'
     ];
 
     protected $guarded = [
@@ -47,6 +48,13 @@ class PayrollRun extends Model
         'total_employer_contributions' => 'decimal:2',
         'total_cash_required' => 'decimal:2',
         'processed_at' => 'datetime',
+        'payment_date' => 'date',
+        'reconciled_at' => 'datetime',
+        'total_employee_contributions' => 'decimal:2',
+        'total_income_tax' => 'decimal:2',
+        'total_bonus' => 'decimal:2',
+        'total_commission' => 'decimal:2',
+        'total_reimbursement' => 'decimal:2',
         'approved_at' => 'datetime',
         'total_employees' => 'integer',
         'processed_employees' => 'integer',
@@ -64,6 +72,13 @@ class PayrollRun extends Model
         'total_taxes' => 0,
         'total_employer_contributions' => 0,
         'total_cash_required' => 0,
+        'base_currency' => 'USD',
+        'reconciliation_status' => 'pending',
+        'total_employee_contributions' => 0,
+        'total_income_tax' => 0,
+        'total_bonus' => 0,
+        'total_commission' => 0,
+        'total_reimbursement' => 0,
         'total_employees' => 0,
         'processed_employees' => 0
     ];
@@ -131,6 +146,11 @@ class PayrollRun extends Model
     public function adjustments()
     {
         return $this->hasMany(\App\Modules\Hr\Models\PayrollRunAdjustment::class, 'payroll_run_id', 'id');
+    }
+
+    public function approvedByUser()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\User::class, 'approved_by_user_id', 'id');
     }
 
     /**

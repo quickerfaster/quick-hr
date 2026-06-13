@@ -29,7 +29,7 @@ class EmployeePayrollProfile extends Model
     
 
     protected $fillable = [
-        'employee_id', 'pay_schedule_id', 'bank_account_holder_name', 'bank_name', 'account_type', 'bank_account_number', 'bank_routing_number', 'bank_iban', 'bank_swift', 'payment_method', 'tax_filing_status', 'allowances', 'extra_withholding', 'is_exempt_from_federal_tax', 'override_country_code', 'override_state_code', 'currency_code', 'effective_date', 'expiry_date', 'is_active'
+        'employee_id', 'pay_schedule_id', 'bank_name', 'account_type', 'bank_sort_code', 'bank_code', 'bank_account_name', 'bank_account_number', 'bank_routing_number', 'bank_iban', 'bank_swift', 'payment_method', 'tax_filing_status', 'allowances', 'extra_withholding', 'is_exempt_from_federal_tax', 'override_country_code', 'override_state_code', 'currency_code', 'effective_date', 'expiry_date', 'is_active'
     ];
 
     protected $guarded = [
@@ -37,6 +37,9 @@ class EmployeePayrollProfile extends Model
     ];
 
     protected $casts = [
+        'bank_sort_code' => 'encrypted',
+        'bank_code' => 'encrypted',
+        'bank_account_name' => 'encrypted',
         'bank_account_number' => 'encrypted',
         'bank_routing_number' => 'encrypted',
         'bank_iban' => 'encrypted',

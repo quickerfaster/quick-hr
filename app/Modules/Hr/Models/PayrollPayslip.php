@@ -30,7 +30,7 @@ class PayrollPayslip extends Model
     
 
     protected $fillable = [
-        'payslip_number', 'payroll_run_id', 'employee_id', 'base_salary', 'gross_pay', 'total_deductions', 'total_taxes', 'total_benefit_deductions', 'net_pay', 'payment_status', 'paid_at', 'payment_reference', 'bank_account_snapshot', 'notes'
+        'payslip_number', 'payroll_run_id', 'employee_id', 'base_salary', 'gross_pay', 'total_deductions', 'total_taxes', 'total_benefit_deductions', 'net_pay', 'currency_code', 'exchange_rate', 'employer_contribution_total', 'taxable_earnings', 'income_tax', 'social_security_tax', 'medicare_tax', 'pension_employee', 'pension_employer', 'health_insurance_employee', 'health_insurance_employer', 'other_earnings', 'other_deductions', 'net_pay_in_words', 'payslip_pdf_url', 'payment_status', 'paid_at', 'payment_reference', 'bank_account_snapshot', 'notes'
     ];
 
     protected $guarded = [
@@ -44,6 +44,18 @@ class PayrollPayslip extends Model
         'total_taxes' => 'decimal:2',
         'total_benefit_deductions' => 'decimal:2',
         'net_pay' => 'decimal:2',
+        'exchange_rate' => 'decimal:6',
+        'employer_contribution_total' => 'decimal:2',
+        'taxable_earnings' => 'decimal:2',
+        'income_tax' => 'decimal:2',
+        'social_security_tax' => 'decimal:2',
+        'medicare_tax' => 'decimal:2',
+        'pension_employee' => 'decimal:2',
+        'pension_employer' => 'decimal:2',
+        'health_insurance_employee' => 'decimal:2',
+        'health_insurance_employer' => 'decimal:2',
+        'other_earnings' => 'decimal:2',
+        'other_deductions' => 'decimal:2',
         'paid_at' => 'datetime',
         'bank_account_snapshot' => 'array',
         'created_by' => 'integer',
@@ -54,6 +66,19 @@ class PayrollPayslip extends Model
         'total_deductions' => 0,
         'total_taxes' => 0,
         'total_benefit_deductions' => 0,
+        'currency_code' => 'USD',
+        'exchange_rate' => 1,
+        'employer_contribution_total' => 0,
+        'taxable_earnings' => 0,
+        'income_tax' => 0,
+        'social_security_tax' => 0,
+        'medicare_tax' => 0,
+        'pension_employee' => 0,
+        'pension_employer' => 0,
+        'health_insurance_employee' => 0,
+        'health_insurance_employer' => 0,
+        'other_earnings' => 0,
+        'other_deductions' => 0,
         'payment_status' => 'pending'
     ];
 

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('country_code')->default('US');
             $table->string('state_code')->nullable();
-            $table->string('calculation_logic');
+            $table->text('calculation_logic');
             $table->boolean('is_statutory')->default(false);
             $table->date('effective_date');
             $table->date('expiry_date')->nullable();

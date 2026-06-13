@@ -12,9 +12,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('employee_id')->constrained('employees', 'id')->onDelete('cascade');
             $table->foreignId('pay_schedule_id')->constrained('pay_schedules', 'id')->onDelete('restrict');
-            $table->string('bank_account_holder_name')->nullable();
             $table->string('bank_name')->nullable();
             $table->string('account_type')->default('checking')->nullable();
+            $table->text('bank_sort_code')->nullable();
+            $table->text('bank_code')->nullable();
+            $table->text('bank_account_name')->nullable();
             $table->text('bank_account_number')->nullable();
             $table->text('bank_routing_number')->nullable();
             $table->text('bank_iban')->nullable();

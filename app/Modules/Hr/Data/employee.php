@@ -372,6 +372,12 @@ return [
       'foreignKey' => 'employee_id',
       'localKey' => '',
     ],
+    'employeePayrollProfile' => [
+      'type' => 'hasOne',
+      'model' => 'App\Modules\Hr\Models\EmployeePayrollProfile',
+      'foreignKey' => 'employee_id',
+      'localKey' => '',
+    ],
     'employeeProfile' => [
       'type' => 'hasOne',
       'model' => 'App\Modules\Hr\Models\EmployeeProfile',

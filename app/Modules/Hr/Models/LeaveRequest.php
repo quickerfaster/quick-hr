@@ -9,14 +9,14 @@ use Illuminate\Validation\ValidationException;
 use App\Modules\Hr\Models\Employee;
 use App\Modules\Hr\Models\LeaveType;
 use App\Modules\Hr\Models\Attendance;
-
+use QuickerFaster\UILibrary\Traits\Approvals\HasApproval;
 use Illuminate\Database\Eloquent\Model;
 
 
 class LeaveRequest extends Model 
 {
     use HasFactory;
-    
+    use HasApproval;
     use SoftDeletes;
 
     

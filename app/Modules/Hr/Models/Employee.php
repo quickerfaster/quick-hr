@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use App\Modules\Hr\Models\EmployeePosition;
 use App\Modules\Hr\Models\EmployeeJobHistory;
+use App\Modules\Hr\Models\EmployeePayrollProfile;
 use App\Modules\Hr\Models\EmployeeProfile;
 use App\Modules\Admin\Models\Company;
 use App\Modules\Hr\Models\Document;
@@ -111,6 +112,11 @@ class Employee extends Model
     public function jobHistory()
     {
         return $this->hasMany(\App\Modules\Hr\Models\EmployeeJobHistory::class, 'employee_id', 'id');
+    }
+
+    public function employeePayrollProfile()
+    {
+        return $this->hasOne(\App\Modules\Hr\Models\EmployeePayrollProfile::class, 'employee_id', 'id');
     }
 
     public function employeeProfile()
