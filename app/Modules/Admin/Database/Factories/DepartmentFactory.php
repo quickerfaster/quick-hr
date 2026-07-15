@@ -19,7 +19,7 @@ class DepartmentFactory extends Factory
             ]),
             'code' => strtoupper($this->faker->unique()->bothify('DEPT-###')),
             'description' => $this->faker->optional(0.7)->sentence(),
-            'company_id' => Company::factory(),
+            'company_id' => null,
             'parent_department_id' => null,
             'cost_center' => $this->faker->optional(0.5)->bothify('CC-####'),
             'is_active' => true,

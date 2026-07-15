@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -12,28 +14,29 @@ use App\Modules\Hr\Models\PayrollPolicy;
 use Illuminate\Database\Eloquent\Model;
 
 
-class EmployeeAdjustmentProfile extends Model 
+class EmployeeAdjustmentProfile extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'employee_adjustment_profiles';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'employee_id', 'type', 'label', 'calculation_type', 'value', 'effective_date', 'expiry_date', 'is_active', 'policy_id'
+        'company_id', 'employee_id', 'type', 'label', 'calculation_type', 'value', 'effective_date', 'expiry_date', 'is_active', 'policy_id'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -50,21 +53,21 @@ class EmployeeAdjustmentProfile extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -73,7 +76,7 @@ class EmployeeAdjustmentProfile extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -82,11 +85,11 @@ class EmployeeAdjustmentProfile extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -107,6 +110,11 @@ class EmployeeAdjustmentProfile extends Model
     public function policy()
     {
         return $this->belongsTo(\App\Modules\Hr\Models\PayrollPolicy::class, 'policy_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

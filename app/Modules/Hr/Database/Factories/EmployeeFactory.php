@@ -4,6 +4,7 @@ namespace App\Modules\Hr\Database\Factories;
 
 use App\Modules\Hr\Models\Employee;
 use App\Modules\Admin\Models\Department;
+use App\Modules\Admin\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -23,6 +24,7 @@ class EmployeeFactory extends Factory
             'email' => $this->faker->unique()->safeEmail(),
             'phone' => $this->faker->phoneNumber(),
             'hire_date' => $this->faker->dateTimeBetween('-5 years', 'now')->format('Y-m-d'),
+            'company_id' => null,
             // 'status' => $this->faker->randomElement(['Active', 'Inactive', 'Terminated']),
             // 'date_of_birth' => $this->faker->dateTimeBetween('-60 years', '-20 years')->format('Y-m-d'),
             // 'gender' => $this->faker->randomElement(['Male', 'Female', 'Non-binary', 'Prefer not to say']),
@@ -39,6 +41,16 @@ class EmployeeFactory extends Factory
 
             //'department_id' => Department::factory(),
         ];
+    }
+
+    /**
+     * Attach a specific company.
+     */
+    public function forCompany($company)
+    {
+        return $this->state(fn (array $attributes) => [
+            'company_id' => $company instanceof Company ? $company->id : $company,
+        ]);
     }
 
     /**

@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('work_patterns', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->string('name');
             $table->string('code');
             $table->text('description')->nullable();
@@ -26,7 +28,7 @@ return new class extends Migration
             $table->integer('assigned_employee_count')->default(0);
             $table->date('last_used_date')->nullable();
             $table->integer('created_from_template_id')->nullable();
-            
+
             			$table->index('code');
 			$table->index('is_active');
 			$table->index('is_default');

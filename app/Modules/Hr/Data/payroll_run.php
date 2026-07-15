@@ -3,6 +3,28 @@
 return [
   'model' => 'App\Modules\Hr\Models\PayrollRun',
   'fieldDefinitions' => [
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'title' => [
       'display' => 'inline',
       'fillable' => true,
@@ -322,6 +344,7 @@ return [
       '12' => 'current_step',
       '13' => 'created_at',
       '14' => 'updated_at',
+      '15' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'total_gross_pay',
@@ -338,6 +361,7 @@ return [
       '11' => 'updated_by',
       '12' => 'created_at',
       '13' => 'updated_at',
+      '14' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'total_gross_pay',
@@ -353,6 +377,7 @@ return [
       '10' => 'updated_by',
       '11' => 'created_at',
       '12' => 'updated_at',
+      '13' => 'company_id',
     ],
     'onQuery' => [],
   ],
@@ -363,7 +388,8 @@ return [
   'crudType' => 'pages',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'title',
+    '0' => 'company_id',
+    '1' => 'title',
     '1' => 'pay_schedule_id',
     '2' => 'period_start',
     '3' => 'period_end',
@@ -456,6 +482,14 @@ return [
     ],
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     'schedule_period' => [
       'title' => 'Schedule & Period',
       'groupType' => 'payroll',

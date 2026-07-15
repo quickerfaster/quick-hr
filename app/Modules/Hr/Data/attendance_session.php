@@ -25,6 +25,28 @@ return [
         'hintField' => 'employee.first_name,employee.last_name',
       ],
     ],
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'start_time' => [
       'display' => 'inline',
       'fillable' => true,
@@ -185,6 +207,7 @@ return [
       '9' => 'created_at',
       '10' => 'updated_at',
       '11' => 'deleted_at',
+      '12' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'clock_in_event_id',
@@ -198,6 +221,7 @@ return [
       '8' => 'created_at',
       '9' => 'updated_at',
       '10' => 'deleted_at',
+      '11' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'clock_in_event_id',
@@ -210,6 +234,7 @@ return [
       '7' => 'validation_notes',
       '8' => 'updated_at',
       '9' => 'deleted_at',
+      '10' => 'company_id',
     ],
     'onQuery' => [
       '0' => 'deleted_at',
@@ -224,7 +249,8 @@ return [
   'crudType' => 'drawers',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'attendance_id',
+    '0' => 'company_id',
+    '1' => 'attendance_id',
     '1' => 'start_time',
     '2' => 'end_time',
     '3' => 'duration_hours',
@@ -309,6 +335,14 @@ return [
     ],
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     'session_timing' => [
       'title' => 'Session Timing',
       'groupType' => 'hr',

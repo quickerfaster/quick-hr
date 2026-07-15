@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('employee_job_histories', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->foreignId('employee_id')->constrained('employees', 'id')->onDelete('cascade');
             $table->date('effective_date');
             $table->date('end_date')->nullable();
@@ -26,13 +28,13 @@ return new class extends Migration
             $table->string('employment_status');
             $table->string('location')->nullable();
             $table->string('shift')->nullable();
-            
+
             			$table->index('employee_id');
 			$table->index('effective_date');
 			$table->index('change_reason');
 			$table->index('employment_status');
 			$table->index(['employee_id', 'effective_date']);
-            
+
             $table->timestamps();
         });
     }

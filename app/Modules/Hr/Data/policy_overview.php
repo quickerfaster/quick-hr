@@ -3,6 +3,28 @@
 return [
   'model' => 'App\Modules\Hr\Models\PolicyOverview',
   'fieldDefinitions' => [
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'dummy' => [
       'display' => 'inline',
       'fillable' => true,
@@ -12,16 +34,38 @@ return [
     ],
   ],
   'detailComponent' => '',
-  'hiddenFields' => [],
+  'hiddenFields' => [
+    'onTable' => [
+      '0' => 'company_id',
+    ],
+    'onNewForm' => [
+      '0' => 'company_id',
+    ],
+    'onEditForm' => [
+      '0' => 'company_id',
+    ],
+    'onQuery' => [],
+  ],
   'simpleActions' => [],
   'isTransaction' => false,
   'crudType' => 'modals',
   'includeControllers' => false,
-  'tableDefaultFields' => [],
+  'tableDefaultFields' => [
+    '0' => 'company_id',
+  ],
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [],
-  'fieldGroups' => [],
+  'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
+  ],
   'moreActions' => [],
   'switchViews' => [],
   'relations' => [],

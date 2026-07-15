@@ -67,10 +67,13 @@
     "prefer-stable": true,
 
 
-    "repositories": [
+        "repositories": [
         {
-            "type": "vcs",
-            "url": "https://github.com/quickerfaster/ui-library"
+            "type": "path",
+            "url": "/Users/mac/Projects/Libraries/ui-library",
+            "options": {
+                "symlink": true
+            }
         }
     ]
 

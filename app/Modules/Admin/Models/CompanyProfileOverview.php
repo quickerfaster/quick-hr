@@ -2,6 +2,8 @@
 
 namespace App\Modules\Admin\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -11,54 +13,55 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\Model;
 
 
-class CompanyProfileOverview extends Model 
+class CompanyProfileOverview extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
-    
 
-    
 
-    
+
+
+
+
     protected $table = 'company_profile_overviews';
-    
-    
-    
-    
-    
+
+
+
+
+
 
     protected $fillable = [
-        'dummy'
+        'dummy', 'company_id'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
-        
+
     ];
 
     protected $attributes = [
-        
+
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -67,7 +70,7 @@ class CompanyProfileOverview extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -76,11 +79,11 @@ class CompanyProfileOverview extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -93,7 +96,12 @@ class CompanyProfileOverview extends Model
         return parent::save($options);
     }
 
-    
+
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
+    }
 
     /**
      * Create a new factory instance for the model.

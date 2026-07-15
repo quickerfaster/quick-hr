@@ -2,16 +2,19 @@
 
 namespace App\Modules\System\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ApprovalTier extends Model
 {
+    use HasCompanyScope;
     protected $table = 'approval_tiers';
 
     protected $fillable = [
-        'approval_request_id', 'tier_type', 'sequence', 'name', 'roles',
+        'company_id', 'approval_request_id', 'tier_type', 'sequence', 'name', 'roles',
         'approval_mode', 'status', 'approved_by', 'approved_at', 'comments',
     ];
 
@@ -33,5 +36,10 @@ class ApprovalTier extends Model
     public function tierApprovals(): HasMany
     {
         return $this->hasMany(ApprovalTierApproval::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 }

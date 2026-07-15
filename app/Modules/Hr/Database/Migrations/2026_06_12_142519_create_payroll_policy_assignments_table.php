@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('payroll_policy_assignments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->foreignId('payroll_policy_id')->constrained('payroll_policies', 'id')->onDelete('restrict');
             $table->string('assignable_type');
             $table->integer('assignable_id');
@@ -19,7 +21,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
-            
+
             			$table->index('payroll_policy_id');
 			$table->index('assignable_type');
 			$table->index('assignable_id');

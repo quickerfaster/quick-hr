@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('payroll_policies', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->string('name');
             $table->string('type');
             $table->string('effect')->default('addition');
@@ -24,7 +26,7 @@ return new class extends Migration
             $table->foreignId('parent_policy_id')->nullable()->constrained('payroll_policies', 'id')->onDelete('set null');
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
-            
+
             			$table->index('name');
 			$table->index('type');
 			$table->index('country_code');

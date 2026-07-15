@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -12,28 +14,29 @@ use App\Modules\Hr\Models\LeaveType;
 use Illuminate\Database\Eloquent\Model;
 
 
-class LeaveApprover extends Model 
+class LeaveApprover extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'leave_approvers';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'employee_id', 'approver_id', 'approval_level', 'can_approve_all_types', 'leave_type_ids', 'max_approval_days', 'is_active'
+        'company_id', 'employee_id', 'approver_id', 'approval_level', 'can_approve_all_types', 'leave_type_ids', 'max_approval_days', 'is_active'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -50,21 +53,21 @@ class LeaveApprover extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -73,7 +76,7 @@ class LeaveApprover extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -82,11 +85,11 @@ class LeaveApprover extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -112,6 +115,11 @@ class LeaveApprover extends Model
     public function leaveTypes()
     {
         return $this->belongsToMany(\App\Modules\Hr\Models\LeaveType::class, 'leave_approver_leave_type', 'leave_approver_id', 'leave_type_id', 'id', 'leave_type_id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

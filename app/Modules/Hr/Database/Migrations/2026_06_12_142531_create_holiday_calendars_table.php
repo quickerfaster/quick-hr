@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('holiday_calendars', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->string('name');
             $table->string('year')->default(2026)->nullable();
             $table->text('description')->nullable();
@@ -20,7 +22,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->integer('holiday_count')->default(0);
             $table->datetime('last_updated')->nullable();
-            
+
             			$table->index('name');
 			$table->index('country_code');
 			$table->index('year');

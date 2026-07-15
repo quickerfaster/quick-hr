@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -11,28 +13,29 @@ use App\Modules\Hr\Models\Employee;
 use Illuminate\Database\Eloquent\Model;
 
 
-class Team extends Model 
+class Team extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'teams';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'name', 'code', 'description', 'team_lead_id', 'is_active'
+        'company_id', 'name', 'code', 'description', 'team_lead_id', 'is_active'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -44,21 +47,21 @@ class Team extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -67,7 +70,7 @@ class Team extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -76,11 +79,11 @@ class Team extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -101,6 +104,11 @@ class Team extends Model
     public function teamLead()
     {
         return $this->belongsTo(\App\Modules\Hr\Models\Employee::class, 'team_lead_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

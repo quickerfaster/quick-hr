@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -13,28 +15,29 @@ use App\Modules\Hr\Models\Attendance;
 use Illuminate\Database\Eloquent\Model;
 
 
-class ShiftSchedule extends Model 
+class ShiftSchedule extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'shift_schedules';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'employee_id', 'shift_id', 'schedule_date', 'status', 'schedule_type', 'start_time_override', 'end_time_override', 'actual_start_time', 'actual_end_time', 'is_cover_required', 'cover_employee_id', 'is_published', 'notes', 'attendance_id', 'approved_by', 'approved_at', 'published_at', 'created_from_template', 'last_modified_by', 'last_modified_at'
+        'company_id', 'employee_id', 'shift_id', 'schedule_date', 'status', 'schedule_type', 'start_time_override', 'end_time_override', 'actual_start_time', 'actual_end_time', 'is_cover_required', 'cover_employee_id', 'is_published', 'notes', 'attendance_id', 'approved_by', 'approved_at', 'published_at', 'created_from_template', 'last_modified_by', 'last_modified_at'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -58,21 +61,21 @@ class ShiftSchedule extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -81,7 +84,7 @@ class ShiftSchedule extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -90,11 +93,11 @@ class ShiftSchedule extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -125,6 +128,11 @@ class ShiftSchedule extends Model
     public function attendance()
     {
         return $this->belongsTo(\App\Modules\Hr\Models\Attendance::class, 'attendance_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

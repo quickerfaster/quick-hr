@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -17,28 +19,29 @@ use App\Modules\Hr\Models\WorkPattern;
 use Illuminate\Database\Eloquent\Model;
 
 
-class Attendance extends Model 
+class Attendance extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'attendances';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'employee_id', 'date', 'shift_id', 'status', 'net_hours', 'regular_hours', 'overtime_hours', 'double_time_hours', 'absence_type', 'absence_reason', 'leave_request_id', 'is_paid_absence', 'hours_deducted', 'is_approved', 'needs_review', 'notes', 'minutes_late', 'minutes_early_departure', 'missed_break_minutes', 'sessions', 'approved_by', 'approved_at', 'last_calculated_at', 'calculation_method', 'attendance_policy_id', 'work_pattern_id', 'is_unplanned', 'calculation_metadata', 'calculation_version'
+        'company_id', 'employee_id', 'date', 'shift_id', 'status', 'net_hours', 'regular_hours', 'overtime_hours', 'double_time_hours', 'absence_type', 'absence_reason', 'leave_request_id', 'is_paid_absence', 'hours_deducted', 'is_approved', 'needs_review', 'notes', 'minutes_late', 'minutes_early_departure', 'missed_break_minutes', 'sessions', 'approved_by', 'approved_at', 'last_calculated_at', 'calculation_method', 'attendance_policy_id', 'work_pattern_id', 'is_unplanned', 'calculation_metadata', 'calculation_version'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -78,21 +81,21 @@ class Attendance extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -101,7 +104,7 @@ class Attendance extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -110,11 +113,11 @@ class Attendance extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -160,6 +163,11 @@ class Attendance extends Model
     public function workPattern()
     {
         return $this->belongsTo(\App\Modules\Hr\Models\WorkPattern::class, 'work_pattern_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

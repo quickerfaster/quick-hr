@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('attendance_adjustments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->foreignId('attendance_id')->constrained('attendances', 'id')->onDelete('cascade');
             $table->decimal('original_net_hours', 6, 2)->nullable();
             $table->string('original_status')->nullable();
@@ -18,7 +20,7 @@ return new class extends Migration
             $table->text('reason');
             $table->string('adjusted_by')->nullable();
             $table->datetime('adjusted_at')->nullable();
-            
+
             			$table->index('attendance_id');
 			$table->index('adjusted_status');
 			$table->index('adjusted_at');

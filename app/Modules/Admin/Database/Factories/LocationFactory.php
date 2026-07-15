@@ -3,6 +3,7 @@
 namespace App\Modules\Admin\Database\Factories;
 
 use App\Modules\Admin\Models\Location;
+use App\Modules\Admin\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class LocationFactory extends Factory
@@ -27,6 +28,7 @@ class LocationFactory extends Factory
             'email' => $this->faker->optional(0.6)->companyEmail(),
             'website' => $this->faker->optional(0.5)->url(),
             'timezone' => $this->faker->optional(0.8)->timezone(),
+            'company_id' => null,
             'is_active' => true,
             'is_remote' => false,
             'is_headquarters' => false,
@@ -44,6 +46,16 @@ class LocationFactory extends Factory
             'created_at' => now(),
             'updated_at' => now(),
         ];
+    }
+
+    /**
+     * Attach a specific company.
+     */
+    public function forCompany($company)
+    {
+        return $this->state(fn (array $attributes) => [
+            'company_id' => $company instanceof Company ? $company->id : $company,
+        ]);
     }
 
     /**

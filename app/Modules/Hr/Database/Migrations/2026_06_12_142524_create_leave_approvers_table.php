@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('leave_approvers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->foreignId('employee_id')->constrained('employees', 'id')->onDelete('cascade');
             $table->foreignId('approver_id')->constrained('employees', 'id')->onDelete('cascade');
             $table->integer('approval_level')->default(1);
@@ -17,7 +19,7 @@ return new class extends Migration
             $table->foreignId('leave_type_ids')->nullable()->constrained('leave_types', 'id');
             $table->integer('max_approval_days')->nullable();
             $table->boolean('is_active')->default(true);
-            
+
             			$table->index('employee_id');
 			$table->index('approver_id');
 			$table->index('approval_level');

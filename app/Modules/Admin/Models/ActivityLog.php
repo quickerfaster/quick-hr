@@ -2,6 +2,8 @@
 
 namespace App\Modules\Admin\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -11,28 +13,29 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\Model;
 
 
-class ActivityLog extends Model 
+class ActivityLog extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
-    
 
-    
 
-    
+
+
+
+
     protected $table = 'activity_logs';
-    
-    
-    
+
+
+
     public $timestamps = false;
-    
+
 
     protected $fillable = [
-        'log_name', 'action', 'description'
+        'log_name', 'action', 'description', 'company_id'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -46,25 +49,25 @@ class ActivityLog extends Model
     ];
 
     protected $attributes = [
-        
+
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -73,7 +76,7 @@ class ActivityLog extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -82,11 +85,11 @@ class ActivityLog extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -97,6 +100,11 @@ class ActivityLog extends Model
     {
         $this->validate();
         return parent::save($options);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     public function causer()

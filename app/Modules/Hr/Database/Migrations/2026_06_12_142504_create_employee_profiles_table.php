@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('employee_profiles', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->foreignId('employee_id')->constrained('employees', 'id')->onDelete('cascade');
             $table->string('photo')->nullable();
             $table->string('preferred_name')->nullable();
@@ -33,7 +35,7 @@ return new class extends Migration
             $table->string('passport_number')->nullable();
             $table->date('passport_expiry_date')->nullable();
             $table->string('national_id_number')->nullable();
-            
+
             			$table->index('employee_id');
 			$table->index('personal_email');
 			$table->index('date_of_birth');

@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('holidays', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->foreignId('calendar_id')->constrained('holiday_calendars', 'id')->onDelete('cascade');
             $table->string('name');
             $table->text('description')->nullable();
@@ -34,7 +36,7 @@ return new class extends Migration
             $table->boolean('generated_from_template')->default(false);
             $table->integer('override_id')->nullable();
             $table->datetime('last_synced_at')->nullable();
-            
+
             			$table->index('calendar_id');
 			$table->index('date');
 			$table->index('is_active');

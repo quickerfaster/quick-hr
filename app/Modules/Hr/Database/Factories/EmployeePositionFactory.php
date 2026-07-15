@@ -7,6 +7,7 @@ use App\Modules\Hr\Models\EmployeePosition;
 use App\Modules\Admin\Models\Shift;
 use App\Modules\Admin\Models\Department;
 use App\Modules\Admin\Models\JobTitle;
+use App\Modules\Admin\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class EmployeePositionFactory extends Factory
@@ -38,9 +39,20 @@ class EmployeePositionFactory extends Factory
             'work_phone_extension' => $this->faker->optional()->numerify('###'),
             'job_description' => $this->faker->optional()->paragraph(),
             // 'is_primary' => true,
+            'company_id' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ];
+    }
+
+    /**
+     * Attach a specific company.
+     */
+    public function forCompany($company)
+    {
+        return $this->state(fn (array $attributes) => [
+            'company_id' => $company instanceof Company ? $company->id : $company,
+        ]);
     }
 
     /**

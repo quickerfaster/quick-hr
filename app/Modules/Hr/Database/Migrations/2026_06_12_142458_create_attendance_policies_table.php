@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('attendance_policies', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->string('name');
             $table->string('code');
             $table->text('description')->nullable();
@@ -34,7 +36,7 @@ return new class extends Migration
             $table->integer('version')->default(1);
             $table->string('last_updated_by')->nullable();
             $table->datetime('last_updated_at')->nullable();
-            
+
             			$table->index('code');
 			$table->index('is_active');
 			$table->index('is_default');

@@ -2,16 +2,19 @@
 
 namespace App\Modules\System\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ApprovalRequest extends Model
 {
+    use HasCompanyScope;
     protected $table = 'approval_requests';
 
     protected $fillable = [
-        'approvable_type', 'approvable_id', 'status', 'current_tier_id',
+        'company_id', 'approvable_type', 'approvable_id', 'status', 'current_tier_id',
         'submitted_by', 'submitted_at', 'completed_at',
     ];
 
@@ -38,5 +41,10 @@ class ApprovalRequest extends Model
     public function currentTier()
     {
         return $this->belongsTo(ApprovalTier::class, 'current_tier_id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 }

@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\DB;
 
 class EmployeeWithDependenciesSeeder extends Seeder
 {
+    /**
+     * The company to associate all seeded data with.
+     */
+    protected $company;
 
 
     /**
@@ -59,22 +63,23 @@ class EmployeeWithDependenciesSeeder extends Seeder
     private function createDependencies(): void
     {
         // Companies (each creates its own location via factory)
-        Company::factory()->count(3)->active()->create();
+        $companies = Company::factory()->count(3)->active()->create();
+        $this->company = $companies->first();
 
         // Additional locations (not tied to a company, but can be used)
-        Location::factory()->count(5)->active()->create();
+        Location::factory()->count(5)->active()->create(['company_id' => $this->company->id]);
 
         // Departments
-        Department::factory()->count(10)->create();
+        Department::factory()->count(10)->create(['company_id' => $this->company->id]);
 
         // Job titles
-        JobTitle::factory()->count(20)->create();
+        JobTitle::factory()->count(20)->create(['company_id' => $this->company->id]);
 
         // Shifts
-        Shift::factory()->count(5)->create();
+        Shift::factory()->count(5)->create(['company_id' => $this->company->id]);
 
         // Attendance policies
-        AttendancePolicy::factory()->count(5)->create();
+        AttendancePolicy::factory()->count(5)->create(['company_id' => $this->company->id]);
 
         // Pay Schedules (since you don't have a factory yet, create manually)
         $this->createPaySchedules();
@@ -87,6 +92,7 @@ class EmployeeWithDependenciesSeeder extends Seeder
     {
         $schedules = [
             [
+                'company_id' => $this->company->id,
                 'name' => 'Monthly',
                 'code' => 'MON',
                 'frequency' => 'Monthly',
@@ -100,6 +106,7 @@ class EmployeeWithDependenciesSeeder extends Seeder
                 'is_default' => true,
             ],
             [
+                'company_id' => $this->company->id,
                 'name' => 'Bi-Weekly',
                 'code' => 'BIW',
                 'frequency' => 'Bi-weekly',
@@ -113,6 +120,7 @@ class EmployeeWithDependenciesSeeder extends Seeder
                 'is_default' => false,
             ],
             [
+                'company_id' => $this->company->id,
                 'name' => 'Weekly',
                 'code' => 'WEE',
                 'frequency' => 'Weekly',
@@ -147,7 +155,7 @@ class EmployeeWithDependenciesSeeder extends Seeder
                 'employee_number' => $employeeNumbers[$sequence->index],
                 //'status' => 'Active', // assuming 'status' column exists – if not, remove this line
             ])
-            ->create();
+            ->create(['company_id' => $this->company->id]);
 
         return $employees;
     }
@@ -182,6 +190,7 @@ class EmployeeWithDependenciesSeeder extends Seeder
             EmployeePosition::factory()
                 ->forEmployee($employee)
                 ->state([
+                    'company_id' => $this->company->id,
                     'job_title_id' => $jobTitle->id,
                     'department_id' => $department->id,
                     'attendance_policy_id' => $attendancePolicy->id,
@@ -216,6 +225,7 @@ class EmployeeWithDependenciesSeeder extends Seeder
             $paySchedule = $paySchedules->random();
 
             EmployeePayrollProfile::create([
+                'company_id' => $this->company->id,
                 'employee_id' => $employee->id,
                 'pay_schedule_id' => $paySchedule->id,
                 'bank_account_name' => $employee->first_name . ' ' . $employee->last_name,

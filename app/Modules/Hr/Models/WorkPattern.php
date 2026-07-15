@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -11,28 +13,29 @@ use App\Modules\Admin\Models\Shift;
 use Illuminate\Database\Eloquent\Model;
 
 
-class WorkPattern extends Model 
+class WorkPattern extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'work_patterns';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'name', 'code', 'description', 'pattern_type', 'rotation_weeks', 'shift_id', 'applicable_days', 'override_start_time', 'override_end_time', 'effective_date', 'end_date', 'is_active', 'is_default'
+        'company_id', 'name', 'code', 'description', 'pattern_type', 'rotation_weeks', 'shift_id', 'applicable_days', 'override_start_time', 'override_end_time', 'effective_date', 'end_date', 'is_active', 'is_default'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -62,21 +65,21 @@ class WorkPattern extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -85,7 +88,7 @@ class WorkPattern extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -94,11 +97,11 @@ class WorkPattern extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -114,6 +117,11 @@ class WorkPattern extends Model
     public function shift()
     {
         return $this->belongsTo(\App\Modules\Admin\Models\Shift::class, 'shift_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

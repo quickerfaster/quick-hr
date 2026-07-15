@@ -25,6 +25,28 @@ return [
         'hintField' => 'first_name',
       ],
     ],
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'photo' => [
       'display' => 'inline',
       'fillable' => true,
@@ -217,15 +239,18 @@ return [
       '11' => 'passport_number',
       '12' => 'passport_expiry_date',
       '13' => 'national_id_number',
+      '14' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'created_at',
       '1' => 'updated_at',
       '2' => 'deleted_at',
+      '3' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'updated_at',
       '1' => 'deleted_at',
+      '2' => 'company_id',
     ],
     'onQuery' => [
       '0' => 'deleted_at',
@@ -240,7 +265,8 @@ return [
   'crudType' => 'pages',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'employee_id',
+    '0' => 'company_id',
+    '1' => 'employee_id',
     '1' => 'preferred_name',
     '2' => 'personal_email',
     '3' => 'date_of_birth',
@@ -282,6 +308,14 @@ return [
     ],
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     'extended_personal_information' => [
       'title' => 'Personal Information',
       'icon' => 'fas fa-user-circle',

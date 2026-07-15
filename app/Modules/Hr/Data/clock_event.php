@@ -12,6 +12,28 @@ return [
       'filterable' => true,
       'searchable' => true,
     ],
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'event_type' => [
       'display' => 'inline',
       'fillable' => true,
@@ -134,6 +156,7 @@ return [
       '5' => 'created_at',
       '6' => 'updated_at',
       '7' => 'deleted_at',
+      '8' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'ip_address',
@@ -144,6 +167,7 @@ return [
       '5' => 'created_at',
       '6' => 'updated_at',
       '7' => 'deleted_at',
+      '8' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'ip_address',
@@ -153,6 +177,7 @@ return [
       '4' => 'sync_attempts',
       '5' => 'updated_at',
       '6' => 'deleted_at',
+      '7' => 'company_id',
     ],
     'onQuery' => [
       '0' => 'deleted_at',
@@ -165,7 +190,8 @@ return [
   'crudType' => 'modals',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'employee_id',
+    '0' => 'company_id',
+    '1' => 'employee_id',
     '1' => 'event_type',
     '2' => 'timestamp',
     '3' => 'method',
@@ -204,6 +230,14 @@ return [
     ],
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     'basic_info' => [
       'title' => 'Event Information',
       'groupType' => 'hr',

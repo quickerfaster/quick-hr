@@ -25,6 +25,28 @@ return [
         'hintField' => 'first_name',
       ],
     ],
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'effective_date' => [
       'display' => 'inline',
       'fillable' => true,
@@ -160,14 +182,17 @@ return [
     'onTable' => [
       '0' => 'created_at',
       '1' => 'updated_at',
+      '2' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'created_at',
       '1' => 'updated_at',
+      '2' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'created_at',
       '1' => 'updated_at',
+      '2' => 'company_id',
     ],
     'onQuery' => [],
   ],
@@ -178,7 +203,8 @@ return [
   'crudType' => 'pages',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'employee_id',
+    '0' => 'company_id',
+    '1' => 'employee_id',
     '1' => 'effective_date',
     '2' => 'change_reason',
     '3' => 'job_title',
@@ -214,6 +240,14 @@ return [
     ],
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     'change_details' => [
       'title' => 'Change Details',
       'icon' => 'fas fa-exchange-alt',

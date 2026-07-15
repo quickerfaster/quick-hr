@@ -22,6 +22,28 @@ return [
       'filterable' => true,
       'searchable' => true,
     ],
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'address_line_1' => [
       'display' => 'inline',
       'fillable' => true,
@@ -254,6 +276,7 @@ return [
       '17' => 'created_at',
       '18' => 'updated_at',
       '19' => 'deleted_at',
+      '20' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'external_id',
@@ -261,6 +284,7 @@ return [
       '2' => 'employee_count',
       '3' => 'department_count',
       '4' => 'deleted_at',
+      '5' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'external_id',
@@ -268,6 +292,7 @@ return [
       '2' => 'employee_count',
       '3' => 'department_count',
       '4' => 'deleted_at',
+      '5' => 'company_id',
     ],
     'onQuery' => [
       '0' => 'deleted_at',
@@ -282,12 +307,13 @@ return [
   'crudType' => 'pages',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'name',
-    '1' => 'code',
-    '2' => 'city',
-    '3' => 'country_code',
-    '4' => 'is_active',
-    '5' => 'is_headquarters',
+    '0' => 'company_id',
+    '1' => 'name',
+    '2' => 'code',
+    '3' => 'city',
+    '4' => 'country_code',
+    '5' => 'is_active',
+    '6' => 'is_headquarters',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,
@@ -347,6 +373,14 @@ return [
     ],
   ],
   'fieldGroups' => [
+    /*'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],*/
     'basic_info' => [
       'title' => 'Basic Information',
       'groupType' => 'hr',
@@ -404,7 +438,7 @@ return [
         '2' => 'closing_date',
       ],
     ],
-    'system_info' => [
+    /*'system_info' => [
       'title' => 'System Information',
       'groupType' => 'hr',
       'icon' => 'fas fa-server',
@@ -414,7 +448,7 @@ return [
         '2' => 'employee_count',
         '3' => 'department_count',
       ],
-    ],
+    ],*/
   ],
   'moreActions' => [
     '0' => [

@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -11,28 +13,29 @@ use App\Modules\Hr\Models\PayrollPolicy;
 use Illuminate\Database\Eloquent\Model;
 
 
-class PayrollPolicyAssignment extends Model 
+class PayrollPolicyAssignment extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'payroll_policy_assignments';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'payroll_policy_id', 'assignable_type', 'assignable_id', 'priority', 'effective_date', 'expiry_date', 'is_active'
+        'company_id', 'payroll_policy_id', 'assignable_type', 'assignable_id', 'priority', 'effective_date', 'expiry_date', 'is_active'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -51,21 +54,21 @@ class PayrollPolicyAssignment extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -74,7 +77,7 @@ class PayrollPolicyAssignment extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -83,11 +86,11 @@ class PayrollPolicyAssignment extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -108,6 +111,11 @@ class PayrollPolicyAssignment extends Model
     public function assignable()
     {
         return $this->morphTo('assignable', 'assignable_type', 'assignable_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

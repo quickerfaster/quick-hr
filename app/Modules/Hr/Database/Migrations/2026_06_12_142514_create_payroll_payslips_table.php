@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('payroll_payslips', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->string('payslip_number');
             $table->foreignId('payroll_run_id')->constrained('payroll_runs', 'id')->onDelete('cascade');
             $table->foreignId('employee_id')->constrained('employees', 'id')->onDelete('restrict');
@@ -41,7 +43,7 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
-            
+
             			$table->index('payslip_number');
 			$table->index('payroll_run_id');
 			$table->index('employee_id');
@@ -55,7 +57,7 @@ return new class extends Migration
 			$table->index(['employee_id', 'paid_at']);
 			$table->unique(['payroll_run_id', 'employee_id']);
 			$table->unique('payslip_number');
-            
+
             $table->timestamps();
         });
     }

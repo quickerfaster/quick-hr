@@ -11,7 +11,7 @@ use QuickerFaster\UILibrary\Traits\HasSettings;
 
 class User extends BaseUser implements MustVerifyEmail, Onboardable
 {
-    use HasApiTokens, GetsOnboarded, HasSettings; 
+    use HasApiTokens, GetsOnboarded, HasSettings;
 
     /**
      * Override $fillable to add application-specific fields.
@@ -22,6 +22,7 @@ class User extends BaseUser implements MustVerifyEmail, Onboardable
         'email',       // from base
         'status',      // from base
         'password',    // from base
+        'company_id',  // from base (multi-tenancy)
         'email_verified_at',
         'has_seen_tour',
     ];

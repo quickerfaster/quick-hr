@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -11,28 +13,29 @@ use App\Modules\Hr\Models\Employee;
 use Illuminate\Database\Eloquent\Model;
 
 
-class Document extends Model 
+class Document extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'documents';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'employee_id', 'name', 'type', 'document', 'uploaded_at', 'expiry_date', 'description'
+        'company_id', 'employee_id', 'name', 'type', 'document', 'uploaded_at', 'expiry_date', 'description'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -41,25 +44,25 @@ class Document extends Model
     ];
 
     protected $attributes = [
-        
+
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -68,7 +71,7 @@ class Document extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -77,11 +80,11 @@ class Document extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -97,6 +100,11 @@ class Document extends Model
     public function employee()
     {
         return $this->belongsTo(\App\Modules\Hr\Models\Employee::class, 'employee_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

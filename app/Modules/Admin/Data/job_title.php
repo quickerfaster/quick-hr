@@ -20,6 +20,28 @@ return [
       'validation' => 'nullable|string',
       'searchable' => true,
     ],
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
   ],
   'detailComponent' => '',
   'hiddenFields' => [
@@ -27,15 +49,18 @@ return [
       '0' => 'created_at',
       '1' => 'updated_at',
       '2' => 'deleted_at',
+      '3' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'created_at',
       '1' => 'updated_at',
       '2' => 'deleted_at',
+      '3' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'updated_at',
       '1' => 'deleted_at',
+      '2' => 'company_id',
     ],
     'onQuery' => [
       '0' => 'deleted_at',
@@ -50,8 +75,9 @@ return [
   'crudType' => 'drawers',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'title',
-    '1' => 'description',
+    '0' => 'company_id',
+    '1' => 'title',
+    '2' => 'description',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,
@@ -97,6 +123,14 @@ return [
     ],
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     '0' => [
       'title' => 'Job Title Information',
       'groupType' => 'hr',

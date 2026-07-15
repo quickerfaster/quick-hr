@@ -2,15 +2,18 @@
 
 namespace App\Modules\System\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ApprovalLog extends Model
 {
+    use HasCompanyScope;
     protected $table = 'approval_logs';
 
     protected $fillable = [
-        'approval_request_id', 'user_id', 'action', 'tier_id',
+        'company_id', 'approval_request_id', 'user_id', 'action', 'tier_id',
         'comments', 'old_status', 'new_status',
     ];
 
@@ -27,5 +30,10 @@ class ApprovalLog extends Model
     public function tier(): BelongsTo
     {
         return $this->belongsTo(ApprovalTier::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 }

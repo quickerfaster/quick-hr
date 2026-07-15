@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('shifts', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
             $table->string('name');
             $table->string('code');
             $table->string('shift_category')->default('regular')->nullable();
@@ -23,8 +24,9 @@ return new class extends Migration
             $table->integer('created_from_template_id')->nullable();
             $table->date('last_used_date')->nullable();
             $table->integer('usage_count')->default(0);
-            
-            			$table->index('code');
+
+            			$table->index('company_id');
+   $table->index('code');
 			$table->index('is_active');
 			$table->index('is_default');
 			$table->index('shift_category');

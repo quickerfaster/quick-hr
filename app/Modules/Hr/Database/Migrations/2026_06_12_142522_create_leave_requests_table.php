@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('leave_requests', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->foreignId('employee_id')->constrained('employees', 'id')->onDelete('cascade');
             $table->foreignId('leave_type_id')->constrained('leave_types', 'id')->onDelete('restrict');
             $table->date('start_date');
@@ -26,7 +28,7 @@ return new class extends Migration
             $table->boolean('reported_after_absence')->default(false);
             $table->integer('workdays_count')->nullable();
             $table->boolean('overlap_with_holiday')->default(false);
-            
+
             			$table->index('employee_id');
 			$table->index('status');
 			$table->index('start_date');

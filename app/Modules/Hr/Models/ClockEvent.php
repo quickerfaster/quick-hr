@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -11,28 +13,29 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\Model;
 
 
-class ClockEvent extends Model 
+class ClockEvent extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'clock_events';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'employee_id', 'event_type', 'timestamp', 'method', 'latitude', 'longitude', 'location_name', 'timezone', 'ip_address', 'device_id', 'device_name', 'sync_status', 'sync_attempts'
+        'company_id', 'employee_id', 'event_type', 'timestamp', 'method', 'latitude', 'longitude', 'location_name', 'timezone', 'ip_address', 'device_id', 'device_name', 'sync_status', 'sync_attempts'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -50,21 +53,21 @@ class ClockEvent extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -73,7 +76,7 @@ class ClockEvent extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -82,11 +85,11 @@ class ClockEvent extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -99,7 +102,12 @@ class ClockEvent extends Model
         return parent::save($options);
     }
 
-    
+
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
+    }
 
     /**
      * Create a new factory instance for the model.

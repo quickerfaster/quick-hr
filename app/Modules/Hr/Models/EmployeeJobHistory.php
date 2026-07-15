@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -11,28 +13,29 @@ use App\Modules\Hr\Models\Employee;
 use Illuminate\Database\Eloquent\Model;
 
 
-class EmployeeJobHistory extends Model 
+class EmployeeJobHistory extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
-    
 
-    
 
-    
+
+
+
+
     protected $table = 'employee_job_histories';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'employee_id', 'effective_date', 'end_date', 'change_reason', 'notes', 'job_title', 'department', 'manager_name', 'pay_type', 'hourly_rate', 'base_salary', 'salary_currency', 'pay_frequency', 'employment_status', 'location', 'shift'
+        'company_id', 'employee_id', 'effective_date', 'end_date', 'change_reason', 'notes', 'job_title', 'department', 'manager_name', 'pay_type', 'hourly_rate', 'base_salary', 'salary_currency', 'pay_frequency', 'employment_status', 'location', 'shift'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -47,21 +50,21 @@ class EmployeeJobHistory extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -70,7 +73,7 @@ class EmployeeJobHistory extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -79,11 +82,11 @@ class EmployeeJobHistory extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -99,6 +102,11 @@ class EmployeeJobHistory extends Model
     public function employee()
     {
         return $this->belongsTo(\App\Modules\Hr\Models\Employee::class, 'employee_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -12,28 +14,29 @@ use App\Modules\Hr\Models\PaySchedule;
 use Illuminate\Database\Eloquent\Model;
 
 
-class EmployeePayrollProfile extends Model 
+class EmployeePayrollProfile extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'employee_payroll_profiles';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'employee_id', 'pay_schedule_id', 'bank_name', 'account_type', 'bank_sort_code', 'bank_code', 'bank_account_name', 'bank_account_number', 'bank_routing_number', 'bank_iban', 'bank_swift', 'payment_method', 'tax_filing_status', 'allowances', 'extra_withholding', 'is_exempt_from_federal_tax', 'override_country_code', 'override_state_code', 'currency_code', 'effective_date', 'expiry_date', 'is_active'
+        'company_id', 'employee_id', 'pay_schedule_id', 'bank_name', 'account_type', 'bank_sort_code', 'bank_code', 'bank_account_name', 'bank_account_number', 'bank_routing_number', 'bank_iban', 'bank_swift', 'payment_method', 'tax_filing_status', 'allowances', 'extra_withholding', 'is_exempt_from_federal_tax', 'override_country_code', 'override_state_code', 'currency_code', 'effective_date', 'expiry_date', 'is_active'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -65,21 +68,21 @@ class EmployeePayrollProfile extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -88,7 +91,7 @@ class EmployeePayrollProfile extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -97,11 +100,11 @@ class EmployeePayrollProfile extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -122,6 +125,11 @@ class EmployeePayrollProfile extends Model
     public function paySchedule()
     {
         return $this->belongsTo(\App\Modules\Hr\Models\PaySchedule::class, 'pay_schedule_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

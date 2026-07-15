@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -19,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class EmployeePosition extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
     use SoftDeletes;
 
@@ -34,6 +37,7 @@ class EmployeePosition extends Model
 
 
     protected $fillable = [
+        'company_id',
         'pay_schedule_id',
         'employee_id',
         'job_title_id',
@@ -175,6 +179,11 @@ class EmployeePosition extends Model
 
 
 
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
+    }
+
     /**
      * Create a new factory instance for the model.
      */
@@ -271,7 +280,7 @@ class EmployeePosition extends Model
 
             EmployeeJobHistory::create($historyData);
 
-            
+
             // NEW: Sync company_id on Employee when department changes
             if ($position->isDirty('department_id')) {
                 $department = $position->department; // automatically loaded via relation
@@ -281,7 +290,7 @@ class EmployeePosition extends Model
                 }
             }
 
-            
+
         });
 
 

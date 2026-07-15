@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -12,28 +14,29 @@ use App\Modules\Hr\Models\ClockEvent;
 use Illuminate\Database\Eloquent\Model;
 
 
-class AttendanceSession extends Model 
+class AttendanceSession extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'attendance_sessions';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'attendance_id', 'start_time', 'end_time', 'duration_hours', 'session_type', 'is_adjusted', 'adjustment_reason', 'clock_in_event_id', 'clock_out_event_id', 'is_overnight', 'adjusted_by', 'adjusted_at', 'calculated_duration', 'validation_status', 'validation_notes'
+        'company_id', 'attendance_id', 'start_time', 'end_time', 'duration_hours', 'session_type', 'is_adjusted', 'adjustment_reason', 'clock_in_event_id', 'clock_out_event_id', 'is_overnight', 'adjusted_by', 'adjusted_at', 'calculated_duration', 'validation_status', 'validation_notes'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -57,21 +60,21 @@ class AttendanceSession extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -80,7 +83,7 @@ class AttendanceSession extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -89,11 +92,11 @@ class AttendanceSession extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -119,6 +122,11 @@ class AttendanceSession extends Model
     public function clockOutEvent()
     {
         return $this->belongsTo(\App\Modules\Hr\Models\ClockEvent::class, 'clock_out_event_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

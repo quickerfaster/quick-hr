@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('leave_types', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->string('name');
             $table->string('code');
             $table->text('description')->nullable();
@@ -17,7 +19,7 @@ return new class extends Migration
             $table->boolean('requires_approval')->default(true);
             $table->integer('max_days_per_request')->nullable();
             $table->boolean('is_active')->default(true);
-            
+
             			$table->index('name');
 			$table->index('code');
 			$table->index('is_active');

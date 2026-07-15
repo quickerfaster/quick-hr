@@ -55,28 +55,6 @@ return [
         'hintField' => '',
       ],
     ],
-    'location_id' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'select',
-      'label' => 'Primary Location',
-      'validation' => 'required|integer|exists:locations,id',
-      'filterable' => true,
-      'searchable' => true,
-      'relationship' => [
-        'model' => 'App\Modules\Admin\Models\Location',
-        'type' => 'belongsTo',
-        'display_field' => 'name',
-        'dynamic_property' => 'location',
-        'foreign_key' => 'location_id',
-        'inlineAdd' => false,
-      ],
-      'options' => [
-        'model' => 'App\Modules\Admin\Models\Location',
-        'column' => 'name',
-        'hintField' => '',
-      ],
-    ],
     'status' => [
       'display' => 'inline',
       'fillable' => true,
@@ -254,7 +232,6 @@ return [
     '1' => 'subdomain',
     '2' => 'level',
     '3' => 'status',
-    '4' => 'location_id',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,
@@ -304,7 +281,6 @@ return [
         '3' => 'currency_code',
         '4' => 'level',
         '5' => 'parent_company_id',
-        '6' => 'location_id',
       ],
     ],
     'subscription_and_status' => [
@@ -376,12 +352,6 @@ return [
     ],
   ],
   'relations' => [
-    'location' => [
-      'type' => 'belongsTo',
-      'model' => 'App\Modules\Admin\Models\Location',
-      'foreignKey' => 'location_id',
-      'localKey' => '',
-    ],
     'employees' => [
       'type' => 'hasMany',
       'model' => 'App\Modules\Hr\Models\Employee',

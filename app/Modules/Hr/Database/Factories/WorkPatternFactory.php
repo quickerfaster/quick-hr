@@ -2,6 +2,7 @@
 namespace App\Modules\Hr\Database\Factories;
 
 use App\Modules\Hr\Models\WorkPattern;
+use App\Modules\Admin\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class WorkPatternFactory extends Factory
@@ -17,7 +18,18 @@ class WorkPatternFactory extends Factory
             'applicable_days' => "1,2,3,4,5",
             'pattern_type' => 'recurring',
             'effective_date' => now()->startOfYear(),
+            'company_id' => null,
             'is_active' => true,
         ];
+    }
+
+    /**
+     * Attach a specific company.
+     */
+    public function forCompany($company)
+    {
+        return $this->state(fn (array $attributes) => [
+            'company_id' => $company instanceof Company ? $company->id : $company,
+        ]);
     }
 }

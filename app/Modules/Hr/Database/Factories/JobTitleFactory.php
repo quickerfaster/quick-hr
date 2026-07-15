@@ -3,6 +3,7 @@
 namespace App\Modules\Hr\Database\Factories;
 
 use App\Modules\Admin\Models\JobTitle;
+use App\Modules\Admin\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class JobTitleFactory extends Factory
@@ -14,10 +15,21 @@ class JobTitleFactory extends Factory
         return [
             'title' => $this->faker->unique()->jobTitle(),
             'description' => $this->faker->optional(0.7)->paragraph(),
+            'company_id' => null,
             // 'editable' => $this->faker->randomElement(['Yes', 'No']),
             'created_at' => now(),
             'updated_at' => now(),
         ];
+    }
+
+    /**
+     * Attach a specific company.
+     */
+    public function forCompany($company)
+    {
+        return $this->state(fn (array $attributes) => [
+            'company_id' => $company instanceof Company ? $company->id : $company,
+        ]);
     }
 
     /**

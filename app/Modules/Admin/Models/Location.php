@@ -2,6 +2,8 @@
 
 namespace App\Modules\Admin\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -11,28 +13,29 @@ use App\Modules\Hr\Models\EmployeePosition;
 use Illuminate\Database\Eloquent\Model;
 
 
-class Location extends Model 
+class Location extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'locations';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'name', 'code', 'address_line_1', 'address_line_2', 'city', 'country_code', 'state_code', 'postal_code', 'phone', 'email', 'website', 'timezone', 'is_active', 'is_remote', 'is_headquarters', 'capacity', 'opening_hours', 'opening_date', 'closing_date', 'latitude', 'longitude', 'geofence_radius'
+        'name', 'code', 'address_line_1', 'address_line_2', 'city', 'country_code', 'state_code', 'postal_code', 'phone', 'email', 'website', 'timezone', 'is_active', 'is_remote', 'is_headquarters', 'capacity', 'opening_hours', 'opening_date', 'closing_date', 'latitude', 'longitude', 'geofence_radius', 'company_id'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -62,21 +65,21 @@ class Location extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -85,7 +88,7 @@ class Location extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -94,11 +97,11 @@ class Location extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -109,6 +112,11 @@ class Location extends Model
     {
         $this->validate();
         return parent::save($options);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     public function employeePositions()

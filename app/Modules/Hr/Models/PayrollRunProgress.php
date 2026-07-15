@@ -2,16 +2,24 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Model;
 
 
 class PayrollRunProgress extends Model
 {
+    use HasCompanyScope;
     protected $table = 'payroll_run_progress';
-    protected $fillable = ['payroll_run_id', 'total_employees', 'processed_employees', 'status'];
+    protected $fillable = ['company_id', 'payroll_run_id', 'total_employees', 'processed_employees', 'status'];
 
     public function payrollRun()
     {
         return $this->belongsTo(PayrollRun::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 }

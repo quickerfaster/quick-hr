@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -12,27 +14,28 @@ use App\Modules\Hr\Models\PayrollPolicyAssignment;
 use Illuminate\Database\Eloquent\Model;
 
 
-class PayrollPolicy extends Model 
+class PayrollPolicy extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
+
 
     protected $table = 'payroll_policies';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'name', 'type', 'effect', 'description', 'country_code', 'state_code', 'calculation_logic', 'employer_ratio', 'is_statutory', 'effective_date', 'expiry_date', 'is_active', 'parent_policy_id'
+        'company_id', 'name', 'type', 'effect', 'description', 'country_code', 'state_code', 'calculation_logic', 'employer_ratio', 'is_statutory', 'effective_date', 'expiry_date', 'is_active', 'parent_policy_id'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -53,21 +56,21 @@ class PayrollPolicy extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -76,7 +79,7 @@ class PayrollPolicy extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -85,11 +88,11 @@ class PayrollPolicy extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -115,6 +118,11 @@ class PayrollPolicy extends Model
     public function assignments()
     {
         return $this->hasMany(\App\Modules\Hr\Models\PayrollPolicyAssignment::class, 'payroll_policy_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('employee_groups', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->string('name');
             $table->string('code');
             $table->string('group_type')->default('manual');
@@ -18,7 +20,7 @@ return new class extends Migration
             $table->json('dynamic_rules')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
-            
+
             			$table->index('name');
 			$table->index('code');
 			$table->index('group_type');

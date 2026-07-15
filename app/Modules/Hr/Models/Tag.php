@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -11,28 +13,29 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\Model;
 
 
-class Tag extends Model 
+class Tag extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
-    
 
-    
 
-    
+
+
+
+
     protected $table = 'tags';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'name', 'slug', 'color', 'description', 'is_active'
+        'company_id', 'name', 'slug', 'color', 'description', 'is_active'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -45,21 +48,21 @@ class Tag extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -68,7 +71,7 @@ class Tag extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -77,11 +80,11 @@ class Tag extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -94,7 +97,12 @@ class Tag extends Model
         return parent::save($options);
     }
 
-    
+
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
+    }
 
     /**
      * Create a new factory instance for the model.

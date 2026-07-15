@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('pay_schedules', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->string('name');
             $table->string('code');
             $table->string('frequency');
@@ -25,7 +27,7 @@ return new class extends Migration
             $table->boolean('is_default')->default(false);
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
-            
+
             			$table->index('name');
 			$table->index('code');
 			$table->index('frequency');

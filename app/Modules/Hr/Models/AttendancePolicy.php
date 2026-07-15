@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -11,28 +13,29 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\Model;
 
 
-class AttendancePolicy extends Model 
+class AttendancePolicy extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'attendance_policies';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'name', 'code', 'description', 'grace_period_minutes', 'early_departure_grace_minutes', 'overtime_daily_threshold_hours', 'overtime_weekly_threshold_hours', 'max_daily_overtime_hours', 'overtime_multiplier', 'double_time_threshold_hours', 'double_time_multiplier', 'requires_break_after_hours', 'break_duration_minutes', 'unpaid_break_minutes', 'country_code', 'state_code', 'applies_to_shift_categories', 'effective_date', 'expiration_date', 'is_active', 'is_default'
+        'company_id', 'name', 'code', 'description', 'grace_period_minutes', 'early_departure_grace_minutes', 'overtime_daily_threshold_hours', 'overtime_weekly_threshold_hours', 'max_daily_overtime_hours', 'overtime_multiplier', 'double_time_threshold_hours', 'double_time_multiplier', 'requires_break_after_hours', 'break_duration_minutes', 'unpaid_break_minutes', 'country_code', 'state_code', 'applies_to_shift_categories', 'effective_date', 'expiration_date', 'is_active', 'is_default'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -76,21 +79,21 @@ class AttendancePolicy extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -99,7 +102,7 @@ class AttendancePolicy extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -108,11 +111,11 @@ class AttendancePolicy extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -125,7 +128,12 @@ class AttendancePolicy extends Model
         return parent::save($options);
     }
 
-    
+
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
+    }
 
     /**
      * Create a new factory instance for the model.

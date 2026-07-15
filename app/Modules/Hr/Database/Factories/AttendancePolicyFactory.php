@@ -3,6 +3,7 @@
 namespace App\Modules\Hr\Database\Factories;
 
 use App\Modules\Hr\Models\AttendancePolicy;
+use App\Modules\Admin\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AttendancePolicyFactory extends Factory
@@ -27,8 +28,19 @@ class AttendancePolicyFactory extends Factory
             'unpaid_break_minutes' => 0,
             'applies_to_shift_categories' => json_encode(['regular']), // <-- FIX: JSON string, not array
             'effective_date' => now()->startOfYear(),
+            'company_id' => null,
             'is_active' => true,
             'is_default' => false,
         ];
+    }
+
+    /**
+     * Attach a specific company.
+     */
+    public function forCompany($company)
+    {
+        return $this->state(fn (array $attributes) => [
+            'company_id' => $company instanceof Company ? $company->id : $company,
+        ]);
     }
 }

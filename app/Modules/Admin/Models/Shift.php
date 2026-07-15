@@ -2,6 +2,8 @@
 
 namespace App\Modules\Admin\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -13,28 +15,29 @@ use App\Modules\Admin\Models\Shift;
 use Illuminate\Database\Eloquent\Model;
 
 
-class Shift extends Model 
+class Shift extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'shifts';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'name', 'code', 'shift_category', 'description', 'start_time', 'end_time', 'duration_hours', 'is_overnight', 'is_active', 'is_default', 'created_from_template_id', 'last_used_date', 'usage_count'
+        'name', 'code', 'shift_category', 'description', 'start_time', 'end_time', 'duration_hours', 'is_overnight', 'is_active', 'is_default', 'created_from_template_id', 'last_used_date', 'usage_count', 'company_id'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -56,21 +59,21 @@ class Shift extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -79,7 +82,7 @@ class Shift extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -88,11 +91,11 @@ class Shift extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -103,6 +106,11 @@ class Shift extends Model
     {
         $this->validate();
         return parent::save($options);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     public function shiftSchedules()

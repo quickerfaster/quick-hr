@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('clock_events', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->string('employee_id');
             $table->string('event_type');
             $table->datetime('timestamp');
@@ -23,7 +25,7 @@ return new class extends Migration
             $table->string('device_name')->nullable();
             $table->string('sync_status')->default('pending')->nullable();
             $table->integer('sync_attempts')->default(0)->nullable();
-            
+
             			$table->index('employee_id');
 			$table->index('event_type');
 			$table->index('timestamp');

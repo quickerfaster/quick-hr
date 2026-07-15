@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -13,28 +15,29 @@ use QuickerFaster\UILibrary\Traits\Approvals\HasApproval;
 use Illuminate\Database\Eloquent\Model;
 
 
-class LeaveRequest extends Model 
+class LeaveRequest extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
     use HasApproval;
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'leave_requests';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'employee_id', 'leave_type_id', 'start_date', 'end_date', 'reason', 'status', 'approved_by', 'approved_at', 'denial_reason', 'attendance_synced', 'attendance_records_count', 'last_sync_at', 'is_retroactive', 'reported_after_absence', 'workdays_count', 'overlap_with_holiday'
+        'company_id', 'employee_id', 'leave_type_id', 'start_date', 'end_date', 'reason', 'status', 'approved_by', 'approved_at', 'denial_reason', 'attendance_synced', 'attendance_records_count', 'last_sync_at', 'is_retroactive', 'reported_after_absence', 'workdays_count', 'overlap_with_holiday'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -60,21 +63,21 @@ class LeaveRequest extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -83,7 +86,7 @@ class LeaveRequest extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -92,11 +95,11 @@ class LeaveRequest extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -127,6 +130,11 @@ class LeaveRequest extends Model
     public function attendanceRecords()
     {
         return $this->hasMany(\App\Modules\Hr\Models\Attendance::class, 'leave_request_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

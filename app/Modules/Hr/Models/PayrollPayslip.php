@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -13,28 +15,29 @@ use App\Modules\Hr\Models\PayslipItem;
 use Illuminate\Database\Eloquent\Model;
 
 
-class PayrollPayslip extends Model 
+class PayrollPayslip extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
-    
 
-    
 
-    
+
+
+
+
     protected $table = 'payroll_payslips';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'payslip_number', 'payroll_run_id', 'employee_id', 'base_salary', 'gross_pay', 'total_deductions', 'total_taxes', 'total_benefit_deductions', 'net_pay', 'currency_code', 'exchange_rate', 'employer_contribution_total', 'taxable_earnings', 'income_tax', 'social_security_tax', 'medicare_tax', 'pension_employee', 'pension_employer', 'health_insurance_employee', 'health_insurance_employer', 'other_earnings', 'other_deductions', 'net_pay_in_words', 'payslip_pdf_url', 'payment_status', 'paid_at', 'payment_reference', 'bank_account_snapshot', 'notes'
+        'company_id', 'payslip_number', 'payroll_run_id', 'employee_id', 'base_salary', 'gross_pay', 'total_deductions', 'total_taxes', 'total_benefit_deductions', 'net_pay', 'currency_code', 'exchange_rate', 'employer_contribution_total', 'taxable_earnings', 'income_tax', 'social_security_tax', 'medicare_tax', 'pension_employee', 'pension_employer', 'health_insurance_employee', 'health_insurance_employer', 'other_earnings', 'other_deductions', 'net_pay_in_words', 'payslip_pdf_url', 'payment_status', 'paid_at', 'payment_reference', 'bank_account_snapshot', 'notes'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -83,21 +86,21 @@ class PayrollPayslip extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -106,7 +109,7 @@ class PayrollPayslip extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -115,11 +118,11 @@ class PayrollPayslip extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -145,6 +148,11 @@ class PayrollPayslip extends Model
     public function items()
     {
         return $this->hasMany(\App\Modules\Hr\Models\PayslipItem::class, 'payslip_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

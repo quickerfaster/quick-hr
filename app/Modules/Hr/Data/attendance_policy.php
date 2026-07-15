@@ -12,6 +12,28 @@ return [
       'filterable' => true,
       'searchable' => true,
     ],
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'code' => [
       'display' => 'inline',
       'fillable' => true,
@@ -214,6 +236,7 @@ return [
       '7' => 'created_at',
       '8' => 'updated_at',
       '9' => 'deleted_at',
+      '10' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'version',
@@ -222,6 +245,7 @@ return [
       '3' => 'created_at',
       '4' => 'updated_at',
       '5' => 'deleted_at',
+      '6' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'version',
@@ -229,6 +253,7 @@ return [
       '2' => 'last_updated_at',
       '3' => 'updated_at',
       '4' => 'deleted_at',
+      '5' => 'company_id',
     ],
     'onQuery' => [
       '0' => 'deleted_at',
@@ -243,7 +268,8 @@ return [
   'crudType' => 'pages',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'name',
+    '0' => 'company_id',
+    '1' => 'name',
     '1' => 'code',
     '2' => 'country_code',
     '3' => 'is_active',
@@ -312,6 +338,14 @@ return [
     ],
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     'basic_info' => [
       'title' => 'Basic Information',
       'groupType' => 'hr',

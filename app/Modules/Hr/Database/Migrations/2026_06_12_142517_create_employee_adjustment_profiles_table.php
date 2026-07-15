@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('employee_adjustment_profiles', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->foreignId('employee_id')->constrained('employees', 'id')->onDelete('cascade');
             $table->string('type');
             $table->string('label');
@@ -21,7 +23,7 @@ return new class extends Migration
             $table->foreignId('policy_id')->nullable()->constrained('payroll_policies', 'id')->onDelete('set null');
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
-            
+
             			$table->index('employee_id');
 			$table->index('type');
 			$table->index('is_active');

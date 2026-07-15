@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -14,28 +16,29 @@ use QuickerFaster\UILibrary\Traits\Approvals\HasApproval;
 use Illuminate\Database\Eloquent\Model;
 
 
-class PayrollRun extends Model 
+class PayrollRun extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
     use HasApproval;
-    
 
-    
 
-    
+
+
+
     protected $table = 'payroll_runs';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'title', 'pay_schedule_id', 'period_start', 'period_end', 'status', 'current_step', 'calculation_status', 'total_gross_pay', 'total_deductions', 'total_taxes', 'total_employer_contributions', 'total_cash_required', 'processed_by', 'processed_at', 'base_currency', 'payment_date', 'reconciliation_status', 'reconciled_at', 'payment_batch_id', 'total_employee_contributions', 'total_income_tax', 'total_bonus', 'total_commission', 'total_reimbursement', 'approved_by_user_id', 'approved_at', 'total_employees', 'processed_employees', 'notes'
+        'company_id', 'title', 'pay_schedule_id', 'period_start', 'period_end', 'status', 'current_step', 'calculation_status', 'total_gross_pay', 'total_deductions', 'total_taxes', 'total_employer_contributions', 'total_cash_required', 'processed_by', 'processed_at', 'base_currency', 'payment_date', 'reconciliation_status', 'reconciled_at', 'payment_batch_id', 'total_employee_contributions', 'total_income_tax', 'total_bonus', 'total_commission', 'total_reimbursement', 'approved_by_user_id', 'approved_at', 'total_employees', 'processed_employees', 'notes'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -84,21 +87,21 @@ class PayrollRun extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -107,7 +110,7 @@ class PayrollRun extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -116,11 +119,11 @@ class PayrollRun extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -151,6 +154,11 @@ class PayrollRun extends Model
     public function approvedByUser()
     {
         return $this->belongsTo(\App\Modules\Admin\Models\User::class, 'approved_by_user_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

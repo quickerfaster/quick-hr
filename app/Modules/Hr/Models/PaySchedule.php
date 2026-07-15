@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -12,28 +14,29 @@ use App\Modules\Hr\Models\EmployeePayrollProfile;
 use Illuminate\Database\Eloquent\Model;
 
 
-class PaySchedule extends Model 
+class PaySchedule extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'pay_schedules';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'name', 'code', 'frequency', 'description', 'first_period_start_date', 'next_pay_date', 'payment_delay_days', 'country_code', 'state_code', 'currency_code', 'timezone', 'is_active', 'is_default'
+        'company_id', 'name', 'code', 'frequency', 'description', 'first_period_start_date', 'next_pay_date', 'payment_delay_days', 'country_code', 'state_code', 'currency_code', 'timezone', 'is_active', 'is_default'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -56,21 +59,21 @@ class PaySchedule extends Model
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -79,7 +82,7 @@ class PaySchedule extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -88,11 +91,11 @@ class PaySchedule extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -113,6 +116,11 @@ class PaySchedule extends Model
     public function employeeProfiles()
     {
         return $this->hasMany(\App\Modules\Hr\Models\EmployeePayrollProfile::class, 'pay_schedule_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

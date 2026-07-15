@@ -2,6 +2,8 @@
 
 namespace App\Modules\Admin\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -15,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Department extends Model 
 {
+    use HasCompanyScope;
     use HasFactory;
     
     use SoftDeletes;

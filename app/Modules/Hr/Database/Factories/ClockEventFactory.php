@@ -3,6 +3,7 @@
 namespace App\Modules\Hr\Database\Factories;
 
 use App\Modules\Hr\Models\ClockEvent;
+use App\Modules\Admin\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ClockEventFactory extends Factory
@@ -12,7 +13,7 @@ class ClockEventFactory extends Factory
     public function definition()
     {
         $timestamp = $this->faker->dateTimeThisMonth();
-        
+
         return [
             'employee_id' => $this->faker->bothify('EMP-####-###'), // string employee_number
             'event_type' => $this->faker->randomElement(['clock_in', 'clock_out']),
@@ -27,9 +28,20 @@ class ClockEventFactory extends Factory
             'device_name' => $this->faker->optional(0.7)->bothify('Device Model ##??'),
             'sync_status' => 'synced',
             'sync_attempts' => 0,
+            'company_id' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ];
+    }
+
+    /**
+     * Attach a specific company.
+     */
+    public function forCompany($company)
+    {
+        return $this->state(fn (array $attributes) => [
+            'company_id' => $company instanceof Company ? $company->id : $company,
+        ]);
     }
 
     /**

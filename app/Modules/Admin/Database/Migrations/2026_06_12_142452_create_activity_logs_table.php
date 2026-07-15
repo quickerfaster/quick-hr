@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('company_id')->nullable();
             $table->string('log_name')->nullable();
             $table->string('action');
             $table->text('description')->nullable();
@@ -22,8 +23,9 @@ return new class extends Migration
             $table->json('new_values')->nullable();
             $table->json('properties')->nullable();
             $table->datetime('updated_at');
-            
-            			$table->index('log_name');
+
+            			$table->index('company_id');
+   $table->index('log_name');
 			$table->index('action');
 			$table->index('created_at');
 			$table->index('causer_id');
@@ -31,8 +33,8 @@ return new class extends Migration
 			$table->index(['log_name', 'created_at']);
 			$table->index(['action', 'created_at']);
 			$table->index(['causer_type', 'causer_id']);
-            
-            
+
+
         });
     }
 

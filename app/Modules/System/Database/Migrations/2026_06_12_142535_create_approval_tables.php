@@ -11,6 +11,8 @@ return new class extends Migration
         // 1. Create approval_requests (without current_tier_id FK)
         Schema::create('approval_requests', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->morphs('approvable');
             $table->enum('status', ['draft', 'pending', 'approved', 'rejected', 'cancelled'])->default('draft');
             $table->unsignedBigInteger('current_tier_id')->nullable();
@@ -27,6 +29,8 @@ return new class extends Migration
         // 2. Create approval_tiers
         Schema::create('approval_tiers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->foreignId('approval_request_id')
                   ->constrained('approval_requests')
                   ->cascadeOnDelete();
@@ -48,6 +52,8 @@ return new class extends Migration
         // 3. Create approval_tier_approvals (explicit foreign key to approval_tiers)
         Schema::create('approval_tier_approvals', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->unsignedBigInteger('tier_id');
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->text('comments')->nullable();
@@ -61,6 +67,8 @@ return new class extends Migration
         // 4. Create approval_logs (explicit foreign keys)
         Schema::create('approval_logs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->unsignedBigInteger('approval_request_id');
             $table->foreignId('user_id')->constrained();
             $table->string('action', 50);

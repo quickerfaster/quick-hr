@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('employee_payroll_profiles', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->foreignId('employee_id')->constrained('employees', 'id')->onDelete('cascade');
             $table->foreignId('pay_schedule_id')->constrained('pay_schedules', 'id')->onDelete('restrict');
             $table->string('bank_name')->nullable();
@@ -34,7 +36,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
-            
+
             			$table->index('employee_id');
 			$table->index('pay_schedule_id');
 			$table->index('is_active');

@@ -2,6 +2,8 @@
 
 namespace App\Modules\Hr\Models;
 
+use App\Modules\Admin\Traits\HasCompanyScope;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
@@ -11,28 +13,29 @@ use App\Modules\Hr\Models\Attendance;
 use Illuminate\Database\Eloquent\Model;
 
 
-class AttendanceAdjustment extends Model 
+class AttendanceAdjustment extends Model
 {
+    use HasCompanyScope;
     use HasFactory;
-    
+
     use SoftDeletes;
 
-    
 
-    
+
+
     protected $table = 'attendance_adjustments';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'attendance_id', 'original_net_hours', 'original_status', 'adjusted_net_hours', 'adjusted_status', 'reason', 'adjusted_by', 'adjusted_at'
+        'company_id', 'attendance_id', 'original_net_hours', 'original_status', 'adjusted_net_hours', 'adjusted_status', 'reason', 'adjusted_by', 'adjusted_at'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -42,25 +45,25 @@ class AttendanceAdjustment extends Model
     ];
 
     protected $attributes = [
-        
+
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -69,7 +72,7 @@ class AttendanceAdjustment extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -78,11 +81,11 @@ class AttendanceAdjustment extends Model
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -98,6 +101,11 @@ class AttendanceAdjustment extends Model
     public function attendance()
     {
         return $this->belongsTo(\App\Modules\Hr\Models\Attendance::class, 'attendance_id', 'id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     /**

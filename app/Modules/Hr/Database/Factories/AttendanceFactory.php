@@ -4,6 +4,7 @@ namespace App\Modules\Hr\Database\Factories;
 
 use App\Modules\Hr\Models\Attendance;
 use App\Modules\Hr\Models\Employee;
+use App\Modules\Admin\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AttendanceFactory extends Factory
@@ -14,7 +15,7 @@ class AttendanceFactory extends Factory
     {
         $date = $this->faker->dateTimeBetween('-1 month', 'now');
         $employee = Employee::factory()->create();
-        
+
         return [
             'employee_id' => $employee->id,
             'employee_number' => $employee->employee_number,
@@ -48,9 +49,20 @@ class AttendanceFactory extends Factory
             'missed_break_minutes' => 0,
             'calculation_metadata' => null,
             'calculation_version' => null,
+            'company_id' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ];
+    }
+
+    /**
+     * Attach a specific company.
+     */
+    public function forCompany($company)
+    {
+        return $this->state(fn (array $attributes) => [
+            'company_id' => $company instanceof Company ? $company->id : $company,
+        ]);
     }
 
     /**

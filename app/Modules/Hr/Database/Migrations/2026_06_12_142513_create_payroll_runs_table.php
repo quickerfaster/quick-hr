@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('payroll_runs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->string('title');
             $table->foreignId('pay_schedule_id')->constrained('pay_schedules', 'id')->onDelete('restrict');
             $table->date('period_start');
@@ -43,7 +45,7 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
-            
+
             			$table->index('pay_schedule_id');
 			$table->index('status');
 			$table->index('period_start');
@@ -57,7 +59,7 @@ return new class extends Migration
 			$table->index(['period_start', 'period_end']);
 			$table->index(['pay_schedule_id', 'period_start', 'period_end']);
 			$table->unique('title');
-            
+
             $table->timestamps();
         });
     }

@@ -2,6 +2,7 @@
 namespace App\Modules\Hr\Database\Factories;
 
 use App\Modules\Admin\Models\ShiftSchedule;
+use App\Modules\Admin\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ShiftScheduleFactory extends Factory
@@ -17,10 +18,21 @@ class ShiftScheduleFactory extends Factory
 
             'schedule_type' => 'regular',
             'is_published' => true,
+            'company_id' => null,
 
             // actual_start_time'
             // 'actual_end_time'
         ];
-        
+
+    }
+
+    /**
+     * Attach a specific company.
+     */
+    public function forCompany($company)
+    {
+        return $this->state(fn (array $attributes) => [
+            'company_id' => $company instanceof Company ? $company->id : $company,
+        ]);
     }
 }

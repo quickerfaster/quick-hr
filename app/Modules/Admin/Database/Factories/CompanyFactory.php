@@ -3,7 +3,6 @@
 namespace App\Modules\Admin\Database\Factories;
 
 use App\Modules\Admin\Models\Company;
-use App\Modules\Admin\Models\Location;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CompanyFactory extends Factory
@@ -15,7 +14,6 @@ class CompanyFactory extends Factory
         return [
             'name' => $this->faker->company(),
             'parent_company_id' => null,
-            'location_id' => Location::factory(), // Creates a location automatically
             'subdomain' => $this->faker->unique()->bothify(strtolower($this->faker->company())),
             'database_name' => null,
             'status' => $this->faker->randomElement(['pending', 'active', 'suspended', 'canceled']),
@@ -66,13 +64,4 @@ class CompanyFactory extends Factory
         ]);
     }
 
-    /**
-     * Attach a specific location.
-     */
-    public function atLocation($location)
-    {
-        return $this->state(fn (array $attributes) => [
-            'location_id' => $location instanceof Location ? $location->id : $location,
-        ]);
-    }
 }

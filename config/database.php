@@ -6,6 +6,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Multi-Tenancy Note
+    |--------------------------------------------------------------------------
+    | This application uses multi-tenancy via company_id foreign keys.
+    | See config/multitenancy.php for tenant configuration.
+    | The default connection is used for all tenant data.
+    */
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Database Connection Name
     |--------------------------------------------------------------------------
     |

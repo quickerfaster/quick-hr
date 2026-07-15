@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('employee_positions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->foreignId('employee_id')->constrained('employees', 'id')->onDelete('cascade');
             $table->foreignId('job_title_id')->constrained('job_titles', 'id')->onDelete('restrict');
             $table->foreignId('department_id')->constrained('departments', 'id')->onDelete('restrict');
@@ -29,7 +31,7 @@ return new class extends Migration
             $table->string('work_email')->nullable();
             $table->string('work_phone_extension')->nullable();
             $table->text('job_description')->nullable();
-            
+
             			$table->index('employee_id');
 			$table->index('employment_status');
 			$table->index('department_id');

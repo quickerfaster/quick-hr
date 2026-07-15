@@ -22,6 +22,28 @@ return [
       'filterable' => true,
       'searchable' => true,
     ],
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'shift_category' => [
       'display' => 'inline',
       'fillable' => true,
@@ -125,6 +147,7 @@ return [
       '6' => 'created_at',
       '7' => 'updated_at',
       '8' => 'deleted_at',
+      '9' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'duration_hours',
@@ -135,6 +158,7 @@ return [
       '5' => 'created_at',
       '6' => 'updated_at',
       '7' => 'deleted_at',
+      '8' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'duration_hours',
@@ -143,6 +167,7 @@ return [
       '3' => 'last_used_date',
       '4' => 'usage_count',
       '5' => 'deleted_at',
+      '6' => 'company_id',
     ],
     'onQuery' => [
       '0' => 'deleted_at',
@@ -157,12 +182,13 @@ return [
   'crudType' => 'drawers',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'name',
-    '1' => 'code',
-    '2' => 'shift_category',
-    '3' => 'start_time',
-    '4' => 'end_time',
-    '5' => 'is_active',
+    '0' => 'company_id',
+    '1' => 'name',
+    '2' => 'code',
+    '3' => 'shift_category',
+    '4' => 'start_time',
+    '5' => 'end_time',
+    '6' => 'is_active',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,
@@ -242,6 +268,14 @@ return [
     ],
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     'basic_info' => [
       'title' => 'Basic Information',
       'groupType' => 'hr',

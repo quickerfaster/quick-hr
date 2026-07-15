@@ -41,6 +41,28 @@ return [
       'filterable' => true,
       'searchable' => true,
     ],
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'password' => [
       'display' => 'inline',
       'fillable' => true,
@@ -83,6 +105,7 @@ return [
       '4' => 'created_at',
       '5' => 'updated_at',
       '6' => 'deleted_at',
+      '7' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'email_verified_at',
@@ -90,11 +113,13 @@ return [
       '2' => 'created_at',
       '3' => 'updated_at',
       '4' => 'deleted_at',
+      '5' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'remember_token',
       '1' => 'email_verified_at',
       '2' => 'deleted_at',
+      '3' => 'company_id',
     ],
     'onQuery' => [
       '0' => 'password_confirmation',
@@ -111,9 +136,10 @@ return [
   'crudType' => 'drawers',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'name',
-    '1' => 'email',
-    '2' => 'status',
+    '0' => 'company_id',
+    '1' => 'name',
+    '2' => 'email',
+    '3' => 'status',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,
@@ -150,6 +176,14 @@ return [
     ],
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'admin',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     'identity' => [
       'title' => 'Identity',
       'groupType' => 'admin',

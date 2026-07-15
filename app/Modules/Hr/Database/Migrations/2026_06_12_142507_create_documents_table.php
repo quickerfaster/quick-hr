@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->foreignId('employee_id')->constrained('employees', 'id')->onDelete('cascade');
             $table->string('name');
             $table->string('type');
@@ -17,7 +19,7 @@ return new class extends Migration
             $table->date('uploaded_at')->nullable();
             $table->date('expiry_date')->nullable();
             $table->text('description')->nullable();
-            
+
             			$table->index('employee_id');
 			$table->index('type');
 			$table->index('uploaded_at');

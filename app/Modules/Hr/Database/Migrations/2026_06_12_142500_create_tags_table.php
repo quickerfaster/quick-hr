@@ -10,12 +10,14 @@ return new class extends Migration
     {
         Schema::create('tags', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->string('name');
             $table->string('slug')->nullable();
             $table->string('color')->default('primary');
             $table->text('description')->nullable();
             $table->boolean('is_active')->default(true);
-            
+
             			$table->index('name');
 			$table->index('slug');
 			$table->index('color');
@@ -23,7 +25,7 @@ return new class extends Migration
 			$table->index(['color', 'is_active']);
 			$table->unique('name');
 			$table->unique('slug');
-            
+
             $table->timestamps();
         });
     }

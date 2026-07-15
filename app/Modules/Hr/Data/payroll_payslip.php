@@ -3,6 +3,28 @@
 return [
   'model' => 'App\Modules\Hr\Models\PayrollPayslip',
   'fieldDefinitions' => [
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'payslip_number' => [
       'display' => 'inline',
       'fillable' => true,
@@ -284,17 +306,20 @@ return [
       '7' => 'updated_by',
       '8' => 'created_at',
       '9' => 'updated_at',
+      '10' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'created_by',
       '1' => 'updated_by',
       '2' => 'created_at',
       '3' => 'updated_at',
+      '4' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'updated_by',
       '1' => 'created_at',
       '2' => 'updated_at',
+      '3' => 'company_id',
     ],
     'onQuery' => [],
   ],
@@ -305,7 +330,8 @@ return [
   'crudType' => 'pages',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'payslip_number',
+    '0' => 'company_id',
+    '1' => 'payslip_number',
     '1' => 'employee_id',
     '2' => 'payroll_run_id',
     '3' => 'net_pay',
@@ -355,6 +381,14 @@ return [
     ],
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     'identification' => [
       'title' => 'Payslip Identification',
       'groupType' => 'payroll',

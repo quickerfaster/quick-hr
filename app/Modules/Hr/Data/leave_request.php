@@ -3,6 +3,28 @@
 return [
   'model' => 'App\Modules\Hr\Models\LeaveRequest',
   'fieldDefinitions' => [
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'employee_id' => [
       'display' => 'inline',
       'fillable' => true,
@@ -200,6 +222,7 @@ return [
       '6' => 'created_at',
       '7' => 'updated_at',
       '8' => 'deleted_at',
+      '9' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'status',
@@ -215,6 +238,7 @@ return [
       '10' => 'created_at',
       '11' => 'updated_at',
       '12' => 'deleted_at',
+      '13' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'employee_id',
@@ -224,6 +248,7 @@ return [
       '4' => 'created_at',
       '5' => 'updated_at',
       '6' => 'deleted_at',
+      '7' => 'company_id',
     ],
     'onQuery' => [
       '0' => 'deleted_at',
@@ -238,7 +263,8 @@ return [
   'crudType' => 'drawers',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'employee_id',
+    '0' => 'company_id',
+    '1' => 'employee_id',
     '1' => 'leave_type_id',
     '2' => 'start_date',
     '3' => 'end_date',
@@ -323,6 +349,14 @@ return [
     ],
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     'request_details' => [
       'title' => 'Request Details',
       'groupType' => 'hr',

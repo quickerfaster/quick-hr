@@ -47,6 +47,28 @@ return [
       'validation' => 'nullable|string|max:1000',
       'searchable' => true,
     ],
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'created_at' => [
       'display' => 'inline',
       'fillable' => false,
@@ -118,6 +140,7 @@ return [
       '4' => 'new_values',
       '5' => 'properties',
       '6' => 'updated_at',
+      '7' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'causer_type',
@@ -129,9 +152,11 @@ return [
       '6' => 'properties',
       '7' => 'created_at',
       '8' => 'updated_at',
+      '9' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'All fields (audit logs are not editable)',
+      '1' => 'company_id',
     ],
     'onDetail' => [],
   ],
@@ -142,11 +167,12 @@ return [
   'crudType' => 'pages',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'created_at',
-    '1' => 'log_name',
-    '2' => 'action',
-    '3' => 'description',
-    '4' => 'causer_id',
+    '0' => 'company_id',
+    '1' => 'created_at',
+    '2' => 'log_name',
+    '3' => 'action',
+    '4' => 'description',
+    '5' => 'causer_id',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,
@@ -181,6 +207,14 @@ return [
     'filterColumns' => true,
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'admin',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     'main_info' => [
       'title' => 'Activity Information',
       'groupType' => 'admin',

@@ -25,6 +25,28 @@ return [
         'hintField' => 'first_name',
       ],
     ],
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'job_title_id' => [
       'display' => 'inline',
       'fillable' => true,
@@ -315,9 +337,14 @@ return [
       '2' => 'cost_center',
       '3' => 'job_description',
       '4' => 'work_phone_extension',
+      '5' => 'company_id',
     ],
-    'onNewForm' => [],
-    'onEditForm' => [],
+    'onNewForm' => [
+      '0' => 'company_id',
+    ],
+    'onEditForm' => [
+      '0' => 'company_id',
+    ],
     'onQuery' => [],
   ],
   'simpleActions' => [
@@ -329,7 +356,8 @@ return [
   'crudType' => 'pages',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'employee_id',
+    '0' => 'company_id',
+    '1' => 'employee_id',
     '1' => 'job_title_id',
     '2' => 'department_id',
     '3' => 'employment_status',
@@ -372,6 +400,14 @@ return [
     'trashView' => true,
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     'job_information' => [
       'title' => 'Job Information',
       'groupType' => 'hr',

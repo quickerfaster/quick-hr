@@ -10,10 +10,12 @@ return new class extends Migration
     {
         Schema::create('job_titles', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
-            
-            			$table->index('title');
+
+            			$table->index('company_id');
+   $table->index('title');
 			$table->index('deleted_at');
 			$table->unique('title');
             $table->softDeletes();

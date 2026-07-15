@@ -170,15 +170,18 @@ return [
       '0' => 'created_at',
       '1' => 'updated_at',
       '2' => 'deleted_at',
+      '3' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'created_at',
       '1' => 'updated_at',
       '2' => 'deleted_at',
+      '3' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'updated_at',
       '1' => 'deleted_at',
+      '2' => 'company_id',
     ],
     'onQuery' => [
       '0' => 'deleted_at',

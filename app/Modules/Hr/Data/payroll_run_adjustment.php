@@ -3,6 +3,28 @@
 return [
   'model' => 'App\Modules\Hr\Models\PayrollRunAdjustment',
   'fieldDefinitions' => [
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'payroll_run_id' => [
       'display' => 'inline',
       'fillable' => true,
@@ -132,17 +154,20 @@ return [
       '5' => 'created_at',
       '6' => 'updated_at',
       '7' => 'deleted_at',
+      '8' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'source_id',
       '1' => 'created_by',
       '2' => 'updated_by',
       '3' => 'deleted_at',
+      '4' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'source_id',
       '1' => 'updated_by',
       '2' => 'deleted_at',
+      '3' => 'company_id',
     ],
     'onQuery' => [
       '0' => 'deleted_at',
@@ -157,7 +182,8 @@ return [
   'crudType' => 'drawers',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'payroll_run_id',
+    '0' => 'company_id',
+    '1' => 'payroll_run_id',
     '1' => 'employee_id',
     '2' => 'type',
     '3' => 'label',
@@ -199,6 +225,14 @@ return [
     ],
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     'adjustment_info' => [
       'title' => 'Adjustment Details',
       'groupType' => 'payroll',

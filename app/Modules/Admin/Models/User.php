@@ -13,30 +13,30 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 
-class User extends Authenticatable 
+class User extends Authenticatable
 {
     use HasFactory;
     use HasRoles, Notifiable;
     use SoftDeletes;
 
-    
+
 
     protected $guard_name = 'web';
 
 
     protected $table = 'users';
-    
-    
-    
+
+
+
     public $timestamps = true;
-    
+
 
     protected $fillable = [
-        'name', 'email', 'status', 'password'
+        'name', 'email', 'status', 'password', 'company_id'
     ];
 
     protected $guarded = [
-        
+
     ];
 
     protected $casts = [
@@ -44,25 +44,25 @@ class User extends Authenticatable
     ];
 
     protected $attributes = [
-        
+
     ];
 
     protected $dispatchesEvents = [
-        
+
     ];
 
     /**
      * Validation rules for the model.
      */
     protected static $rules = [
-        
+
     ];
 
     /**
      * Custom validation messages.
      */
     protected static $messages = [
-        
+
     ];
 
     /**
@@ -71,7 +71,7 @@ class User extends Authenticatable
     protected static function boot()
     {
         parent::boot();
-        
+
     }
 
     /**
@@ -80,11 +80,11 @@ class User extends Authenticatable
     public function validate()
     {
         $validator = Validator::make($this->attributesToArray(), static::$rules, static::$messages);
-        
+
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
-        
+
         return true;
     }
 
@@ -95,6 +95,11 @@ class User extends Authenticatable
     {
         $this->validate();
         return parent::save($options);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
     }
 
     public function employee()

@@ -25,6 +25,28 @@ return [
         'hintField' => 'first_name,last_name',
       ],
     ],
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'pay_schedule_id' => [
       'display' => 'inline',
       'fillable' => true,
@@ -271,15 +293,18 @@ return [
       '16' => 'created_at',
       '17' => 'updated_at',
       '18' => 'deleted_at',
+      '19' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'created_by',
       '1' => 'updated_by',
       '2' => 'deleted_at',
+      '3' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'updated_by',
       '1' => 'deleted_at',
+      '2' => 'company_id',
     ],
     'onQuery' => [
       '0' => 'deleted_at',
@@ -294,7 +319,8 @@ return [
   'crudType' => 'pages',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'employee_id',
+    '0' => 'company_id',
+    '1' => 'employee_id',
     '1' => 'pay_schedule_id',
     '2' => 'payment_method',
     '3' => 'is_active',
@@ -350,6 +376,14 @@ return [
     ],
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     'employee_link' => [
       'title' => 'Employee & Schedule',
       'groupType' => 'payroll',

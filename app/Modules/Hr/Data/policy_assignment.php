@@ -3,6 +3,28 @@
 return [
   'model' => 'App\Modules\Hr\Models\PolicyAssignment',
   'fieldDefinitions' => [
+    'company_id' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Company',
+      'validation' => 'required|integer|exists:companies,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'company',
+        'foreign_key' => 'company_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Admin\Models\Company',
+        'column' => 'name',
+        'hintField' => '',
+      ],
+    ],
     'attendance_policy_id' => [
       'display' => 'inline',
       'fillable' => true,
@@ -69,15 +91,18 @@ return [
       '1' => 'created_at',
       '2' => 'updated_at',
       '3' => 'deleted_at',
+      '4' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'created_at',
       '1' => 'updated_at',
       '2' => 'deleted_at',
+      '3' => 'company_id',
     ],
     'onEditForm' => [
       '0' => 'updated_at',
       '1' => 'deleted_at',
+      '2' => 'company_id',
     ],
     'onQuery' => [
       '0' => 'deleted_at',
@@ -92,7 +117,8 @@ return [
   'crudType' => 'modals',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'attendance_policy_id',
+    '0' => 'company_id',
+    '1' => 'attendance_policy_id',
     '1' => 'assignable_type',
     '2' => 'assignable_id',
     '3' => 'priority',
@@ -134,6 +160,14 @@ return [
     ],
   ],
   'fieldGroups' => [
+    'company' => [
+      'title' => 'Company',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => [
+        '0' => 'company_id',
+      ],
+    ],
     'assignment' => [
       'title' => 'Policy Assignment',
       'groupType' => 'hr',

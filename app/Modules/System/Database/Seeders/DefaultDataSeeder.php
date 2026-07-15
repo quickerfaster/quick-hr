@@ -32,7 +32,7 @@ class DefaultDataSeeder extends Seeder
 
         // 2. Create default shift
         $defaultShift = Shift::create([
-            // 'company_id' => $company->id,
+            'company_id' => $company->id,
             'name' => 'Standard Day Shift',
             'code' => 'STD',
             'start_time' => '09:00:00',
@@ -46,7 +46,7 @@ class DefaultDataSeeder extends Seeder
 
         // 3. Create default work pattern
         $defaultWorkPattern = WorkPattern::create([
-            // 'company_id' => $company->id,
+            'company_id' => $company->id,
             'name' => 'Monday-Friday',
             'code' => 'M-F',
             'shift_id' => $defaultShift->id,
@@ -59,7 +59,7 @@ class DefaultDataSeeder extends Seeder
 
         // 4. Create default attendance policy
         $defaultPolicy = AttendancePolicy::create([
-            // 'company_id' => $company->id,
+            'company_id' => $company->id,
             'name' => 'Default Attendance Policy',
             'code' => 'DEFAULT',
             'effective_date' => Carbon::now(),
@@ -81,7 +81,7 @@ class DefaultDataSeeder extends Seeder
 
         // 5. Create default location
         $defaultLocation = Location::create([
-            // 'company_id' => $company->id,
+            'company_id' => $company->id,
             'name' => 'Headquarters',
             'code' => 'HQ',
             'is_active' => true,
@@ -104,7 +104,7 @@ class DefaultDataSeeder extends Seeder
         // Optional: Assign the default policy to the company via PolicyAssignment
         // (if you want company‑specific default)
         // \App\Modules\Hr\Models\PolicyAssignment::create([
-        //     // 'company_id' => $company->id,
+        //     'company_id' => $company->id,
         //     'attendance_policy_id' => $defaultPolicy->id,
         // ]);
     }

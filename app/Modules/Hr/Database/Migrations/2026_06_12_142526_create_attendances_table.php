@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->foreignId('employee_id')->nullable()->constrained('employees', 'id')->onDelete('restrict');
             $table->date('date');
             $table->foreignId('shift_id')->nullable()->constrained('shifts', 'id')->onDelete('restrict');
@@ -39,7 +41,7 @@ return new class extends Migration
             $table->boolean('is_unplanned')->default(false);
             $table->json('calculation_metadata')->nullable();
             $table->string('calculation_version')->nullable();
-            
+
             			$table->index('employee_id');
 			$table->index('date');
 			$table->index('status');

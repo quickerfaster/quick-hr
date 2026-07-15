@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('attendance_sessions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->foreignId('attendance_id')->constrained('attendances', 'id')->onDelete('cascade');
             $table->datetime('start_time');
             $table->datetime('end_time')->nullable();
@@ -25,7 +27,7 @@ return new class extends Migration
             $table->decimal('calculated_duration', 6, 2)->nullable();
             $table->string('validation_status')->default('valid')->nullable();
             $table->text('validation_notes')->nullable();
-            
+
             			$table->index('attendance_id');
 			$table->index('start_time');
 			$table->index('end_time');

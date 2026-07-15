@@ -15,9 +15,9 @@ return new class extends Migration
             $table->string('address_line_1');
             $table->string('address_line_2')->nullable();
             $table->string('city');
-            $table->string('state_province')->nullable();
+            $table->string('country_code')->default('US');
+            $table->string('state_code')->nullable();
             $table->string('postal_code')->nullable();
-            $table->string('country')->default('US')->nullable();
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
             $table->string('website')->nullable();
@@ -25,6 +25,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->boolean('is_remote')->default(false);
             $table->boolean('is_headquarters')->default(false);
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
             $table->integer('capacity')->nullable();
             $table->text('opening_hours')->nullable();
             $table->date('opening_date')->nullable();
@@ -36,19 +37,20 @@ return new class extends Migration
             $table->datetime('last_synced_at')->nullable();
             $table->integer('employee_count')->default(0);
             $table->integer('department_count')->default(0);
-            
-            			$table->index('code');
+
+            			$table->index('company_id');
+   $table->index('code');
 			$table->index('is_active');
 			$table->index('is_remote');
 			$table->index('is_headquarters');
-			$table->index('country');
+			$table->index('country_code');
 			$table->index('timezone');
 			$table->index('city');
 			$table->index('deleted_at');
-			$table->index(['country', 'is_active']);
+			$table->index(['country_code', 'is_active']);
 			$table->index(['is_remote', 'is_active']);
-			$table->index(['city', 'state_province']);
-			$table->unique(['name', 'city', 'country']);
+			$table->index(['city', 'state_code']);
+			$table->unique(['name', 'city', 'country_code']);
 			$table->unique('code');
             $table->softDeletes();
             $table->timestamps();

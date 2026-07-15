@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('shift_schedules', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+            $table->index('company_id');
             $table->foreignId('employee_id')->constrained('employees', 'id')->onDelete('cascade');
             $table->foreignId('shift_id')->constrained('shifts', 'id')->onDelete('restrict');
             $table->date('schedule_date');
@@ -30,7 +32,7 @@ return new class extends Migration
             $table->boolean('created_from_template')->default(false);
             $table->string('last_modified_by')->nullable();
             $table->datetime('last_modified_at')->nullable();
-            
+
             			$table->index('employee_id');
 			$table->index('shift_id');
 			$table->index('schedule_date');
