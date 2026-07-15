@@ -373,14 +373,14 @@ return [
     ],
   ],
   'fieldGroups' => [
-    /*'company' => [
+    'company' => [
       'title' => 'Company',
       'groupType' => 'hr',
       'icon' => 'fas fa-building',
       'fields' => [
         '0' => 'company_id',
       ],
-    ],*/
+    ],
     'basic_info' => [
       'title' => 'Basic Information',
       'groupType' => 'hr',
