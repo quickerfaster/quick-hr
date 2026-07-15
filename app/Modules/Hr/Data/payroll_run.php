@@ -12,7 +12,7 @@ return [
       'filterable' => true,
       'searchable' => true,
       'relationship' => [
-        'model' => 'App\Modules\Admin\Models\Company',
+        'model' => 'App\Modules\Hr\Models\Company',
         'type' => 'belongsTo',
         'display_field' => 'name',
         'dynamic_property' => 'company',
@@ -20,7 +20,7 @@ return [
         'inlineAdd' => false,
       ],
       'options' => [
-        'model' => 'App\Modules\Admin\Models\Company',
+        'model' => 'App\Modules\Hr\Models\Company',
         'column' => 'name',
         'hintField' => '',
       ],
@@ -256,7 +256,7 @@ return [
       'validation' => 'nullable|exists:users,id',
       'filterable' => true,
       'relationship' => [
-        'model' => 'App\Modules\Admin\Models\User',
+        'model' => 'App\Modules\Hr\Models\User',
         'type' => 'belongsTo',
         'display_field' => 'full_name',
         'dynamic_property' => 'approvedByUser',
@@ -264,7 +264,7 @@ return [
         'inlineAdd' => false,
       ],
       'options' => [
-        'model' => 'App\Modules\Admin\Models\User',
+        'model' => 'App\Modules\Hr\Models\User',
         'column' => 'full_name',
         'hintField' => '',
       ],
@@ -755,7 +755,7 @@ return [
     ],
     'approvedByUser' => [
       'type' => 'belongsTo',
-      'model' => 'App\Modules\Admin\Models\User',
+      'model' => 'App\Modules\Hr\Models\User',
       'foreignKey' => 'approved_by_user_id',
       'localKey' => '',
     ],

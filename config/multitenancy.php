@@ -12,7 +12,7 @@ return [
     | Tenant Model
     |--------------------------------------------------------------------------
     */
-    'tenant_model' => \App\Modules\Admin\Models\Company::class,
+    'tenant_model' => \App\Modules\Hr\Models\Company::class,
 
     /*
     |--------------------------------------------------------------------------

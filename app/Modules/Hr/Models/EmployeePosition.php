@@ -9,10 +9,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use App\Modules\Hr\Models\Employee;
-use App\Modules\Admin\Models\JobTitle;
-use App\Modules\Admin\Models\Department;
-use App\Modules\Admin\Models\Location;
-use App\Modules\Admin\Models\Shift;
+use App\Modules\Hr\Models\JobTitle;
+use App\Modules\Hr\Models\Department;
+use App\Modules\Hr\Models\Location;
+use App\Modules\Hr\Models\Shift;
 use App\Modules\Hr\Models\EmployeeWorkPattern;
 use App\Modules\Hr\Models\AttendancePolicy;
 
@@ -132,12 +132,12 @@ class EmployeePosition extends Model
 
     public function jobTitle()
     {
-        return $this->belongsTo(\App\Modules\Admin\Models\JobTitle::class, 'job_title_id', 'id');
+        return $this->belongsTo(\App\Modules\Hr\Models\JobTitle::class, 'job_title_id', 'id');
     }
 
     public function department()
     {
-        return $this->belongsTo(\App\Modules\Admin\Models\Department::class, 'department_id', 'id');
+        return $this->belongsTo(\App\Modules\Hr\Models\Department::class, 'department_id', 'id');
     }
 
     public function manager()
@@ -152,12 +152,12 @@ class EmployeePosition extends Model
 
     public function location()
     {
-        return $this->belongsTo(\App\Modules\Admin\Models\Location::class, 'location_id', 'id');
+        return $this->belongsTo(\App\Modules\Hr\Models\Location::class, 'location_id', 'id');
     }
 
     public function shift()
     {
-        return $this->belongsTo(\App\Modules\Admin\Models\Shift::class, 'shift_id', 'id');
+        return $this->belongsTo(\App\Modules\Hr\Models\Shift::class, 'shift_id', 'id');
     }
 
     public function employeeWorkPatterns()
@@ -181,7 +181,7 @@ class EmployeePosition extends Model
 
     public function company()
     {
-        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
+        return $this->belongsTo(\App\Modules\Hr\Models\Company::class, 'company_id', 'id');
     }
 
     /**
@@ -343,12 +343,12 @@ class EmployeePosition extends Model
 
             // Convert IDs to names where possible
             if ($field === 'job_title_id') {
-                $old = optional(\App\Modules\Admin\Models\JobTitle::find($old))->title ?? $old;
-                $new = optional(\App\Modules\Admin\Models\JobTitle::find($new))->title ?? $new;
+                $old = optional(\App\Modules\Hr\Models\JobTitle::find($old))->title ?? $old;
+                $new = optional(\App\Modules\Hr\Models\JobTitle::find($new))->title ?? $new;
                 $field = 'Job Title';
             } elseif ($field === 'department_id') {
-                $old = optional(\App\Modules\Admin\Models\Department::find($old))->name ?? $old;
-                $new = optional(\App\Modules\Admin\Models\Department::find($new))->name ?? $new;
+                $old = optional(\App\Modules\Hr\Models\Department::find($old))->name ?? $old;
+                $new = optional(\App\Modules\Hr\Models\Department::find($new))->name ?? $new;
                 $field = 'Department';
             } elseif ($field === 'manager_id') {
                 $old = optional(\App\Modules\Hr\Models\Employee::find($old))->full_name ?? $old;

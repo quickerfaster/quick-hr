@@ -12,7 +12,7 @@ return [
       'filterable' => true,
       'searchable' => true,
       'relationship' => [
-        'model' => 'App\Modules\Admin\Models\Company',
+        'model' => 'App\Modules\Hr\Models\Company',
         'type' => 'belongsTo',
         'display_field' => 'name',
         'dynamic_property' => 'company',
@@ -20,7 +20,7 @@ return [
         'inlineAdd' => false,
       ],
       'options' => [
-        'model' => 'App\Modules\Admin\Models\Company',
+        'model' => 'App\Modules\Hr\Models\Company',
         'column' => 'name',
         'hintField' => '',
       ],
@@ -56,7 +56,7 @@ return [
       'filterable' => true,
       'searchable' => true,
       'relationship' => [
-        'model' => 'App\Modules\Admin\Models\Shift',
+        'model' => 'App\Modules\Hr\Models\Shift',
         'type' => 'belongsTo',
         'display_field' => 'name',
         'dynamic_property' => 'shift',
@@ -64,7 +64,7 @@ return [
         'inlineAdd' => false,
       ],
       'options' => [
-        'model' => 'App\Modules\Admin\Models\Shift',
+        'model' => 'App\Modules\Hr\Models\Shift',
         'column' => 'name',
         'hintField' => 'start_time,end_time',
       ],
@@ -593,7 +593,7 @@ return [
     ],
     'shift' => [
       'type' => 'belongsTo',
-      'model' => 'App\Modules\Admin\Models\Shift',
+      'model' => 'App\Modules\Hr\Models\Shift',
       'foreignKey' => 'shift_id',
       'localKey' => '',
     ],

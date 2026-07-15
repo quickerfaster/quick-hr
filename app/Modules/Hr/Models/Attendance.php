@@ -12,7 +12,7 @@ use App\Modules\Hr\Models\Employee;
 use App\Modules\Hr\Models\AttendanceSession;
 use App\Modules\Hr\Models\AttendanceAdjustment;
 use App\Modules\Hr\Models\LeaveRequest;
-use App\Modules\Admin\Models\Shift;
+use App\Modules\Hr\Models\Shift;
 use App\Modules\Hr\Models\AttendancePolicy;
 use App\Modules\Hr\Models\WorkPattern;
 
@@ -152,7 +152,7 @@ class Attendance extends Model
 
     public function shift()
     {
-        return $this->belongsTo(\App\Modules\Admin\Models\Shift::class, 'shift_id', 'id');
+        return $this->belongsTo(\App\Modules\Hr\Models\Shift::class, 'shift_id', 'id');
     }
 
     public function attendancePolicy()
@@ -167,7 +167,7 @@ class Attendance extends Model
 
     public function company()
     {
-        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
+        return $this->belongsTo(\App\Modules\Hr\Models\Company::class, 'company_id', 'id');
     }
 
     /**

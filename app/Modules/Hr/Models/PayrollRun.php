@@ -11,7 +11,7 @@ use Illuminate\Validation\ValidationException;
 use App\Modules\Hr\Models\PaySchedule;
 use App\Modules\Hr\Models\PayrollPayslip;
 use App\Modules\Hr\Models\PayrollRunAdjustment;
-use App\Modules\Admin\Models\User;
+use App\Modules\Hr\Models\User;
 use QuickerFaster\UILibrary\Traits\Approvals\HasApproval;
 use Illuminate\Database\Eloquent\Model;
 
@@ -153,12 +153,12 @@ class PayrollRun extends Model
 
     public function approvedByUser()
     {
-        return $this->belongsTo(\App\Modules\Admin\Models\User::class, 'approved_by_user_id', 'id');
+        return $this->belongsTo(\App\Modules\Hr\Models\User::class, 'approved_by_user_id', 'id');
     }
 
     public function company()
     {
-        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
+        return $this->belongsTo(\App\Modules\Hr\Models\Company::class, 'company_id', 'id');
     }
 
     /**

@@ -72,7 +72,7 @@ return [
       'editable' => true,
       'editable_mode' => 'modal',
       'relationship' => [
-        'model' => 'App\Modules\Admin\Models\Company',
+        'model' => 'App\Modules\Hr\Models\Company',
         'type' => 'belongsTo',
         'display_field' => 'name',
         'dynamic_property' => 'company',
@@ -80,7 +80,7 @@ return [
         'inlineAdd' => false,
       ],
       'options' => [
-        'model' => 'App\Modules\Admin\Models\Company',
+        'model' => 'App\Modules\Hr\Models\Company',
         'column' => 'name',
         'hintField' => '',
       ],
@@ -389,7 +389,7 @@ return [
     ],
     'company' => [
       'type' => 'belongsTo',
-      'model' => 'App\Modules\Admin\Models\Company',
+      'model' => 'App\Modules\Hr\Models\Company',
       'foreignKey' => 'company_id',
       'localKey' => '',
     ],

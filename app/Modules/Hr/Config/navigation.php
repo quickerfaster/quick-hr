@@ -2,6 +2,13 @@
 
 return [
     'context_groups' => [
+        'Company Profile' => [
+            'label' => 'Company Profile',
+            'icon' => 'fas fa-building',
+            'order' => 1,
+            'route' => NULL,
+            'url' => 'hr/dashboard-company-profile-overview',
+        ],
         'policies' => [
             'label' => 'Policies',
             'icon' => 'fas fa-gavel',
@@ -46,6 +53,44 @@ return [
         ],
     ],
     'contexts' => [
+        'Company Profile' => [
+            [
+                'key' => 'company_profile_overview',
+                'label' => 'Overview',
+                'icon' => 'fas fa-chart-bar',
+                'route' => '/hr/dashboard-company-profile-overview',
+                'permission' => 'view_company_profile_overview',
+                'order' => 1,
+                'page_title' => NULL,
+            ],
+            [
+                'key' => 'location',
+                'label' => 'Locations',
+                'icon' => 'fas fa-map-marker-alt',
+                'route' => '/hr/locations',
+                'permission' => 'view_location',
+                'order' => 2,
+                'page_title' => NULL,
+            ],
+            [
+                'key' => 'company',
+                'label' => 'Companies',
+                'icon' => 'fas fa-building',
+                'route' => '/hr/companies',
+                'permission' => 'manage-system',
+                'order' => 3,
+                'page_title' => NULL,
+            ],
+            [
+                'key' => 'department',
+                'label' => 'Departments',
+                'icon' => 'fas fa-sitemap',
+                'route' => '/hr/departments',
+                'permission' => 'view_department',
+                'order' => 4,
+                'page_title' => NULL,
+            ],
+        ],
         'policies' => [
             [
                 'key' => 'attendance_policy',
@@ -184,6 +229,15 @@ return [
                 'route' => '/hr/employee-positions',
                 'permission' => 'view_employee_position',
                 'order' => 4,
+                'page_title' => NULL,
+            ],
+            [
+                'key' => 'job_title',
+                'label' => 'Job Titles',
+                'icon' => 'fas fa-briefcase',
+                'route' => '/hr/job-titles',
+                'permission' => 'view_job_title',
+                'order' => 10,
                 'page_title' => NULL,
             ],
         ],
@@ -379,6 +433,15 @@ return [
                 'route' => '/hr/holidays',
                 'permission' => 'view_holiday',
                 'order' => 3,
+                'page_title' => NULL,
+            ],
+            [
+                'key' => 'shift',
+                'label' => 'Shifts',
+                'icon' => 'fas fa-calendar-day',
+                'route' => '/hr/shifts',
+                'permission' => 'view_shift',
+                'order' => 6,
                 'page_title' => NULL,
             ],
         ],

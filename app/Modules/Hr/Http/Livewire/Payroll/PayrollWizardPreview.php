@@ -14,9 +14,9 @@ use App\Modules\Hr\Jobs\Payrolls\ProcessPayrollRun;
 
 
 
-use App\Modules\Admin\Models\Company;
-use App\Modules\Admin\Models\Department;
-use App\Modules\Admin\Models\Location;
+use App\Modules\Hr\Models\Company;
+use App\Modules\Hr\Models\Department;
+use App\Modules\Hr\Models\Location;
 
 class PayrollWizardPreview extends Component
 {

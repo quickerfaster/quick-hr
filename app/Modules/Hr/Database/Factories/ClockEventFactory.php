@@ -3,7 +3,7 @@
 namespace App\Modules\Hr\Database\Factories;
 
 use App\Modules\Hr\Models\ClockEvent;
-use App\Modules\Admin\Models\Company;
+use App\Modules\Hr\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ClockEventFactory extends Factory

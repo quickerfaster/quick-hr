@@ -34,7 +34,7 @@ return [
       'filterable' => true,
       'searchable' => true,
       'relationship' => [
-        'model' => 'App\Modules\Admin\Models\Company',
+        'model' => 'App\Modules\Hr\Models\Company',
         'type' => 'belongsTo',
         'display_field' => 'name',
         'dynamic_property' => 'company',
@@ -42,7 +42,7 @@ return [
         'inlineAdd' => false,
       ],
       'options' => [
-        'model' => 'App\Modules\Admin\Models\Company',
+        'model' => 'App\Modules\Hr\Models\Company',
         'column' => 'name',
         'hintField' => '',
       ],
@@ -56,7 +56,7 @@ return [
       'filterable' => true,
       'searchable' => true,
       'relationship' => [
-        'model' => 'App\Modules\Admin\Models\JobTitle',
+        'model' => 'App\Modules\Hr\Models\JobTitle',
         'type' => 'belongsTo',
         'display_field' => 'title',
         'dynamic_property' => 'jobTitle',
@@ -64,7 +64,7 @@ return [
         'inlineAdd' => false,
       ],
       'options' => [
-        'model' => 'App\Modules\Admin\Models\JobTitle',
+        'model' => 'App\Modules\Hr\Models\JobTitle',
         'column' => 'title',
         'hintField' => '',
       ],
@@ -80,7 +80,7 @@ return [
       'validation' => 'required|integer|exists:departments,id',
       'filterable' => true,
       'relationship' => [
-        'model' => 'App\Modules\Admin\Models\Department',
+        'model' => 'App\Modules\Hr\Models\Department',
         'type' => 'belongsTo',
         'display_field' => 'name',
         'dynamic_property' => 'department',
@@ -88,7 +88,7 @@ return [
         'inlineAdd' => false,
       ],
       'options' => [
-        'model' => 'App\Modules\Admin\Models\Department',
+        'model' => 'App\Modules\Hr\Models\Department',
         'column' => 'name',
         'hintField' => '',
       ],
@@ -247,7 +247,7 @@ return [
       'validation' => 'required|integer',
       'filterable' => true,
       'relationship' => [
-        'model' => 'App\Modules\Admin\Models\Location',
+        'model' => 'App\Modules\Hr\Models\Location',
         'type' => 'belongsTo',
         'display_field' => 'name',
         'dynamic_property' => 'location',
@@ -255,7 +255,7 @@ return [
         'inlineAdd' => false,
       ],
       'options' => [
-        'model' => 'App\Modules\Admin\Models\Location',
+        'model' => 'App\Modules\Hr\Models\Location',
         'column' => 'name',
         'hintField' => '',
       ],
@@ -267,7 +267,7 @@ return [
       'label' => 'Shift',
       'validation' => 'nullable|integer',
       'relationship' => [
-        'model' => 'App\Modules\Admin\Models\Shift',
+        'model' => 'App\Modules\Hr\Models\Shift',
         'type' => 'belongsTo',
         'display_field' => 'name',
         'dynamic_property' => 'shift',
@@ -275,7 +275,7 @@ return [
         'inlineAdd' => false,
       ],
       'options' => [
-        'model' => 'App\Modules\Admin\Models\Shift',
+        'model' => 'App\Modules\Hr\Models\Shift',
         'column' => 'name',
         'hintField' => '',
       ],
@@ -481,13 +481,13 @@ return [
     ],
     'jobTitle' => [
       'type' => 'belongsTo',
-      'model' => 'App\Modules\Admin\Models\JobTitle',
+      'model' => 'App\Modules\Hr\Models\JobTitle',
       'foreignKey' => 'job_title_id',
       'localKey' => '',
     ],
     'department' => [
       'type' => 'belongsTo',
-      'model' => 'App\Modules\Admin\Models\Department',
+      'model' => 'App\Modules\Hr\Models\Department',
       'foreignKey' => 'department_id',
       'localKey' => '',
     ],
@@ -505,13 +505,13 @@ return [
     ],
     'location' => [
       'type' => 'belongsTo',
-      'model' => 'App\Modules\Admin\Models\Location',
+      'model' => 'App\Modules\Hr\Models\Location',
       'foreignKey' => 'location_id',
       'localKey' => '',
     ],
     'shift' => [
       'type' => 'belongsTo',
-      'model' => 'App\Modules\Admin\Models\Shift',
+      'model' => 'App\Modules\Hr\Models\Shift',
       'foreignKey' => 'shift_id',
       'localKey' => '',
     ],

@@ -104,7 +104,7 @@ class ActivityLog extends Model
 
     public function company()
     {
-        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
+        return $this->belongsTo(\App\Modules\Hr\Models\Company::class, 'company_id', 'id');
     }
 
     public function causer()

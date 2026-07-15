@@ -4,7 +4,7 @@ namespace App\Modules\Hr\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
-use App\Modules\Admin\Models\JobTitle;
+use App\Modules\Hr\Models\JobTitle;
 
 class JobTitleSeeder extends Seeder
 {

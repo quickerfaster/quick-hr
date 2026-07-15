@@ -13,7 +13,7 @@ use App\Modules\Hr\Models\{
     AttendanceSession,
     PolicyAssignment
 };
-use App\Modules\Admin\Models\Shift;
+use App\Modules\Hr\Models\Shift;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
@@ -380,7 +380,7 @@ class AttendanceCalculator
 
 
 
-    public function getApplicablePolicy(EmployeePosition $position, Carbon $date, ?\App\Modules\Admin\Models\Shift $shift = null): ?AttendancePolicy
+    public function getApplicablePolicy(EmployeePosition $position, Carbon $date, ?\App\Modules\Hr\Models\Shift $shift = null): ?AttendancePolicy
     {
         // Priority 1: Employee-specific policy (direct override)
         if ($position->attendance_policy_id) {
@@ -392,28 +392,28 @@ class AttendanceCalculator
 
         // Priority 2: Shift-specific policy (only via PolicyAssignment)
         if ($shift) {
-            $policy = $this->getPolicyForEntity(\App\Modules\Admin\Models\Shift::class, $shift->id, $date);
+            $policy = $this->getPolicyForEntity(\App\Modules\Hr\Models\Shift::class, $shift->id, $date);
             if ($policy)
                 return $policy;
         }
 
         // Priority 3: Department policy
         if ($position->department) {
-            $policy = $this->getPolicyForEntity(\App\Modules\Admin\Models\Department::class, $position->department->id, $date);
+            $policy = $this->getPolicyForEntity(\App\Modules\Hr\Models\Department::class, $position->department->id, $date);
             if ($policy)
                 return $policy;
         }
 
         // Priority 4: Location policy
         if ($position->location) {
-            $policy = $this->getPolicyForEntity(\App\Modules\Admin\Models\Location::class, $position->location->id, $date);
+            $policy = $this->getPolicyForEntity(\App\Modules\Hr\Models\Location::class, $position->location->id, $date);
             if ($policy)
                 return $policy;
         }
 
         // Priority 5: Company policy
         if ($position->department && $position->department->company) {
-            $policy = $this->getPolicyForEntity(\App\Modules\Admin\Models\Company::class, $position->department->company->id, $date);
+            $policy = $this->getPolicyForEntity(\App\Modules\Hr\Models\Company::class, $position->department->company->id, $date);
             if ($policy)
                 return $policy;
         }
@@ -433,7 +433,7 @@ class AttendanceCalculator
     /**
      * Fetch a policy assigned to a specific entity (company, location, department, shift).
      *
-     * @param string $modelClass Fully qualified model class (e.g., 'App\Modules\Admin\Models\Company')
+     * @param string $modelClass Fully qualified model class (e.g., 'App\Modules\Hr\Models\Company')
      * @param int $id
      * @param Carbon $date
      * @return AttendancePolicy|null
@@ -543,7 +543,7 @@ class AttendanceCalculator
         $dayOfWeek = $date->dayOfWeekIso; // 1=Monday, 7=Sunday
 
         // Priority 1: Specific ShiftSchedule for the date
-        $shiftSchedule = \App\Modules\Admin\Models\ShiftSchedule::where('employee_id', $employee->id)
+        $shiftSchedule = \App\Modules\Hr\Models\ShiftSchedule::where('employee_id', $employee->id)
             ->whereDate('schedule_date', $dateString)
             ->where('is_published', true)
             ->first();

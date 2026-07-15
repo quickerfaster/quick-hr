@@ -18,8 +18,8 @@ use App\Modules\Hr\Models\{
     ShiftSchedule
 };
 use App\Modules\Hr\Services\AttendanceCalculator;
-use App\Modules\Admin\Models\Shift;
-use App\Modules\Admin\Models\Location;
+use App\Modules\Hr\Models\Shift;
+use App\Modules\Hr\Models\Location;
 
 
 class AttendanceCalculatorTest extends TestCase

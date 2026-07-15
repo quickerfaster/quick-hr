@@ -410,10 +410,10 @@ class PayrollCalculator
         // 1. Get assignments (with their policies)
         $assignments = PayrollPolicyAssignment::with('payrollPolicy')
             ->whereIn('assignable_type', [
-                'App\Modules\Admin\Models\Company',
-                'App\Modules\Admin\Models\Location',
-                'App\Modules\Admin\Models\Department',
-                'App\Modules\Admin\Models\Shift',
+                'App\Modules\Hr\Models\Company',
+                'App\Modules\Hr\Models\Location',
+                'App\Modules\Hr\Models\Department',
+                'App\Modules\Hr\Models\Shift',
                 'App\Modules\Hr\Models\EmployeeGroup',
             ])
             ->where(function ($q) use ($position) {
@@ -424,16 +424,16 @@ class PayrollCalculator
                 $employeeGroupId = $position->employee->employee_group_id;
 
                 $q->where(function ($q2) use ($companyId) {
-                    $q2->where('assignable_type', 'App\Modules\Admin\Models\Company')
+                    $q2->where('assignable_type', 'App\Modules\Hr\Models\Company')
                         ->where('assignable_id', $companyId);
                 })->orWhere(function ($q2) use ($locationId) {
-                    $q2->where('assignable_type', 'App\Modules\Admin\Models\Location')
+                    $q2->where('assignable_type', 'App\Modules\Hr\Models\Location')
                         ->where('assignable_id', $locationId);
                 })->orWhere(function ($q2) use ($departmentId) {
-                    $q2->where('assignable_type', 'App\Modules\Admin\Models\Department')
+                    $q2->where('assignable_type', 'App\Modules\Hr\Models\Department')
                         ->where('assignable_id', $departmentId);
                 })->orWhere(function ($q2) use ($shiftId) {
-                    $q2->where('assignable_type', 'App\Modules\Admin\Models\Shift')
+                    $q2->where('assignable_type', 'App\Modules\Hr\Models\Shift')
                         ->where('assignable_id', $shiftId);
                 })->orWhere(function ($q2) use ($employeeGroupId) {
                     $q2->where('assignable_type', 'App\Modules\Hr\Models\EmployeeGroup')
@@ -449,10 +449,10 @@ class PayrollCalculator
 
         // 2. Get IDs of policies that have ANY assignment (not just those that match this employee)
         $assignedPolicyIds = PayrollPolicyAssignment::whereIn('assignable_type', [
-            'App\Modules\Admin\Models\Company',
-            'App\Modules\Admin\Models\Location',
-            'App\Modules\Admin\Models\Department',
-            'App\Modules\Admin\Models\Shift',
+            'App\Modules\Hr\Models\Company',
+            'App\Modules\Hr\Models\Location',
+            'App\Modules\Hr\Models\Department',
+            'App\Modules\Hr\Models\Shift',
             'App\Modules\Hr\Models\EmployeeGroup',
         ])
             ->where('effective_date', '<=', $this->run->period_end)

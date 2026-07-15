@@ -2,8 +2,8 @@
 
 namespace App\Modules\Hr\Database\Factories;
 
-use App\Modules\Admin\Models\JobTitle;
-use App\Modules\Admin\Models\Company;
+use App\Modules\Hr\Models\JobTitle;
+use App\Modules\Hr\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class JobTitleFactory extends Factory

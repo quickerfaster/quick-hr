@@ -19,10 +19,4 @@ return [
     'url' => 'admin/admin/general-settings',
     'permission' => 'view_system_setting',
 ],
-    [
-    'title' => 'Company Locations',
-    'icon' => 'fas fa-building',
-    'url' => 'admin/admin/dashboard-company-profile-overview',
-    'permission' => 'view_location',
-],
 ];

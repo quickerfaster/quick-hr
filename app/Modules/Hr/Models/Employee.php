@@ -12,7 +12,7 @@ use App\Modules\Hr\Models\EmployeePosition;
 use App\Modules\Hr\Models\EmployeeJobHistory;
 use App\Modules\Hr\Models\EmployeePayrollProfile;
 use App\Modules\Hr\Models\EmployeeProfile;
-use App\Modules\Admin\Models\Company;
+use App\Modules\Hr\Models\Company;
 use App\Modules\Hr\Models\Document;
 use App\Modules\Hr\Models\EmployeeWorkPattern;
 use App\Models\User;
@@ -129,7 +129,7 @@ class Employee extends Model
 
     public function company()
     {
-        return $this->belongsTo(\App\Modules\Admin\Models\Company::class, 'company_id', 'id');
+        return $this->belongsTo(\App\Modules\Hr\Models\Company::class, 'company_id', 'id');
     }
 
     public function documents()

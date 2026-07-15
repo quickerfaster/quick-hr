@@ -10,7 +10,7 @@ use App\Modules\Hr\Models\{
     PolicyAssignment, ClockEvent, Attendance, AttendanceSession, ShiftSchedule
 };
 use App\Modules\Hr\Services\AttendanceCalculator;
-use App\Modules\Admin\Models\Shift;
+use App\Modules\Hr\Models\Shift;
 
 class AttendanceCalculatorStatusTest extends TestCase
 {

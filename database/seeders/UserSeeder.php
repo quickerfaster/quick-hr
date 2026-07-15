@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User; // Since it extednds App\Modules\Admin\Models\User
 use App\Modules\Admin\Models\Role;
-use App\Modules\Admin\Models\Company;
+use App\Modules\Hr\Models\Company;
 
 
 class UserSeeder extends Seeder

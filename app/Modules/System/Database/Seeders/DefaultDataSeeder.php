@@ -5,12 +5,12 @@ namespace App\Modules\System\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 
-use App\Modules\Admin\Models\Company;
-use App\Modules\Admin\Models\Shift;
+use App\Modules\Hr\Models\Company;
+use App\Modules\Hr\Models\Shift;
 use App\Modules\Hr\Models\WorkPattern;
 use App\Modules\Hr\Models\AttendancePolicy;
-use App\Modules\Admin\Models\Location;
-use App\Modules\Admin\Models\Department;
+use App\Modules\Hr\Models\Location;
+use App\Modules\Hr\Models\Department;
 
 class DefaultDataSeeder extends Seeder
 {

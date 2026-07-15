@@ -1,6 +1,6 @@
 @php
     // Find employee linked to the logged-in user
-    //$user = App\Modules\Admin\Models\User::find(Auth::id())->first(); //->firstOrFail();
+    //$user = App\Modules\Hr\Models\User::find(Auth::id())->first(); //->firstOrFail();
     if (!auth()->user()) {
         abort(403, 'You are not assigned login record. Please contact HR Office.');
     }

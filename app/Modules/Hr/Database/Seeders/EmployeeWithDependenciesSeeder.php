@@ -7,11 +7,11 @@ use App\Modules\Hr\Models\Employee;
 use App\Modules\Hr\Models\EmployeePosition;
 use App\Modules\Hr\Models\EmployeePayrollProfile;
 use App\Modules\Hr\Models\PaySchedule;
-use App\Modules\Admin\Models\Department;
-use App\Modules\Admin\Models\JobTitle;
-use App\Modules\Admin\Models\Company;
-use App\Modules\Admin\Models\Location;
-use App\Modules\Admin\Models\Shift;
+use App\Modules\Hr\Models\Department;
+use App\Modules\Hr\Models\JobTitle;
+use App\Modules\Hr\Models\Company;
+use App\Modules\Hr\Models\Location;
+use App\Modules\Hr\Models\Shift;
 use App\Modules\Hr\Models\AttendancePolicy;
 use Illuminate\Support\Facades\DB;
 

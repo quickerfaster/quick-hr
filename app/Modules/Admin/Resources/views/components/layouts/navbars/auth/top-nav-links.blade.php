@@ -33,14 +33,5 @@
         <span>General Settings</span>
     </a>
 </li>
-<li class="nav-item">
-    <a href="/admin/admin/dashboard-company-profile-overview"
-        class="nav-link @if(request()->is('admin/admin/dashboard-company-profile-overview') || request()->is('admin/admin/dashboard-company-profile-overview/*')) fw-bold text-primary @endif">
-        @if(request()->is('admin/admin/dashboard-company-profile-overview') || request()->is('admin/admin/dashboard-company-profile-overview/*'))
-            <i class="fas fas fa-building" aria-hidden="true"></i>
-        @endif
-        <span>Company Profile</span>
-    </a>
-</li>
 
 @include('admin::components.layouts.navbars.auth.top-nav-post-links')

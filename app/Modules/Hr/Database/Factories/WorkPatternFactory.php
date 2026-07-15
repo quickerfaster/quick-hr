@@ -2,7 +2,7 @@
 namespace App\Modules\Hr\Database\Factories;
 
 use App\Modules\Hr\Models\WorkPattern;
-use App\Modules\Admin\Models\Company;
+use App\Modules\Hr\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class WorkPatternFactory extends Factory
