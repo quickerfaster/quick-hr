@@ -24,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
         // morph type in Spatie permission tables (model_has_roles, etc.)
         Relation::morphMap([
             'user' => \App\Models\User::class,
+            'system' => \App\Modules\System\Models\System::class,
         ]);
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use App\Modules\Hr\Models\Employee;
+use QuickerFaster\UILibrary\Traits\HasSettings;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 class Company extends Model
 {
     use HasFactory;
+    use HasSettings;
 
     use SoftDeletes;
 
