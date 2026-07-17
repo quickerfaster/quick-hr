@@ -60,7 +60,7 @@ class AuthorizationService
         }
 
         // Public views that don't require permission or belongs to the user
-        if (in_array($view, ['dashboard', 'my-profile', 'my-account'])) {
+        if (in_array($view, ['dashboard', 'my-profile', 'my-account', 'my-preferences'])) {
             return true;
         }
 

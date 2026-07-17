@@ -2,12 +2,12 @@
 
 return [
     'context_groups' => [
-        'Company Profile' => [
-            'label' => 'Company Profile',
+        'Organization' => [
+            'label' => 'Organization',
             'icon' => 'fas fa-building',
-            'order' => 1,
+            'order' => 10000,
             'route' => NULL,
-            'url' => 'hr/dashboard-company-profile-overview',
+            'url' => 'hr/dashboard-organization-overview',
         ],
         'policies' => [
             'label' => 'Policies',
@@ -53,12 +53,12 @@ return [
         ],
     ],
     'contexts' => [
-        'Company Profile' => [
+        'Organization' => [
             [
                 'key' => 'company_profile_overview',
                 'label' => 'Overview',
                 'icon' => 'fas fa-chart-bar',
-                'route' => '/hr/dashboard-company-profile-overview',
+                'route' => '/hr/dashboard-organization-overview',
                 'permission' => 'view_company_profile_overview',
                 'order' => 1,
                 'page_title' => NULL,

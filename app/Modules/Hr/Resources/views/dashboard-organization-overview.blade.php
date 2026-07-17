@@ -1,20 +1,14 @@
-<div>
 <x-qf::navigation-layout
-    configKey="admin.dashboards.dashboard"
-    context="General Settings"
-    moduleName="admin"
+    configKey="hr.dashboards.dashboard_organization_overview"
+    context="Organization"
+    moduleName="hr"
     :overrides="[
         'top_bar' => ['enabled' => true],
         'breadcrumb' => ['enabled' => false],
         'title' => ['enabled' => false],
         'titleRow' => ['enabled' => false],
-        'context_menu' => ['enabled' => false],
+        'context_menu' => ['enabled' => true],
     ]"
 >
-
-<br /><br/>
-    <livewire:qf.settings-panel mode="system" />
-
+    <livewire:qf.dashboard config-key="hr.dashboards.dashboard_organization_overview" />
 </x-qf::navigation-layout>
-</div>
-

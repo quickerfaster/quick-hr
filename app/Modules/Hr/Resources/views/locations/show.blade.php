@@ -5,7 +5,7 @@
     $customComponent = !empty($config['detailComponent']) ? $config['detailComponent'] : 'qf.data-table-detail';
 @endphp
 
-<x-qf::navigation-layout configKey="hr.location" context="Company Profile" moduleName="hr" :overrides="[
+<x-qf::navigation-layout configKey="hr.location" context="Organization" moduleName="hr" :overrides="[
         'top_bar' => ['enabled' => true],
         'breadcrumb' => ['enabled' => false],
         'title' => ['enabled' => false],

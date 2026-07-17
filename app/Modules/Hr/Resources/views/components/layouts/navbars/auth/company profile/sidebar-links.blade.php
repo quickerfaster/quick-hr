@@ -1,6 +1,6 @@
 {{-- Sidebar Links for Admin --}}
 
-@include('admin::components.layouts.navbars.auth.company profile/sidebar-pre-links')
+@include('admin::components.layouts.navbars.auth.organization/sidebar-pre-links')
 
 {{-- Generated Links --}}
 {{-- Generated Links --}}
@@ -15,7 +15,7 @@
 {{-- Generated Links --}}
 {{-- Generated Links --}}
 <li class="nav-item text-nowrap">
-<a href="/hr/hr/dashboard-company-profile-overview" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
+<a href="/hr/hr/dashboard-organization-overview" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
 data-bs-placement="right" title="Overview">
 <i class="fas fa-chart-bar me-2"></i>
 @if ($state === 'full')
@@ -69,7 +69,7 @@ data-bs-placement="right" title="Shifts">
 </a>
 </li>
 <li class="nav-item text-nowrap">
-<a href="/hr/hr/dashboard-company-profile-overview" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
+<a href="/hr/hr/dashboard-organization-overview" class="nav-link d-flex align-items-center" data-bs-toggle="tooltip" wire:ignore.self
 data-bs-placement="right" title="Overview">
 <i class="fas fa-chart-bar me-2"></i>
 @if ($state === 'full')
@@ -123,4 +123,4 @@ data-bs-placement="right" title="Job Titles">
     </a>
 </li>
 
-@include('admin::components.layouts.navbars.auth.company profile/sidebar-post-links')
+@include('admin::components.layouts.navbars.auth.organization/sidebar-post-links')
