@@ -80,6 +80,7 @@ return [
       'field_type' => 'file',
       'label' => 'File',
       'validation' => 'required|file|max:10240',
+      'reactivity' => 'live'
     ],
     'uploaded_at' => [
       'display' => 'inline',

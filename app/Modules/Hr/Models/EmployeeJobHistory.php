@@ -31,7 +31,7 @@ class EmployeeJobHistory extends Model
 
 
     protected $fillable = [
-        'company_id', 'employee_id', 'effective_date', 'end_date', 'change_reason', 'notes', 'job_title', 'department', 'manager_name', 'pay_type', 'hourly_rate', 'base_salary', 'salary_currency', 'pay_frequency', 'employment_status', 'location', 'shift'
+        'company_id', 'employee_id', 'effective_date', 'end_date', 'change_reason', 'notes', 'job_title', 'department', 'manager_name', 'pay_type', 'hourly_rate', 'base_salary', 'salary_currency', 'pay_frequency', 'employment_status', 'location', 'shift', 'changed_by_user_id'
     ];
 
     protected $guarded = [
@@ -42,7 +42,8 @@ class EmployeeJobHistory extends Model
         'effective_date' => 'date',
         'end_date' => 'date',
         'hourly_rate' => 'decimal:2',
-        'base_salary' => 'decimal:2'
+        'base_salary' => 'decimal:2',
+        'changed_by_user_id' => 'integer'
     ];
 
     protected $attributes = [
@@ -107,6 +108,11 @@ class EmployeeJobHistory extends Model
     public function company()
     {
         return $this->belongsTo(\App\Modules\Hr\Models\Company::class, 'company_id', 'id');
+    }
+
+    public function changedByUser()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'changed_by_user_id', 'id');
     }
 
     /**

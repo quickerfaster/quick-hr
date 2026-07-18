@@ -28,12 +28,13 @@ return new class extends Migration
             $table->string('employment_status');
             $table->string('location')->nullable();
             $table->string('shift')->nullable();
+            $table->foreignId('changed_by_user_id')->nullable()->constrained('users')->nullOnDelete();
 
             			$table->index('employee_id');
-			$table->index('effective_date');
-			$table->index('change_reason');
-			$table->index('employment_status');
-			$table->index(['employee_id', 'effective_date']);
+   $table->index('effective_date');
+   $table->index('change_reason');
+   $table->index('employment_status');
+   $table->index(['employee_id', 'effective_date']);
 
             $table->timestamps();
         });

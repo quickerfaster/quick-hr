@@ -6,6 +6,7 @@ use App\Modules\Admin\Traits\HasCompanyScope;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use App\Modules\Hr\Models\Employee;
@@ -258,28 +259,24 @@ class EmployeePosition extends Model
                 return;
             }
 
-            // Build a snapshot of the *new* state (what the employee moves to)
-            $historyData = [
-                'employee_id' => $position->employee_id,
-                'job_title' => optional($position->jobTitle)->title,
-                'department' => optional($position->department)->name,
-                'manager_name' => optional($position->manager)->full_name, // assume accessor
-                'pay_type' => $position->pay_type,
-                'hourly_rate' => $position->hourly_rate,
-                'base_salary' => $position->base_salary,
-                'salary_currency' => $position->salary_currency,
-                'pay_frequency' => $position->pay_frequency,
-                'employment_status' => $position->employment_status,
-                'location' => optional($position->location)->name,
-                'shift' => optional($position->shift)->name,
-                'effective_date' => now()->toDateString(),
-                'change_reason' => self::determineReason($changes),
-                'notes' => self::buildDescription($changes),
-                'changed_by_user_id' => \Auth::id(),
-            ];
+            DB::transaction(function () use ($position, $changes) {
+                // Close the previous active history entry by setting its end_date
+                EmployeeJobHistory::where('employee_id', $position->employee_id)
+                    ->whereNull('end_date')
+                    ->orderBy('effective_date', 'desc')
+                    ->first()
+                    ?->update(['end_date' => now()->toDateString()]);
 
-            EmployeeJobHistory::create($historyData);
+                // Build a snapshot of the *new* state (what the employee moves to)
+                $historyData = self::buildHistorySnapshot($position, [
+                    'effective_date' => now()->toDateString(),
+                    'change_reason' => self::determineReason($changes),
+                    'notes' => self::buildDescription($changes),
+                    'changed_by_user_id' => \Auth::id(),
+                ]);
 
+                EmployeeJobHistory::create($historyData);
+            });
 
             // NEW: Sync company_id on Employee when department changes
             if ($position->isDirty('department_id')) {
@@ -289,14 +286,24 @@ class EmployeePosition extends Model
                     $position->employee->updateQuietly(['company_id' => $companyId]);
                 }
             }
-
-
         });
 
-
-
-        // Also handle creation (new EmployeePosition)
+        /**
+         * When a new position is created, record it as the initial job history entry.
+         */
         static::created(function (self $position) {
+            $historyData = self::buildHistorySnapshot($position, [
+                'effective_date' => now()->toDateString(),
+                'end_date' => null,
+                'change_reason' => 'New Hire / Initial Position',
+                'notes' => 'Initial position assignment as ' . (optional($position->jobTitle)->title ?? 'Unknown')
+                    . ' in ' . (optional($position->department)->name ?? 'Unknown'),
+                'changed_by_user_id' => \Auth::id(),
+            ]);
+
+            EmployeeJobHistory::create($historyData);
+
+            // Sync company_id on Employee from the department
             $department = $position->department;
             $companyId = $department?->company_id;
             if ($position->employee) {
@@ -304,8 +311,57 @@ class EmployeePosition extends Model
             }
         });
 
+        /**
+         * When a position is deleted (soft-deleted), record a final termination history entry.
+         */
+        static::deleted(function (self $position) {
+            DB::transaction(function () use ($position) {
+                // Close the previous active history entry
+                EmployeeJobHistory::where('employee_id', $position->employee_id)
+                    ->whereNull('end_date')
+                    ->orderBy('effective_date', 'desc')
+                    ->first()
+                    ?->update(['end_date' => now()->toDateString()]);
 
+                $historyData = self::buildHistorySnapshot($position, [
+                    'effective_date' => now()->toDateString(),
+                    'end_date' => now()->toDateString(),
+                    'change_reason' => 'Termination / Position Ended',
+                    'notes' => 'Position ' . (optional($position->jobTitle)->title ?? 'Unknown')
+                        . ' in ' . (optional($position->department)->name ?? 'Unknown') . ' ended',
+                    'changed_by_user_id' => \Auth::id(),
+                ]);
 
+                EmployeeJobHistory::create($historyData);
+            });
+        });
+    }
+
+    /**
+     * Build a snapshot data array for an EmployeeJobHistory record
+     * from the current state of the given position model.
+     *
+     * @param  self   $position
+     * @param  array  $additional  Extra key/value pairs to merge (e.g. effective_date, change_reason, notes)
+     * @return array
+     */
+    protected static function buildHistorySnapshot(self $position, array $additional = []): array
+    {
+        return array_merge([
+            'company_id'       => $position->company_id,
+            'employee_id'      => $position->employee_id,
+            'job_title'        => optional($position->jobTitle)->title,
+            'department'       => optional($position->department)->name,
+            'manager_name'     => optional($position->manager)->full_name,
+            'pay_type'         => $position->pay_type,
+            'hourly_rate'      => $position->hourly_rate,
+            'base_salary'      => $position->base_salary,
+            'salary_currency'  => $position->salary_currency,
+            'pay_frequency'    => $position->pay_frequency,
+            'employment_status'=> $position->employment_status,
+            'location'         => optional($position->location)->name,
+            'shift'            => optional($position->shift)->name,
+        ], $additional);
     }
 
     /**
