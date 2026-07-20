@@ -178,8 +178,8 @@ return [
   'tableDefaultFields' => [
     '0' => 'company_id',
     '1' => 'type',
-    '1' => 'label',
-    '2' => 'amount',
+    '2' => 'label',
+    '3' => 'amount',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,

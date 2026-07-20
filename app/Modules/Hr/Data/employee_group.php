@@ -132,9 +132,9 @@ return [
   'tableDefaultFields' => [
     '0' => 'company_id',
     '1' => 'name',
-    '1' => 'code',
-    '2' => 'group_type',
-    '3' => 'is_active',
+    '2' => 'code',
+    '3' => 'group_type',
+    '4' => 'is_active',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,

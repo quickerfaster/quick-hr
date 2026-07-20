@@ -13,6 +13,7 @@ use App\Modules\Hr\Models\Company;
 use App\Modules\Hr\Models\Employee;
 use Illuminate\Support\Facades\DB;
 use QuickerFaster\UILibrary\Traits\HasCurrencySymbol;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -48,15 +49,45 @@ class PayrollWizardAdjustments extends Component
     {
         $this->stepIndex = $stepIndex;
         $this->payrollRunId = $payrollRunId;
+
+        // Guard: verify the payroll run exists and is accessible
+        $run = PayrollRun::find($payrollRunId);
+
+        if (!$run) {
+            $run = PayrollRun::withoutCompanyScope()->find($payrollRunId);
+            if ($run && $run->company_id !== session('current_company_id')) {
+                session()->put('current_company_id', $run->company_id);
+                $run = PayrollRun::find($payrollRunId);
+            }
+        }
+
+        if (!$run) {
+            throw new \RuntimeException("Payroll run #{$payrollRunId} not found. It may have been deleted or is inaccessible.");
+        }
+
         $this->loadAdjustmentsCache();
-        $this->initializeAllTempAdjustments();  // <-- add this line
+        $this->initializeAllTempAdjustments();
 
     }
 
 
     protected function initializeAllTempAdjustments(): void
     {
-        $run = PayrollRun::findOrFail($this->payrollRunId);
+        $run = PayrollRun::find($this->payrollRunId);
+
+        if (!$run) {
+            $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
+            if ($run) {
+                Log::warning("PayrollWizardAdjustments: Company scope mismatch for payroll run #{$this->payrollRunId}. Found via withoutCompanyScope fallback.");
+            }
+        }
+
+        if (!$run) {
+            $this->dispatch('wizardError', 'The payroll run could not be found. It may have been deleted.');
+            $this->dispatch('redirectToWizardStart');
+            return;
+        }
+
         $allEmployeeIds = EmployeePosition::where('pay_schedule_id', $run->pay_schedule_id)
             ->pluck('employee_id');
 
@@ -287,10 +318,15 @@ class PayrollWizardAdjustments extends Component
         ]);
     }
 
-
+    public function hydrate(): void
+    {
+        if ($this->payrollRunId && !PayrollRun::where('id', $this->payrollRunId)->exists()) {
+            $this->dispatch('wizardError', 'The payroll run session has expired or the record was deleted.');
+            $this->dispatch('redirectToWizardStart');
+        }
+    }
 
 }
-
 
 
 

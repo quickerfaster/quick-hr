@@ -321,9 +321,9 @@ return [
   'tableDefaultFields' => [
     '0' => 'company_id',
     '1' => 'employee_id',
-    '1' => 'pay_schedule_id',
-    '2' => 'payment_method',
-    '3' => 'is_active',
+    '2' => 'pay_schedule_id',
+    '3' => 'payment_method',
+    '4' => 'is_active',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,

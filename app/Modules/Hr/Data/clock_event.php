@@ -192,9 +192,9 @@ return [
   'tableDefaultFields' => [
     '0' => 'company_id',
     '1' => 'employee_id',
-    '1' => 'event_type',
-    '2' => 'timestamp',
-    '3' => 'method',
+    '2' => 'event_type',
+    '3' => 'timestamp',
+    '4' => 'method',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,

@@ -7,7 +7,9 @@ use App\Modules\Hr\Models\PaySchedule;
 use App\Modules\Hr\Models\PayrollRun;
 use App\Modules\Hr\Models\PayrollRunAdjustment;
 use App\Modules\Hr\Models\PayrollPayslip;
+use App\Modules\Hr\Models\Company;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PayrollRunWizard extends Component
 {
@@ -18,6 +20,7 @@ class PayrollRunWizard extends Component
     public $period_start = null;
     public $period_end = null;
     public array $stepData = [];
+    public $companyId = null;
 
     public bool $isProcessing = false;
 
@@ -34,7 +37,7 @@ class PayrollRunWizard extends Component
 
     public function mount($payrollRunId = null)
     {
-        
+
         $wizardId = $this->getWizardId();
         if (session()->has($wizardId)) {
             $data = session()->get($wizardId);
@@ -78,6 +81,16 @@ class PayrollRunWizard extends Component
         ]);
     }
 
+    public function getCompaniesProperty()
+    {
+        return Company::all();
+    }
+
+    public function isAllCompaniesMode(): bool
+    {
+        return session('current_company_id') === 0;
+    }
+
     public function goToStep($step)
     {
         $this->currentStep = $step;
@@ -87,12 +100,18 @@ class PayrollRunWizard extends Component
 
     public function goToStep2()
 {
-    $this->validate([
+    $rules = [
         'pay_schedule_id' => 'required|exists:pay_schedules,id',
         'period_start' => 'required|date',
         'period_end' => 'required|date|after:period_start',
         'title' => 'required|unique:payroll_runs,title,' . $this->payrollRunId,
-    ]);
+    ];
+
+    if ($this->isAllCompaniesMode()) {
+        $rules['companyId'] = 'required|integer|exists:companies,id';
+    }
+
+    $this->validate($rules);
 
     DB::transaction(function () {
         if (!$this->payrollRunId) {
@@ -104,6 +123,7 @@ class PayrollRunWizard extends Component
                 'calculation_status' => 'pending',
                 'current_step' => 2,
                 'title' => $this->title ?? "",
+                'company_id' => $this->isAllCompaniesMode() ? $this->companyId : session('current_company_id'),
             ]);
             $this->payrollRunId = $run->id;
             $this->stepData = ['payroll_run_id' => $run->id];
@@ -115,9 +135,17 @@ class PayrollRunWizard extends Component
                 'period_end' => $this->period_end,
                 'current_step' => 2,
                 'title' => $this->title ?? "",
+                'company_id' => $this->isAllCompaniesMode() ? $this->companyId : session('current_company_id'),
             ]);
         }
     });
+
+    Log::debug('PayrollRun goToStep2: record saved', [
+        'run_id' => $this->payrollRunId,
+        'run_company_id' => PayrollRun::find($this->payrollRunId)?->company_id,
+        'session_company_id' => session('current_company_id'),
+        'companyId' => $this->companyId,
+    ]);
 
     $this->currentStep = 2;
     $this->saveToSession();
@@ -139,7 +167,7 @@ class PayrollRunWizard extends Component
 public function finalize()
 {
     $run = PayrollRun::findOrFail($this->payrollRunId);
-    
+
     // Update run status (optional, can stay 'ready_for_review')
     $run->update([
         'status' => 'ready_for_review',
@@ -150,7 +178,7 @@ public function finalize()
     $configKey = 'hr.approvals.payroll_run_approval';
     $resolver = app(\QuickerFaster\UILibrary\Services\Config\Approvals\ApprovalConfigResolver::class, ['configKey' => $configKey]);
     $engine = app(\QuickerFaster\UILibrary\Services\Approvals\ApprovalEngine::class, ['configResolver' => $resolver]);
-    
+
     // Only start if not already under approval
     if (!$run->isUnderApproval()) {
         $engine->startApproval($run, auth()->user());

@@ -119,9 +119,9 @@ return [
   'tableDefaultFields' => [
     '0' => 'company_id',
     '1' => 'attendance_policy_id',
-    '1' => 'assignable_type',
-    '2' => 'assignable_id',
-    '3' => 'priority',
+    '2' => 'assignable_type',
+    '3' => 'assignable_id',
+    '4' => 'priority',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,

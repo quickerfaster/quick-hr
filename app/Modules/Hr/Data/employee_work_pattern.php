@@ -120,9 +120,9 @@ return [
   'tableDefaultFields' => [
     '0' => 'company_id',
     '1' => 'employee_id',
-    '1' => 'work_pattern_id',
-    '2' => 'start_date',
-    '3' => 'end_date',
+    '2' => 'work_pattern_id',
+    '3' => 'start_date',
+    '4' => 'end_date',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,

@@ -143,9 +143,9 @@ return [
   'tableDefaultFields' => [
     '0' => 'company_id',
     '1' => 'employee_id',
-    '1' => 'leave_type_id',
-    '2' => 'balance',
-    '3' => 'year',
+    '2' => 'leave_type_id',
+    '3' => 'balance',
+    '4' => 'year',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,

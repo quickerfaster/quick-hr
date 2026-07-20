@@ -87,6 +87,28 @@
                                 @enderror
                             </div>
                         </div>
+
+                        @if($this->isAllCompaniesMode())
+                        <div class="mb-3">
+                            <label for="companyId" class="form-label">Company <span class="text-danger">*</span></label>
+                            <select
+                                id="companyId"
+                                class="form-select @error('companyId') is-invalid @enderror"
+                                wire:model="companyId"
+                            >
+                                <option value="">-- Select Company --</option>
+                                @foreach($this->companies as $company)
+                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('companyId')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="form-text text-muted">
+                                You are viewing all companies. Please select the company this payroll run belongs to.
+                            </small>
+                        </div>
+                        @endif
                     </div>
 
                     {{-- STEP 2 --}}

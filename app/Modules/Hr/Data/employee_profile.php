@@ -267,9 +267,9 @@ return [
   'tableDefaultFields' => [
     '0' => 'company_id',
     '1' => 'employee_id',
-    '1' => 'preferred_name',
-    '2' => 'personal_email',
-    '3' => 'date_of_birth',
+    '2' => 'preferred_name',
+    '3' => 'personal_email',
+    '4' => 'date_of_birth',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,

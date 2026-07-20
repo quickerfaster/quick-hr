@@ -106,8 +106,8 @@ return [
   'tableDefaultFields' => [
     '0' => 'company_id',
     '1' => 'name',
-    '1' => 'color',
-    '2' => 'is_active',
+    '2' => 'color',
+    '3' => 'is_active',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,
