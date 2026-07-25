@@ -38,7 +38,10 @@ return [
             'driver' => 'database',
             'table' => 'jobs',
             'queue' => 'default',
-            'retry_after' => 7300, // 2 hours + 5 minutes buffer since the 7200 seconds/ 2hr was set
+            // MUST exceed the longest job timeout (ProcessPayrollRun::$timeout = 14400).
+            // If retry_after < timeout, the queue worker will re-release a still-running
+            // job, causing duplicate processing. 15000 = 4h 10min gives a 10-minute buffer.
+            'retry_after' => 15000,
             'after_commit' => false,
         ],
 

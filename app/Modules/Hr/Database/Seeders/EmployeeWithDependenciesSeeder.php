@@ -22,7 +22,6 @@ class EmployeeWithDependenciesSeeder extends Seeder
      */
     protected $company;
 
-
     /**
      * Run the seeder.
      */
@@ -43,8 +42,7 @@ class EmployeeWithDependenciesSeeder extends Seeder
             $this->createDependencies();
 
             // Step 2: Create 5,000 employees with EMP0001..EMP5000 numbers
-            // Recommendation: Ensure createEmployees uses bulk insert or chunking inside
-            $employees = $this->createEmployees(5000);
+            $employees = $this->createEmployees(200);
 
             // Step 3: Create one active position for each employee
             $this->createPositionsForEmployees($employees);
@@ -59,34 +57,120 @@ class EmployeeWithDependenciesSeeder extends Seeder
 
     /**
      * Create all lookup tables that EmployeePosition and EmployeePayrollProfile reference.
+     * Uses firstOrCreate to be idempotent across multiple runs.
      */
     private function createDependencies(): void
     {
-        // Companies (each creates its own location via factory)
-        $companies = Company::factory()->count(3)->active()->create();
+        // Companies - use firstOrCreate to be idempotent
+        $companyNames = ['Acme Corporation', 'Globex Industries', 'Initech Solutions'];
+        $companies = collect();
+        foreach ($companyNames as $i => $name) {
+            $company = Company::firstOrCreate(
+                ['name' => $name],
+                [
+                    'subdomain' => strtolower(explode(' ', $name)[0]),
+                    'status' => 'active',
+                ]
+            );
+            $companies->push($company);
+        }
         $this->company = $companies->first();
 
         // Additional locations (not tied to a company, but can be used)
-        Location::factory()->count(5)->active()->create(['company_id' => $this->company->id]);
+        $locationConfigs = [
+            ['name' => 'Headquarters', 'code' => 'HQ', 'city' => 'New York', 'address_line_1' => '123 Main Street'],
+            ['name' => 'Branch Office A', 'code' => 'BRANCHA', 'city' => 'Los Angeles', 'address_line_1' => '456 Sunset Boulevard'],
+            ['name' => 'Branch Office B', 'code' => 'BRANCHB', 'city' => 'Chicago', 'address_line_1' => '789 Lake Shore Drive'],
+            ['name' => 'Remote Hub', 'code' => 'REMOTE', 'city' => 'Austin', 'address_line_1' => '321 Tech Park'],
+            ['name' => 'Warehouse', 'code' => 'WAREHSE', 'city' => 'Dallas', 'address_line_1' => '654 Industrial Way'],
+        ];
+        foreach ($locationConfigs as $loc) {
+            Location::firstOrCreate(
+                ['code' => $loc['code'], 'company_id' => $this->company->id],
+                [
+                    'name' => $loc['name'],
+                    'address_line_1' => $loc['address_line_1'],
+                    'city' => $loc['city'],
+                    'is_active' => true,
+                ]
+            );
+        }
 
         // Departments
-        Department::factory()->count(10)->create(['company_id' => $this->company->id]);
+        $departmentNames = [
+            'Human Resources', 'Finance', 'Engineering', 'Sales',
+            'Marketing', 'Operations', 'Legal', 'IT',
+            'Customer Support', 'Research & Development',
+        ];
+        foreach ($departmentNames as $name) {
+            Department::firstOrCreate(
+                ['name' => $name, 'company_id' => $this->company->id],
+                [
+                    'code' => strtoupper(substr(str_replace(' ', '', $name), 0, 6)),
+                    'is_active' => true,
+                ]
+            );
+        }
 
         // Job titles
-        JobTitle::factory()->count(20)->create(['company_id' => $this->company->id]);
+        $jobTitleNames = [
+            'Software Engineer', 'Product Manager', 'HR Officer', 'Accountant',
+            'Sales Representative', 'Marketing Specialist', 'Operations Manager',
+            'Legal Counsel', 'IT Support Specialist', 'Customer Service Agent',
+            'Senior Developer', 'Team Lead', 'Finance Analyst', 'Data Scientist',
+            'Business Analyst', 'Quality Assurance Engineer', 'DevOps Engineer',
+            'UX Designer', 'Content Writer', 'Project Manager',
+        ];
+        foreach ($jobTitleNames as $title) {
+            JobTitle::firstOrCreate(
+                ['title' => $title, 'company_id' => $this->company->id],
+                ['description' => $title . ' role']
+            );
+        }
 
         // Shifts
-        Shift::factory()->count(5)->create(['company_id' => $this->company->id]);
+        $shiftConfigs = [
+            ['name' => 'Day Shift', 'start_time' => '08:00:00', 'end_time' => '16:00:00'],
+            ['name' => 'Night Shift', 'start_time' => '16:00:00', 'end_time' => '00:00:00'],
+            ['name' => 'Swing Shift', 'start_time' => '12:00:00', 'end_time' => '20:00:00'],
+            ['name' => 'Morning Shift', 'start_time' => '06:00:00', 'end_time' => '14:00:00'],
+            ['name' => 'Evening Shift', 'start_time' => '14:00:00', 'end_time' => '22:00:00'],
+        ];
+        foreach ($shiftConfigs as $shift) {
+            Shift::firstOrCreate(
+                ['name' => $shift['name'], 'company_id' => $this->company->id],
+                [
+                    'code' => strtoupper(substr(str_replace(' ', '', $shift['name']), 0, 4)),
+                    'start_time' => $shift['start_time'],
+                    'end_time' => $shift['end_time'],
+                    'is_active' => true,
+                ]
+            );
+        }
 
         // Attendance policies
-        AttendancePolicy::factory()->count(5)->create(['company_id' => $this->company->id]);
+        $policyNames = ['Standard', 'Flexible', 'Strict', 'Remote', 'Executive'];
+        foreach ($policyNames as $policyName) {
+            AttendancePolicy::firstOrCreate(
+                ['name' => $policyName, 'company_id' => $this->company->id],
+                [
+                    'code' => strtoupper(substr($policyName, 0, 4)),
+                    'grace_period_minutes' => 15,
+                    'early_departure_grace_minutes' => 0,
+                    'applies_to_shift_categories' => json_encode(['regular']),
+                    'effective_date' => now()->startOfYear()->toDateString(),
+                    'is_active' => true,
+                ]
+            );
+        }
 
-        // Pay Schedules (since you don't have a factory yet, create manually)
+        // Pay Schedules
         $this->createPaySchedules();
     }
 
     /**
      * Create pay schedules directly because no factory is available.
+     * Uses firstOrCreate to be idempotent.
      */
     private function createPaySchedules(): void
     {
@@ -136,34 +220,47 @@ class EmployeeWithDependenciesSeeder extends Seeder
         ];
 
         foreach ($schedules as $schedule) {
-            PaySchedule::create($schedule);
+            PaySchedule::firstOrCreate(
+                ['name' => $schedule['name'], 'company_id' => $schedule['company_id']],
+                $schedule
+            );
         }
     }
 
     /**
      * Create employees with sequential employee numbers.
+     * Uses firstOrCreate to be idempotent.
      */
-    private function createEmployees(int $count): \Illuminate\Database\Eloquent\Collection
+    private function createEmployees(int $count): \Illuminate\Support\Collection
     {
-        $employeeNumbers = array_map(function ($i) {
-            return 'EMP' . str_pad($i, 4, '0', STR_PAD_LEFT);
-        }, range(1, $count));
+        $employees = collect();
 
-        $employees = Employee::factory()
-            ->count($count)
-            ->sequence(fn($sequence) => [
-                'employee_number' => $employeeNumbers[$sequence->index],
-                //'status' => 'Active', // assuming 'status' column exists – if not, remove this line
-            ])
-            ->create(['company_id' => $this->company->id]);
+        for ($i = 1; $i <= $count; $i++) {
+            $employeeNumber = 'EMP' . str_pad($i, 4, '0', STR_PAD_LEFT);
+
+            $employee = Employee::firstOrCreate(
+                ['employee_number' => $employeeNumber],
+                [
+                    'first_name' => fake()->firstName(),
+                    'last_name' => fake()->lastName(),
+                    'email' => fake()->unique()->safeEmail(),
+                    'phone' => fake()->phoneNumber(),
+                    'company_id' => $this->company->id,
+                    'hire_date' => fake()->dateTimeBetween('-5 years', 'now')->format('Y-m-d'),
+                ]
+            );
+
+            $employees->push($employee);
+        }
 
         return $employees;
     }
 
     /**
      * Create one EmployeePosition record per employee.
+     * Uses firstOrCreate to be idempotent.
      */
-    private function createPositionsForEmployees(\Illuminate\Database\Eloquent\Collection $employees): void
+    private function createPositionsForEmployees(\Illuminate\Support\Collection $employees): void
     {
         // Pre-fetch all dependency collections for random selection
         $jobTitles = JobTitle::all();
@@ -174,6 +271,12 @@ class EmployeeWithDependenciesSeeder extends Seeder
         $paySchedules = PaySchedule::all();
 
         foreach ($employees as $employee) {
+            // Check if position already exists for this employee
+            $existing = EmployeePosition::where('employee_id', $employee->id)->first();
+            if ($existing) {
+                continue;
+            }
+
             // Random selections
             $jobTitle = $jobTitles->random();
             $department = $departments->random();
@@ -187,9 +290,9 @@ class EmployeeWithDependenciesSeeder extends Seeder
             $baseSalary = $payType === 'salaried_full' ? fake()->randomFloat(2, 40000, 120000) : 0;
             $hourlyRate = $payType === 'hourly' ? fake()->randomFloat(2, 15, 50) : 0;
 
-            EmployeePosition::factory()
-                ->forEmployee($employee)
-                ->state([
+            EmployeePosition::firstOrCreate(
+                ['employee_id' => $employee->id],
+                [
                     'company_id' => $this->company->id,
                     'job_title_id' => $jobTitle->id,
                     'department_id' => $department->id,
@@ -203,50 +306,59 @@ class EmployeeWithDependenciesSeeder extends Seeder
                     'hourly_rate' => $hourlyRate,
                     'base_salary' => $baseSalary,
                     'salary_currency' => fake()->randomElement(['USD', 'EUR', 'GBP']),
-                    'pay_frequency' => $paySchedule->frequency, // match the schedule's frequency
+                    'pay_frequency' => $paySchedule->frequency,
                     'employment_status' => 'Active',
                     'cost_center' => fake()->optional(0.5)->bothify('CC-####'),
                     'work_email' => fake()->optional(0.8)->companyEmail(),
                     'work_phone_extension' => fake()->optional(0.3)->numerify('###'),
-                ])
-                ->create();
+                ]
+            );
         }
     }
 
     /**
      * Create one EmployeePayrollProfile per employee.
+     * Uses firstOrCreate to be idempotent.
      */
-    private function createPayrollProfilesForEmployees(\Illuminate\Database\Eloquent\Collection $employees): void
+    private function createPayrollProfilesForEmployees(\Illuminate\Support\Collection $employees): void
     {
         $paySchedules = PaySchedule::all();
 
         foreach ($employees as $employee) {
-            // Random pay schedule (could be same as position or different – up to you)
+            // Check if payroll profile already exists for this employee
+            $existing = EmployeePayrollProfile::where('employee_id', $employee->id)->first();
+            if ($existing) {
+                continue;
+            }
+
+            // Random pay schedule
             $paySchedule = $paySchedules->random();
 
-            EmployeePayrollProfile::create([
-                'company_id' => $this->company->id,
-                'employee_id' => $employee->id,
-                'pay_schedule_id' => $paySchedule->id,
-                'bank_account_name' => $employee->first_name . ' ' . $employee->last_name,
-                'bank_name' => fake()->company() . ' Bank',
-                'bank_account_number' => fake()->bankAccountNumber(),
-                'bank_routing_number' => fake()->regexify('[0-9]{9}'),
-                'bank_iban' => fake()->optional(0.5)->iban('US'),
-                'bank_swift' => fake()->optional(0.3)->swiftBicNumber(),
-                'account_type' => fake()->randomElement(['checking', 'savings']),
-                'payment_method' => 'bank_transfer',
-                'tax_filing_status' => fake()->randomElement(['single', 'married', 'head_of_household']),
-                'allowances' => fake()->numberBetween(0, 5),
-                'extra_withholding' => fake()->randomFloat(2, 0, 200),
-                'is_exempt_from_federal_tax' => fake()->boolean(10),
-                'override_country_code' => 'US',
-                'override_state_code' => fake()->stateAbbr(),
-                'currency_code' => 'USD',
-                'effective_date' => $employee->hire_date,
-                'expiry_date' => null,
-                'is_active' => true,
-            ]);
+            EmployeePayrollProfile::firstOrCreate(
+                ['employee_id' => $employee->id],
+                [
+                    'company_id' => $this->company->id,
+                    'pay_schedule_id' => $paySchedule->id,
+                    'bank_account_name' => $employee->first_name . ' ' . $employee->last_name,
+                    'bank_name' => fake()->company() . ' Bank',
+                    'bank_account_number' => fake()->bankAccountNumber(),
+                    'bank_routing_number' => fake()->regexify('[0-9]{9}'),
+                    'bank_iban' => fake()->optional(0.5)->iban('US'),
+                    'bank_swift' => fake()->optional(0.3)->swiftBicNumber(),
+                    'account_type' => fake()->randomElement(['checking', 'savings']),
+                    'payment_method' => 'bank_transfer',
+                    'tax_filing_status' => fake()->randomElement(['single', 'married', 'head_of_household']),
+                    'allowances' => fake()->numberBetween(0, 5),
+                    'extra_withholding' => fake()->randomFloat(2, 0, 200),
+                    'is_exempt_from_federal_tax' => fake()->boolean(10),
+                    'override_country_code' => 'US',
+                    'override_state_code' => fake()->stateAbbr(),
+                    'currency_code' => 'USD',
+                    'effective_date' => $employee->hire_date,
+                    'expiry_date' => null,
+                    'is_active' => true,
+                ]
+            );
         }
     }
 

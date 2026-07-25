@@ -35,6 +35,15 @@
             color: #666;
         }
 
+        .multi-company-badge {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 10pt;
+        }
+
         .company-details {
             margin-bottom: 20px;
             font-size: 9pt;
@@ -79,6 +88,10 @@
             padding: 6px 8px;
         }
 
+        .text-end {
+            text-align: right;
+        }
+
         .total-row {
             font-weight: bold;
             background-color: #ecf0f1;
@@ -102,10 +115,19 @@
             .no-print {
                 display: none;
             }
-
             body {
                 padding: 0;
                 margin: 0;
+            }
+            th {
+                background-color: #2c3e50 !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .multi-company-badge {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
         }
     </style>
@@ -115,10 +137,20 @@
     <div class="container">
         <div class="header">
             <h1>Payroll Run Summary</h1>
-            <p>{{ $run->paySchedule->name }} | {{ $run->period_start->format('M d, Y') }} –
-                {{ $run->period_end->format('M d, Y') }}</p>
-
-
+            <p>
+                @if($run->paySchedule)
+                    {{ $run->paySchedule->name }}
+                @elseif($run->is_multi_company)
+                    <span class="multi-company-badge">All Companies</span>
+                @else
+                    No Pay Schedule
+                @endif
+                | {{ $run->period_start->format('M d, Y') }} –
+                {{ $run->period_end->format('M d, Y') }}
+                @if($run->is_multi_company)
+                    <br><small>(Multi‑Company Run)</small>
+                @endif
+            </p>
 
             {{-- Sticky print/close buttons --}}
             <div class="no-print sticky-top bg-white pt-2 pb-2 border-bottom mb-3" style="top: 0; z-index: 1020;">
@@ -133,9 +165,8 @@
             </div>
         </div>
 
-
         <div class="company-details">
-            <strong>Company:</strong> {{ $companyName }}<br>
+            <strong>Company:</strong> {{ $companyName ?? (optional($run->company)->name ?? 'All Companies') }}<br>
             <strong>Run ID:</strong> #{{ $run->id }}<br>
             <strong>Status:</strong> {{ ucfirst($run->status) }}<br>
             <strong>Generated:</strong> {{ now()->format('F j, Y, g:i a') }}

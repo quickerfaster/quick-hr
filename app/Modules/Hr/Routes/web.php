@@ -96,23 +96,18 @@ Route::middleware([
 
 
 
-    Route::get('/payroll-run/{run}/print-summary', function (PayrollRun $run) {
-        $currencyCode = $run->paySchedule->currency_code ?? 'USD';
-        $currencySymbol = '₦'; // or use a helper to get symbol from code
-        $companyName = optional($run->paySchedule->company)->name ?? config('app.name');
+Route::get('/payroll-run/{run}/print-summary', function (PayrollRun $run) {
+    $currencyCode = $run->paySchedule?->currency_code ?? $run->base_currency ?? 'USD';
+    $companyName = $run->paySchedule?->company?->name ?? ($run->is_multi_company ? 'All Companies' : config('app.name', 'Quick HR'));
+    $currencySymbol = "N";
+    $run->load('payslips.employee');
 
-        // Load payslips with employee – use chunking? For print we can load all but if too many, paginate?
-        // For up to 5000 records, loading all is fine; beyond that, paginate in print view.
-        $run->load('payslips.employee');
-
-        return view('hr::livewire.payroll.print.payroll-run-summary', [
-            'run' => $run,
-            'currencySymbol' => $currencySymbol,
-            'companyName' => $companyName,
-        ]);
-    })->name('payroll-run.print-summary');
-
-
+    return view('hr::livewire.payroll.print.payroll-run-summary', [
+        'run' => $run,
+        'currencySymbol' => $currencySymbol,
+        'companyName' => $companyName,
+    ]);
+})->name('payroll-run.print-summary');
 
 
     Route::get('/payroll-run/{run}/summary-grouped/{group_by}', function (PayrollRun $run, $group_by) {

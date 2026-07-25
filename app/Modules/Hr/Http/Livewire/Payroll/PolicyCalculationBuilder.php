@@ -112,9 +112,6 @@ class PolicyCalculationBuilder extends Component
                 $this->bandErrors[$current['index']] = 'Overlap: bracket starts before previous bracket ends.';
             }
             if ($prev && $prev['end'] !== null && $currentStart != $prev['end']) {
-                // Allow a gap? Usually brackets must be contiguous (end of one = start of next)
-                // But many systems allow explicit start, so we only enforce if strict.
-                // We'll just warn but not error – user can decide.
                 if (!isset($this->bandErrors[$current['index']])) {
                     $this->bandErrors[$current['index']] = 'Gap: bracket does not start immediately after previous bracket.';
                 }
@@ -126,11 +123,20 @@ class PolicyCalculationBuilder extends Component
     }
 
     // ---------- Non‑Tax Methods ----------
+
+    /**
+     * Determine if the employee contribution field should be shown.
+     * For all non‑tax policies, the employee value affects the payslip.
+     */
     protected function showEmployeeField(): bool
     {
-        return !in_array($this->policyType, ['bonus']);
+        return $this->policyType !== 'tax';
     }
 
+    /**
+     * Determine if the employer contribution field should be shown.
+     * Only pension, insurance, and benefit policies typically have an employer share.
+     */
     protected function showEmployerField(): bool
     {
         return in_array($this->policyType, ['pension', 'insurance', 'benefit']);
@@ -173,15 +179,13 @@ class PolicyCalculationBuilder extends Component
                 $this->bands = [['start' => '', 'end' => '', 'rate' => '']];
             } else {
                 $this->bands = array_map(function ($band) {
-                    // New three‑column format: start, end, rate (end can be null)
                     if (isset($band['start'], $band['rate'])) {
                         return [
                             'start' => $band['start'] ?? '',
-                            'end' => $band['end'] ?? '',   // end may be null -> convert to empty string for input
+                            'end' => $band['end'] ?? '',
                             'rate' => $band['rate'],
                         ];
                     }
-                    // Old two‑column format: [limit, rate] – convert to start/end
                     if (isset($band[0], $band[1])) {
                         return [
                             'start' => $band[0] ?? '',
@@ -189,12 +193,10 @@ class PolicyCalculationBuilder extends Component
                             'rate' => $band[2] ?? 0,
                         ];
                     }
-                    // Fallback
                     return ['start' => '', 'end' => '', 'rate' => ''];
                 }, $rawBands);
             }
         } else {
-            // Non‑tax new structure
             $this->calculationType = $data['calculation_type'] ?? 'percentage';
             $this->employeeValue = $data['employee_value'] ?? 0;
             $this->employerValue = $data['employer_value'] ?? 0;
@@ -223,7 +225,6 @@ class PolicyCalculationBuilder extends Component
                 $end = isset($band['end']) && $band['end'] !== '' ? (float) $band['end'] : null;
                 $rate = isset($band['rate']) && $band['rate'] !== '' ? (float) $band['rate'] : null;
 
-                // Skip entirely empty rows (all fields empty/zero)
                 if (($start === null || $start == 0) && ($end === null || $end == 0) && ($rate === null || $rate == 0)) {
                     continue;
                 }

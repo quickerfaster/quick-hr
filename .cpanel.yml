@@ -83,3 +83,4 @@ deployment:
     # Rotate logs - keep only last 5
     - /bin/ls -1t $LOGDIR/deploy_*.log | /usr/bin/tail -n +6 | /bin/xargs -r /bin/rm --
 
+#* * * * * cd /path/to/project && php artisan queue:work --once --stop-when-empty --sleep=3 --tries=1 >> storage/logs/worker.log 2>&1

@@ -34,7 +34,7 @@ class PayrollRun extends Model
 
 
     protected $fillable = [
-        'company_id', 'title', 'pay_schedule_id', 'period_start', 'period_end', 'status', 'current_step', 'calculation_status', 'total_gross_pay', 'total_deductions', 'total_taxes', 'total_employer_contributions', 'total_cash_required', 'processed_by', 'processed_at', 'base_currency', 'payment_date', 'reconciliation_status', 'reconciled_at', 'payment_batch_id', 'total_employee_contributions', 'total_income_tax', 'total_bonus', 'total_commission', 'total_reimbursement', 'approved_by_user_id', 'approved_at', 'total_employees', 'processed_employees', 'notes'
+        'company_id', 'title', 'pay_schedule_id', 'period_start', 'period_end', 'status', 'current_step', 'calculation_status', 'total_gross_pay', 'total_deductions', 'total_taxes', 'total_employer_contributions', 'total_cash_required', 'processed_by', 'processed_at', 'base_currency', 'payment_date', 'reconciliation_status', 'reconciled_at', 'payment_batch_id', 'total_employee_contributions', 'total_income_tax', 'total_bonus', 'total_commission', 'total_reimbursement', 'approved_by_user_id', 'approved_at', 'total_employees', 'processed_employees', 'notes', 'is_multi_company', 'per_company_summaries'
     ];
 
     protected $guarded = [
@@ -63,7 +63,9 @@ class PayrollRun extends Model
         'processed_employees' => 'integer',
         'failed_at' => 'datetime',
         'created_by' => 'integer',
-        'updated_by' => 'integer'
+        'updated_by' => 'integer',
+        'is_multi_company' => 'boolean',
+        'per_company_summaries' => 'array',
     ];
 
     protected $attributes = [
@@ -83,7 +85,8 @@ class PayrollRun extends Model
         'total_commission' => 0,
         'total_reimbursement' => 0,
         'total_employees' => 0,
-        'processed_employees' => 0
+        'processed_employees' => 0,
+        'is_multi_company' => false,
     ];
 
     protected $dispatchesEvents = [
@@ -153,7 +156,7 @@ class PayrollRun extends Model
 
     public function approvedByUser()
     {
-        return $this->belongsTo(\App\Modules\Hr\Models\User::class, 'approved_by_user_id', 'id');
+        return $this->belongsTo(\App\Modules\Admin\Models\User::class, 'approved_by_user_id', 'id');
     }
 
     public function company()

@@ -57,7 +57,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label>Pay Schedule</label>
-                                <select wire:model="pay_schedule_id" class="form-control">
+                                <select wire:model.live="pay_schedule_id" class="form-control">
                                     <option value="">Select...</option>
                                     @foreach (\App\Modules\Hr\Models\PaySchedule::where('is_active', true)->get() as $schedule)
                                         <option value="{{ $schedule->id }}">
@@ -90,23 +90,93 @@
 
                         @if($this->isAllCompaniesMode())
                         <div class="mb-3">
-                            <label for="companyId" class="form-label">Company <span class="text-danger">*</span></label>
-                            <select
-                                id="companyId"
-                                class="form-select @error('companyId') is-invalid @enderror"
-                                wire:model="companyId"
-                            >
-                                <option value="">-- Select Company --</option>
-                                @foreach($this->companies as $company)
-                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('companyId')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                            <label class="form-label fw-bold">Process Payroll For</label>
+
+                            {{-- Radio: Single Company --}}
+                            <div class="form-check mb-2">
+                                <input
+                                    class="form-check-input"
+                                    type="radio"
+                                    name="payrollScope"
+                                    id="scopeSingle"
+                                    value="0"
+                                    wire:model.live="isMultiCompany"
+                                    wire:click="$set('isMultiCompany', false)"
+                                >
+                                <label class="form-check-label" for="scopeSingle">
+                                    Single Company
+                                </label>
+                            </div>
+
+                            {{-- Company dropdown (shown only when Single Company is selected) --}}
+                            @if(!$this->isMultiCompany)
+                            <div class="ms-4 mb-3 p-3 border rounded bg-light">
+                                <label for="companyId" class="form-label">Select Company <span class="text-danger">*</span></label>
+                                <select
+                                    id="companyId"
+                                    class="form-select @error('companyId') is-invalid @enderror"
+                                    wire:model="companyId"
+                                >
+                                    <option value="">-- Select Company --</option>
+                                    @foreach($this->companies as $company)
+                                        <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('companyId')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            @endif
+
+                            {{-- Radio: All Companies --}}
+                            <div class="form-check mb-2">
+                                <input
+                                    class="form-check-input"
+                                    type="radio"
+                                    name="payrollScope"
+                                    id="scopeAll"
+                                    value="1"
+                                    wire:model.live="isMultiCompany"
+                                    wire:click="$set('isMultiCompany', true)"
+                                >
+                                <label class="form-check-label" for="scopeAll">
+                                    All Companies
+                                </label>
+                            </div>
+
+{{-- Info box: shown when All Companies is selected --}}
+@if($this->isMultiCompany)
+    <div class="ms-4 p-3 border rounded bg-info bg-opacity-10">
+        @if($this->eligibleCompanyCount > 0)
+            <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-info-circle text-info me-2"></i>
+                <strong>{{ $this->eligibleCompanyCount }} compan{{ $this->eligibleCompanyCount === 1 ? 'y' : 'ies' }}</strong>
+                <span class="ms-1">will be processed with</span>
+                <strong class="ms-1">{{ $this->totalEligibleEmployees }} employee{{ $this->totalEligibleEmployees === 1 ? '' : 's' }}</strong>
+                <span class="ms-1">across all companies.</span>
+            </div>
+            <small class="text-muted d-block">
+                Payslips will be generated per entity. Statutory reports remain separate per legal entity.
+            </small>
+            <div class="mt-2 small">
+                @foreach($this->eligibleCompanies as $ec)
+                    <span class="badge bg-light text-dark me-1 mb-1">
+                        {{ $ec['company_name'] }}: {{ $ec['employee_count'] }}
+                    </span>
+                @endforeach
+            </div>
+        @else
+            <div class="d-flex align-items-center text-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                No active employees found across any company.
+            </div>
+        @endif
+    </div>
+@endif
+
+                            @error('isMultiCompany')
+                                <div class="text-danger mt-1">{{ $message }}</div>
                             @enderror
-                            <small class="form-text text-muted">
-                                You are viewing all companies. Please select the company this payroll run belongs to.
-                            </small>
                         </div>
                         @endif
                     </div>

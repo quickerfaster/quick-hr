@@ -19,6 +19,15 @@ class PayrollRunProcessor
      */
     public function generatePayslips(PayrollRun $run): void
     {
+        // Guard: This processor does NOT support multi-company runs.
+        // Multi-company runs are handled by PayrollCalculator::calculateMultiCompany().
+        if (!empty($run->is_multi_company)) {
+            throw new \RuntimeException(
+                'PayrollRunProcessor does not support multi-company runs. '
+                . 'Use PayrollCalculator for multi-company payroll processing.'
+            );
+        }
+
         // Clear existing payslips (in case of reprocessing draft)
         $run->payslips()->delete();
 

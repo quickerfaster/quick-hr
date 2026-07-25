@@ -53,7 +53,7 @@
             </small>
         </div>
     @else
-        {{-- Non‑tax UI (unchanged from previous answer) --}}
+        {{-- Non‑tax UI --}}
         <div class="mb-3">
             <label class="form-label fw-bold">Calculation Type</label>
             <div class="mb-2">
@@ -70,9 +70,18 @@
             </div>
 
             <div class="row">
+                {{-- Employee Value Field --}}
                 @if ($this->showEmployeeField())
+                    @php
+                        // Determine label based on policy type
+                        $employeeLabel = match($policyType) {
+                            'bonus', 'commission', 'reimbursement' => 'Amount Paid to Employee',
+                            'deduction' => 'Deduction Amount',
+                            default => 'Employee Contribution',
+                        };
+                    @endphp
                     <div class="col-md-6">
-                        <label class="form-label">Employee Contribution</label>
+                        <label class="form-label">{{ $employeeLabel }}</label>
                         <div class="input-group">
                             <span class="input-group-text">
                                 @if ($calculationType === 'fixed')
@@ -84,12 +93,25 @@
                             <input type="number" step="any" class="form-control"
                                 wire:model.live.debounce.1000ms="employeeValue" placeholder="0.00">
                         </div>
-                        <small class="text-muted">The amount deducted from employee's pay.</small>
+                        <small class="text-muted">
+                            @if ($policyType === 'bonus')
+                                The bonus amount to be added to this employee's pay.
+                            @elseif($policyType === 'commission')
+                                The commission amount to be added.
+                            @elseif($policyType === 'reimbursement')
+                                The reimbursement amount to be added.
+                            @elseif($policyType === 'deduction')
+                                The amount to be deducted from the employee's pay.
+                            @else
+                                The amount deducted from (or added to) the employee's pay.
+                            @endif
+                        </small>
                     </div>
                 @else
                     <input type="hidden" wire:model="employeeValue" value="0">
                 @endif
 
+                {{-- Employer Value Field --}}
                 @if ($this->showEmployerField())
                     <div class="col-md-6">
                         <label class="form-label">Employer Contribution</label>

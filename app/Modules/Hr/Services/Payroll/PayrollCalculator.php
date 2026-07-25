@@ -10,6 +10,8 @@ use App\Modules\Hr\Models\EmployeeAdjustmentProfile;
 use App\Modules\Hr\Models\PayrollRunAdjustment;
 use App\Modules\Hr\Models\PayrollPolicy;
 use App\Modules\Hr\Models\PayrollPolicyAssignment;
+use App\Modules\Hr\Models\Company;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -25,13 +27,19 @@ class PayrollCalculator
     {
         $this->run = $run;
 
+        // → Route multi-company runs to the specialized method
+        if ($run->is_multi_company) {
+            $this->calculateMultiCompany($run);
+            return;
+        }
+
         // Get total employee count
-        $totalEmployees = EmployeePosition::where('pay_schedule_id', $this->run->pay_schedule_id)
+        $totalEmployees = EmployeePosition::withoutCompanyScope()->where('pay_schedule_id', $this->run->pay_schedule_id)
             ->where('employment_status', 'Active')
             ->count();
 
         // Create or reset progress record (outside transaction, so immediately visible)
-        \App\Modules\Hr\Models\PayrollRunProgress::updateOrCreate(
+        \App\Modules\Hr\Models\PayrollRunProgress::withoutCompanyScope()->updateOrCreate(
             ['payroll_run_id' => $this->run->id],
             [
                 'total_employees' => $totalEmployees,
@@ -42,13 +50,20 @@ class PayrollCalculator
 
         // Delete previous payslips & items (inside a transaction – but this is quick)
         DB::transaction(function () {
-            PayrollPayslip::where('payroll_run_id', $this->run->id)->delete();
+            PayrollPayslip::withoutCompanyScope()->where('payroll_run_id', $this->run->id)->delete();
         });
 
         // Process employees in chunks – each employee’s data saved in its own transaction
-        EmployeePosition::where('pay_schedule_id', $this->run->pay_schedule_id)
+        EmployeePosition::withoutCompanyScope()->where('pay_schedule_id', $this->run->pay_schedule_id)
             ->where('employment_status', 'Active')
-            ->with(['employee', 'location', 'employee.employeeProfile', 'employee.user'])
+            ->with([
+                'employee' => function ($q) {
+                    $q->withoutCompanyScope();
+                },
+                'location',
+                'employee.employeeProfile',
+                'employee.user',
+            ])
             ->chunk(100, function ($positions) {
                 foreach ($positions as $position) {
                     // Save payslip in a small transaction (for atomicity per employee)
@@ -57,13 +72,13 @@ class PayrollCalculator
                     });
 
                     // Update progress (outside transaction, commits immediately)
-                    \App\Modules\Hr\Models\PayrollRunProgress::where('payroll_run_id', $this->run->id)
+                    \App\Modules\Hr\Models\PayrollRunProgress::withoutCompanyScope()->where('payroll_run_id', $this->run->id)
                         ->increment('processed_employees');
                 }
             });
 
         // Mark as completed
-        \App\Modules\Hr\Models\PayrollRunProgress::where('payroll_run_id', $this->run->id)
+        \App\Modules\Hr\Models\PayrollRunProgress::withoutCompanyScope()->where('payroll_run_id', $this->run->id)
             ->update(['status' => 'completed']);
 
         // Finally, update the run totals (inside a transaction, but done once at the end)
@@ -71,7 +86,10 @@ class PayrollCalculator
     }
 
 
-
+public function setRun(PayrollRun $run): void
+{
+    $this->run = $run;
+}
 
 
 
@@ -86,7 +104,7 @@ class PayrollCalculator
 /**
      * Calculate payslip for a single employee.
      */
-    protected function calculateForEmployee(EmployeePosition $position): PayrollPayslip
+    public function calculateForEmployee(EmployeePosition $position): PayrollPayslip
     {
         $employeeId = $position->employee_id;
         $items = [];
@@ -96,7 +114,7 @@ class PayrollCalculator
         $items[] = $this->makeItem(null, 'earning', 'Base Salary', $baseSalary);
 
         // 2. Recurring adjustments (EmployeeAdjustmentProfile)
-        $recurring = EmployeeAdjustmentProfile::where('employee_id', $employeeId)
+        $recurring = EmployeeAdjustmentProfile::withoutCompanyScope()->where('employee_id', $employeeId)
             ->where('is_active', true)
             ->where('effective_date', '<=', $this->run->period_end)
             ->where(function ($q) {
@@ -133,9 +151,15 @@ class PayrollCalculator
         }
 
         // 3. One‑time adjustments for this run
-        $oneTime = PayrollRunAdjustment::where('payroll_run_id', $this->run->id)
-            ->where('employee_id', $employeeId)
-            ->get();
+$oneTime = PayrollRunAdjustment::withoutGlobalScope(\App\Modules\Admin\Scopes\CompanyScope::class)
+    ->where('payroll_run_id', $this->run->id)
+    ->where('employee_id', $employeeId)
+    ->get();
+
+
+
+
+
 
         foreach ($oneTime as $adj) {
             $amount = $adj->amount;
@@ -164,6 +188,8 @@ class PayrollCalculator
         // 4. Resolve normally assigned and global policies
         $normalPolicies = $this->resolvePoliciesForEmployee($position);
 
+
+
         // 5. Merge policies, giving precedence to overrides
         $allPolicies = [];
         foreach ($normalPolicies as $policy) {
@@ -187,7 +213,8 @@ class PayrollCalculator
             $prorationFactor = $activeDays / $totalDays;
 
             // Get employee and employer amounts
-            $amounts = $this->applyPolicyLogic($effectivePolicy, $items, $baseSalary, $prorationFactor);
+            $annualSalary = $this->annualizeSalary($position->base_salary, $position->pay_frequency);
+            $amounts = $this->applyPolicyLogic($effectivePolicy, $items, $baseSalary, $prorationFactor, $annualSalary);
 
             // Build metadata for auditing
             $metadata = [
@@ -242,8 +269,12 @@ class PayrollCalculator
         $totalTaxes = collect($items)->where('type', 'tax')->sum('amount');
         $netPay = $grossPay - $totalDeductions - $totalTaxes;
 
+        // Determine company_id from employee
+        $companyId = $position->employee->company_id ?? $this->run->company_id;
+
         // Create payslip
         $payslip = PayrollPayslip::create([
+            'company_id' => $companyId,
             'payslip_number' => $this->generatePayslipNumber($position->employee->employee_number),
             'payroll_run_id' => $this->run->id,
             'employee_id' => $employeeId,
@@ -259,6 +290,7 @@ class PayrollCalculator
         // Create line items
         foreach ($items as $item) {
             PayslipItem::create([
+                'company_id' => $companyId,
                 'payslip_id' => $payslip->id,
                 'type' => $item['type'],
                 'label' => $item['label'],
@@ -276,17 +308,17 @@ class PayrollCalculator
     /**
      * Update payroll run totals after all employees processed.
      */
-    protected function updateRunTotals(): void
+    public function updateRunTotals(): void
     {
-        $totals = PayrollPayslip::where('payroll_run_id', $this->run->id)
+        $totals = PayrollPayslip::withoutCompanyScope()->where('payroll_run_id', $this->run->id)
             ->selectRaw('SUM(gross_pay) as total_gross, SUM(total_deductions) as total_deductions, SUM(net_pay) as total_net')
             ->first();
 
-        $totalEmployerContributions = PayslipItem::whereHas('payslip', function($q) {
+        $totalEmployerContributions = PayslipItem::withoutCompanyScope()->whereHas('payslip', function($q) {
             $q->where('payroll_run_id', $this->run->id);
         })->where('type', 'employer_contribution')->sum('amount');
 
-        $totalTaxes = PayslipItem::whereHas('payslip', function($q) {
+        $totalTaxes = PayslipItem::withoutCompanyScope()->whereHas('payslip', function($q) {
             $q->where('payroll_run_id', $this->run->id);
         })->where('type', 'tax')->sum('amount');
 
@@ -408,7 +440,7 @@ class PayrollCalculator
     protected function resolvePoliciesForEmployee(EmployeePosition $position): \Illuminate\Support\Collection
     {
         // 1. Get assignments (with their policies)
-        $assignments = PayrollPolicyAssignment::with('payrollPolicy')
+        $assignments = PayrollPolicyAssignment::withoutCompanyScope()->with('payrollPolicy')
             ->whereIn('assignable_type', [
                 'App\Modules\Hr\Models\Company',
                 'App\Modules\Hr\Models\Location',
@@ -448,7 +480,7 @@ class PayrollCalculator
             ->get();
 
         // 2. Get IDs of policies that have ANY assignment (not just those that match this employee)
-        $assignedPolicyIds = PayrollPolicyAssignment::whereIn('assignable_type', [
+        $assignedPolicyIds = PayrollPolicyAssignment::withoutCompanyScope()->whereIn('assignable_type', [
             'App\Modules\Hr\Models\Company',
             'App\Modules\Hr\Models\Location',
             'App\Modules\Hr\Models\Department',
@@ -467,7 +499,7 @@ class PayrollCalculator
         $countryCode = $position->location->country_code ?? null;
         $stateCode = $position->location->state_code ?? null;
 
-        $globalPolicies = PayrollPolicy::where('is_active', true)
+        $globalPolicies = PayrollPolicy::withoutCompanyScope()->where('is_active', true)
             ->where('effective_date', '<=', $this->run->period_end)
             ->where(function ($q) {
                 $q->whereNull('expiry_date')->orWhere('expiry_date', '>=', $this->run->period_start);
@@ -488,45 +520,70 @@ class PayrollCalculator
     /**
      * Apply policy logic to calculate amount, with optional proration factor.
      */
-protected function applyPolicyLogic(PayrollPolicy $policy, array $items, float $baseSalary, float $prorationFactor = 1.0): array
+protected function applyPolicyLogic(PayrollPolicy $policy, array $items, float $baseSalary, float $prorationFactor = 1.0, ?float $annualSalary = null): array
 {
-    // Return array with 'employee' and 'employer' amounts
     $logic = json_decode($policy->calculation_logic, true);
     if (!$logic) {
         return ['employee' => 0, 'employer' => 0];
     }
 
+    // --- TAX POLICY ---
     if ($policy->type === 'tax') {
-        // Progressive tax calculation using three‑column bands (start, end, rate)
-        $annualTaxable = $baseSalary * 12;
-        $tax = 0;
-        $remaining = $annualTaxable;
+        // 1. Determine the correct ANNUAL income
+        $annualIncome = $annualSalary ?? ($baseSalary * 12);
 
-        // Ensure bands are sorted by start (ascending) – users may not enter in order
+
+
+        // 2. Calculate annual tax using the universal bracket logic
+        $tax = 0;
         $bands = collect($logic['bands'] ?? [])->sortBy('start')->values()->toArray();
 
         foreach ($bands as $band) {
-            $start = $band['start'] ?? 0;
-            $end = $band['end'] ?? null;          // null means infinity (highest bracket)
-            $rate = ($band['rate'] ?? 0) / 100;
+            $start = (float) ($band['start'] ?? 0);
+            $end = $band['end'] ?? PHP_FLOAT_MAX;
+            $rate = (float) ($band['rate'] ?? 0) / 100;
 
-            // Upper bound of this bracket: if end is null, use the remaining income
-            $upper = $end ?? $remaining;
 
-            // Taxable amount in this bracket (can't exceed remaining, and must be >= 0)
-            $taxable = max(0, min($remaining, $upper) - $start);
 
+
+
+            // If annual income doesn't reach this bracket's start, stop entirely.
+            if ($annualIncome <= $start) {
+                break;
+            }
+
+            // Income portion that falls into this bracket
+            $upper = min($annualIncome, $end);
+            $taxable = max(0, $upper - $start);
             $tax += $taxable * $rate;
-            $remaining -= $taxable;
 
-            if ($remaining <= 0) break;
+            // If income is fully covered, stop
+            if ($annualIncome <= $end) {
+                break;
+            }
         }
 
-        $amount = $tax / 12; // monthly tax
-        return ['employee' => $amount, 'employer' => 0]; // taxes are usually employee-only
+        // 3. Convert ANNUAL tax to THIS PAY PERIOD'S tax
+        //    (e.g., divide by 12 for Monthly, 26 for Bi-weekly, 52 for Weekly, etc.)
+        if ($baseSalary > 0 && $annualIncome > 0) {
+            $periodFactor = $baseSalary / $annualIncome; // e.g., 20,000 / 520,000 = 1/26
+        } else {
+            $periodFactor = 1 / 12; // Fallback (safety net)
+        }
+
+
+
+
+        $periodTax = $tax * $periodFactor;
+
+        // Proration (if policy started mid-month, etc.)
+        $periodTax *= $prorationFactor;
+
+
+        return ['employee' => $periodTax, 'employer' => 0];
     }
 
-    // Non-tax policies (pension, benefit, bonus, insurance, deduction)
+    // --- NON-TAX POLICIES (Pension, Benefits, etc.) ---
     $calcType = $logic['calculation_type'] ?? 'percentage';
     $employeeValue = $logic['employee_value'] ?? 0;
     $employerValue = $logic['employer_value'] ?? 0;
@@ -539,14 +596,24 @@ protected function applyPolicyLogic(PayrollPolicy $policy, array $items, float $
         $employerAmount = $baseSalary * ($employerValue / 100);
     }
 
-    // Apply proration (e.g., policy active only part of the pay period)
+    // Apply proration to non-tax policies (as originally intended)
     $employeeAmount *= $prorationFactor;
     $employerAmount *= $prorationFactor;
 
     return ['employee' => $employeeAmount, 'employer' => $employerAmount];
 }
 
-
+protected function annualizeSalary(float $salary, string $frequency): float
+{
+    return match ($frequency) {
+        'Monthly'      => $salary * 12,
+        'Semi-monthly' => $salary * 24,
+        'Bi-weekly'    => $salary * 26,
+        'Weekly'       => $salary * 52,
+        'Daily'        => $salary * 365, // or 260 if you use business days
+        default        => $salary * 12,  // fallback
+    };
+}
 
     /**
      * Generate unique payslip number.
@@ -556,6 +623,258 @@ protected function applyPolicyLogic(PayrollPolicy $policy, array $items, float $
         return 'PS-' . $employeeNumber . '-' . $this->run->id . '-' . now()->format('YmdHis');
     }
 
+    // -----------------------------------------------------------------
+    // Multi-Company Payroll Methods
+    // -----------------------------------------------------------------
 
+
+/**
+ * Calculate payroll for a multi-company run.
+ *
+ * Iterates companies sequentially, processing each company's employees
+ * independently within its own transaction boundary. A failure in one
+ * company does not roll back successfully processed companies.
+ *
+ * @param PayrollRun $run  The multi-company payroll run (is_multi_company = true)
+ */
+public function calculateMultiCompany(PayrollRun $run): void
+{
+    $this->run = $run;
+
+    // ----------------------------------------------------------------
+    // 1. Determine which companies have active employees
+    //    (NO pay_schedule_id filter – we want ALL companies)
+    // ----------------------------------------------------------------
+    $companyIds = EmployeePosition::withoutCompanyScope()
+        ->where('employment_status', 'Active')
+        ->whereHas('employee', function ($q) {
+            $q->withoutCompanyScope();
+        })
+        ->join('employees', 'employee_positions.employee_id', '=', 'employees.id')
+        ->select('employees.company_id')
+        ->distinct()
+        ->pluck('company_id')
+        ->filter() // remove nulls
+        ->values();
+
+    if ($companyIds->isEmpty()) {
+        Log::warning("Multi-company payroll run {$this->run->id}: No companies with active employees found.");
+        $this->run->update([
+            'calculation_status' => 'failed',
+            'failure_reason' => 'No companies have active employees.',
+            'failed_at' => now(),
+        ]);
+        return;
+    }
+
+    // ----------------------------------------------------------------
+    // 2. Count total employees across ALL companies (for progress)
+    // ----------------------------------------------------------------
+    $totalEmployees = EmployeePosition::withoutCompanyScope()
+        ->where('employment_status', 'Active')
+        ->whereHas('employee', function ($q) {
+            $q->withoutCompanyScope();
+        })
+        ->count();
+
+    // 3. Initialize overall progress
+    \App\Modules\Hr\Models\PayrollRunProgress::withoutCompanyScope()->updateOrCreate(
+        ['payroll_run_id' => $this->run->id],
+        [
+            'total_employees' => $totalEmployees,
+            'processed_employees' => 0,
+            'status' => 'processing',
+        ]
+    );
+
+    // 4. Clear all existing payslips (single transaction, quick)
+    DB::transaction(function () {
+        PayrollPayslip::withoutCompanyScope()->where('payroll_run_id', $this->run->id)->delete();
+    });
+
+    // 5. Process each company sequentially
+    $perCompanySummaries = [];
+    $failedCompanies = [];
+    $totalCompanies = $companyIds->count();
+
+    foreach ($companyIds as $companyId) {
+        try {
+            // Fetch positions for this company (NO pay_schedule_id)
+            $companyPositions = EmployeePosition::withoutCompanyScope()
+                ->where('employment_status', 'Active')
+                ->whereHas('employee', function ($q) use ($companyId) {
+                    $q->withoutCompanyScope()->where('company_id', $companyId);
+                })
+                ->with([
+                    'employee' => function ($q) {
+                        $q->withoutCompanyScope();
+                    },
+                    'location',
+                    'employee.employeeProfile',
+                    'employee.user',
+                ])
+                ->get();
+
+            if ($companyPositions->isEmpty()) {
+                Log::info("Multi-company: Company #{$companyId} has no active positions, skipping.");
+                continue;
+            }
+
+            $summary = $this->processCompany(
+                $companyId,
+                $companyPositions,
+                $totalCompanies
+            );
+            $perCompanySummaries[] = $summary;
+
+        } catch (\Exception $e) {
+            Log::error("Multi-company payroll: Company #{$companyId} failed", [
+                'error' => $e->getMessage(),
+                'run_id' => $this->run->id,
+                'trace' => $e->getTraceAsString(),
+            ]);
+            $failedCompanies[] = [
+                'company_id' => $companyId,
+                'company_name' => Company::find($companyId)?->name ?? 'Unknown',
+                'status' => 'failed',
+                'error' => substr($e->getMessage(), 0, 500),
+            ];
+        }
+    }
+
+    // 6. Mark progress complete
+    \App\Modules\Hr\Models\PayrollRunProgress::withoutCompanyScope()->where('payroll_run_id', $this->run->id)
+        ->update(['status' => 'completed']);
+
+    // 7. Update run totals and per-company summaries
+    $this->updateRunTotals();
+
+    $this->run->update([
+        'per_company_summaries' => json_encode([
+            'companies' => $perCompanySummaries,
+            'failed_companies' => $failedCompanies,
+        ]),
+    ]);
+
+    // 8. Determine final calculation status
+    if (!empty($failedCompanies) && empty($perCompanySummaries)) {
+        $this->run->update([
+            'calculation_status' => 'failed',
+            'failure_reason' => 'All ' . count($failedCompanies) . ' companies failed processing.',
+            'failed_at' => now(),
+        ]);
+    } elseif (!empty($failedCompanies)) {
+        $this->run->update([
+            'calculation_status' => 'completed_with_errors',
+            'failure_reason' => 'Partial failure: ' . count($failedCompanies)
+                . ' of ' . $totalCompanies . ' companies failed.',
+        ]);
+    } else {
+        $this->run->update(['calculation_status' => 'completed']);
+    }
+
+    Log::info("Multi-company payroll run {$this->run->id} completed", [
+        'companies_processed' => count($perCompanySummaries),
+        'companies_failed' => count($failedCompanies),
+        'total_employees' => $totalEmployees,
+    ]);
+}
+
+
+
+
+    /**
+     * Process all employees for a single company within a multi-company run.
+     *
+     * Uses the existing calculateForEmployee() method for per-employee logic.
+     * Each employee's payslip is committed in its own transaction.
+     *
+     * @param int                     $companyId       The company being processed
+     * @param \Illuminate\Support\Collection $positions  EmployeePosition instances for this company
+     * @param int                     $totalCompanies  Total number of companies in the run
+     * @return array  Company summary for per_company_summaries JSON
+     */
+    protected function processCompany(
+        int $companyId,
+        Collection $positions,
+        int $totalCompanies
+    ): array {
+        $company = Company::find($companyId);
+        $companyName = $company->name ?? 'Unknown';
+
+        Log::info("Processing company: {$companyName} (#{$companyId})", [
+            'run_id' => $this->run->id,
+            'employee_count' => $positions->count(),
+        ]);
+
+        $processedCount = 0;
+        $companyGrossPay = 0;
+        $companyDeductions = 0;
+        $companyTaxes = 0;
+        $companyEmployerContributions = 0;
+        $companyNetPay = 0;
+
+        // Process employees in chunks (reuse existing chunk size of 100)
+        $positions->chunk(100)->each(function ($chunk) use (
+            &$processedCount,
+            &$companyGrossPay,
+            &$companyDeductions,
+            &$companyTaxes,
+            &$companyEmployerContributions,
+            &$companyNetPay,
+            $companyId
+        ) {
+            foreach ($chunk as $position) {
+                DB::transaction(function () use (
+                    $position,
+                    &$processedCount,
+                    &$companyGrossPay,
+                    &$companyDeductions,
+                    &$companyTaxes,
+                    &$companyEmployerContributions,
+                    &$companyNetPay,
+                    $companyId
+                ) {
+                    // Use the existing single-employee calculator
+                    $payslip = $this->calculateForEmployee($position);
+
+                    // Override the payslip's company_id to the employee's actual company
+                    // (calculateForEmployee may leave it null or set from session context)
+                    $payslip->update(['company_id' => $companyId]);
+
+                    $companyGrossPay += $payslip->gross_pay;
+                    $companyDeductions += $payslip->total_deductions;
+                    $companyTaxes += $payslip->total_taxes;
+                    $companyNetPay += $payslip->net_pay;
+                    $companyEmployerContributions += $payslip->employer_contribution_total ?? 0;
+                });
+
+                $processedCount++;
+
+                // Update overall progress (outside transaction, commits immediately)
+                \App\Modules\Hr\Models\PayrollRunProgress::where('payroll_run_id', $this->run->id)
+                    ->increment('processed_employees');
+            }
+        });
+
+        Log::info("Company {$companyName} (#{$companyId}) processed: {$processedCount} employees", [
+            'run_id' => $this->run->id,
+            'gross_pay' => $companyGrossPay,
+            'net_pay' => $companyNetPay,
+        ]);
+
+        return [
+            'company_id' => $companyId,
+            'company_name' => $companyName,
+            'status' => 'completed',
+            'total_employees' => $processedCount,
+            'gross_pay' => round($companyGrossPay, 2),
+            'total_deductions' => round($companyDeductions, 2),
+            'total_taxes' => round($companyTaxes, 2),
+            'net_pay' => round($companyNetPay, 2),
+            'employer_contributions' => round($companyEmployerContributions, 2),
+            'processed_at' => now()->toIso8601String(),
+        ];
+    }
 
 }

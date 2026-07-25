@@ -98,7 +98,18 @@
             background-color: #ecf0f1;
         }
 
+        .text-end {
+            text-align: right;
+        }
 
+        .multi-company-badge {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 9pt;
+        }
 
         @media print {
             th {
@@ -113,6 +124,11 @@
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
+
+            .multi-company-badge {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
         }
     </style>
 </head>
@@ -121,15 +137,27 @@
     <div class="container">
         <div class="header">
             <h1>Payroll Run Summary</h1>
-            <p>{{ $run->paySchedule->name }} | {{ $run->period_start->format('M d, Y') }} –
-                {{ $run->period_end->format('M d, Y') }}</p>
+            <p>
+                @if($run->paySchedule)
+                    {{ $run->paySchedule->name }}
+                @elseif($run->is_multi_company)
+                    <span class="multi-company-badge">All Companies</span>
+                @else
+                    No Pay Schedule
+                @endif
+                | {{ $run->period_start->format('M d, Y') }} –
+                {{ $run->period_end->format('M d, Y') }}
+            </p>
         </div>
 
         <div class="company-details">
-            <strong>Company:</strong> {{ $companyName ?? 'Your Company' }}<br>
+            <strong>Company:</strong> {{ $companyName ?? ($run->is_multi_company ? 'All Companies' : 'Unknown') }}<br>
             <strong>Run ID:</strong> #{{ $run->id }}<br>
             <strong>Status:</strong> {{ ucfirst($run->status) }}<br>
             <strong>Generated:</strong> {{ now()->format('F j, Y, g:i a') }}
+            @if($run->is_multi_company)
+                <br><strong>Type:</strong> Multi‑Company Run
+            @endif
         </div>
 
         <div class="summary-card">

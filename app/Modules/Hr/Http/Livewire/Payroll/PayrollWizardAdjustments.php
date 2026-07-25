@@ -45,51 +45,53 @@ class PayrollWizardAdjustments extends Component
         'refreshAdjustments' => '$refresh',
     ];
 
-    public function mount(int $stepIndex, int $payrollRunId): void
-    {
-        $this->stepIndex = $stepIndex;
-        $this->payrollRunId = $payrollRunId;
+public function mount(int $stepIndex, int $payrollRunId): void
+{
+    $this->stepIndex = $stepIndex;
+    $this->payrollRunId = $payrollRunId;
 
-        // Guard: verify the payroll run exists and is accessible
-        $run = PayrollRun::find($payrollRunId);
+    // Reset filters to show all employees
+    $this->filterCompany = null;
+    $this->filterDepartment = null;
+    $this->filterLocation = null;
+    $this->filterEmploymentStatus = 'Active';
+    $this->search = '';
+    $this->sortField = 'employee_name';
+    $this->sortDirection = 'asc';
 
-        if (!$run) {
-            $run = PayrollRun::withoutCompanyScope()->find($payrollRunId);
-            if ($run && $run->company_id !== session('current_company_id')) {
-                session()->put('current_company_id', $run->company_id);
-                $run = PayrollRun::find($payrollRunId);
-            }
-        }
-
-        if (!$run) {
-            throw new \RuntimeException("Payroll run #{$payrollRunId} not found. It may have been deleted or is inaccessible.");
-        }
-
-        $this->loadAdjustmentsCache();
-        $this->initializeAllTempAdjustments();
-
+    $run = PayrollRun::withoutCompanyScope()->find($payrollRunId);
+    if (!$run) {
+        session()->forget('payroll-wizard-' . auth()->id());
+        $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found. Please start again.']);
+        return;
     }
+
+    $this->loadAdjustmentsCache();
+    $this->initializeAllTempAdjustments();
+}
 
 
     protected function initializeAllTempAdjustments(): void
     {
-        $run = PayrollRun::find($this->payrollRunId);
+        // Always use withoutCompanyScope() — the wizard's internal state
+        // is the single source of truth, never the global session.
+        $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
 
         if (!$run) {
-            $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
-            if ($run) {
-                Log::warning("PayrollWizardAdjustments: Company scope mismatch for payroll run #{$this->payrollRunId}. Found via withoutCompanyScope fallback.");
-            }
-        }
-
-        if (!$run) {
-            $this->dispatch('wizardError', 'The payroll run could not be found. It may have been deleted.');
-            $this->dispatch('redirectToWizardStart');
+            $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found.']);
             return;
         }
 
-        $allEmployeeIds = EmployeePosition::where('pay_schedule_id', $run->pay_schedule_id)
-            ->pluck('employee_id');
+        $positionQuery = EmployeePosition::withoutCompanyScope();
+
+        // Only filter by pay_schedule_id for single-company runs.
+        // Multi-company runs have pay_schedule_id = null and must include
+        // employees across all schedules.
+        if (!$run->is_multi_company) {
+            $positionQuery->where('pay_schedule_id', $run->pay_schedule_id);
+        }
+
+        $allEmployeeIds = $positionQuery->pluck('employee_id');
 
         foreach ($allEmployeeIds as $employeeId) {
             $this->tempAdjustments[$employeeId] = [
@@ -105,7 +107,8 @@ class PayrollWizardAdjustments extends Component
 
     protected function loadAdjustmentsCache(): void
     {
-        $adjustments = PayrollRunAdjustment::where('payroll_run_id', $this->payrollRunId)
+        $adjustments = PayrollRunAdjustment::withoutCompanyScope()
+            ->where('payroll_run_id', $this->payrollRunId)
             ->get(['employee_id', 'type', 'amount']);
 
         foreach ($adjustments as $adj) {
@@ -113,62 +116,66 @@ class PayrollWizardAdjustments extends Component
         }
     }
 
-    public function getEmployeesProperty()
-    {
-        $run = PayrollRun::findOrFail($this->payrollRunId);
-
-        $query = EmployeePosition::with('employee')
-            ->where('pay_schedule_id', $run->pay_schedule_id);
-
-        // Apply search
-        if (!empty($this->search)) {
-            $searchTerm = '%' . $this->search . '%';
-            $query->whereHas('employee', function ($q) use ($searchTerm) {
-                $q->where('first_name', 'like', $searchTerm)
-                    ->orWhere('last_name', 'like', $searchTerm)
-                    ->orWhere('employee_number', 'like', $searchTerm);
-            });
-        }
-
-        // Apply filters
-        if ($this->filterEmploymentStatus === 'Active') {
-            $query->where('employment_status', 'Active');
-        } elseif ($this->filterEmploymentStatus === 'On Leave') {
-            $query->where('employment_status', 'On Leave');
-        } elseif ($this->filterEmploymentStatus === 'Terminated') {
-            $query->where('employment_status', 'Terminated');
-        }
-
-        if ($this->filterDepartment) {
-            $query->where('department_id', $this->filterDepartment);
-        }
-
-        if ($this->filterLocation) {
-            $query->where('location_id', $this->filterLocation);
-        }
-
-        if ($this->filterCompany) {
-            $query->whereHas('employee', function ($q) {
-                $q->where('company_id', $this->filterCompany);
-            });
-        }
-
-        // Apply sorting
-        if ($this->sortField === 'employee_name') {
-            $query->join('employees', 'employee_positions.employee_id', '=', 'employees.id')
-                ->orderBy('employees.first_name', $this->sortDirection)
-                ->orderBy('employees.last_name', $this->sortDirection)
-                ->select('employee_positions.*');
-        } elseif ($this->sortField === 'base_salary') {
-            $query->orderBy('base_salary', $this->sortDirection);
-        }
-
-        $positions = $query->paginate(50);
-
-
-
-        return $positions;
+public function getEmployeesProperty()
+{
+    $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
+    if (!$run) {
+        return collect();
     }
+
+    $query = EmployeePosition::withoutCompanyScope()
+        ->join('employees', 'employee_positions.employee_id', '=', 'employees.id')
+        ->select('employee_positions.*')
+        ->where('employee_positions.employment_status', 'Active')
+        ->whereNull('employee_positions.deleted_at');
+
+    // Single‑company: filter by pay_schedule_id
+    if (!$run->is_multi_company) {
+        $query->where('employee_positions.pay_schedule_id', $run->pay_schedule_id);
+    }
+
+    // Search
+    if (!empty($this->search)) {
+        $searchTerm = '%' . $this->search . '%';
+        $query->where(function ($q) use ($searchTerm) {
+            $q->where('employees.first_name', 'like', $searchTerm)
+              ->orWhere('employees.last_name', 'like', $searchTerm)
+              ->orWhere('employees.employee_number', 'like', $searchTerm);
+        });
+    }
+
+    // Employment status filter (if 'All' selected, override the 'Active' default)
+    if ($this->filterEmploymentStatus === 'On Leave') {
+        $query->where('employee_positions.employment_status', 'On Leave');
+    } elseif ($this->filterEmploymentStatus === 'Terminated') {
+        $query->where('employee_positions.employment_status', 'Terminated');
+    } elseif ($this->filterEmploymentStatus === 'All') {
+        $query->whereIn('employee_positions.employment_status', ['Active', 'On Leave', 'Terminated']);
+    }
+
+    // Department & Location
+    if ($this->filterDepartment) {
+        $query->where('employee_positions.department_id', $this->filterDepartment);
+    }
+    if ($this->filterLocation) {
+        $query->where('employee_positions.location_id', $this->filterLocation);
+    }
+
+    // Company filter – only for multi‑company runs
+    if ($run->is_multi_company && $this->filterCompany) {
+        $query->where('employees.company_id', $this->filterCompany);
+    }
+
+    // Sorting
+    if ($this->sortField === 'employee_name') {
+        $query->orderBy('employees.first_name', $this->sortDirection)
+              ->orderBy('employees.last_name', $this->sortDirection);
+    } elseif ($this->sortField === 'base_salary') {
+        $query->orderBy('employee_positions.base_salary', $this->sortDirection);
+    }
+
+    return $query->paginate(50);
+}
 
     public function updatedSearch(): void
     {
@@ -230,33 +237,88 @@ class PayrollWizardAdjustments extends Component
         $this->resetPage();
     }
 
-    public function updatedTempAdjustments($value, $key): void
-    {
-        [$employeeId, $type] = explode('.', $key);
-        $amount = (float) $value;
-        $this->saveAdjustmentForEmployee($employeeId, $type, $amount);
+public function updatedTempAdjustments($value, $key): void
+{
+        Log::info('updatedTempAdjustments called', ['key' => $key, 'value' => $value]);
+
+    // Normalize key: remove "tempAdjustments." prefix if present
+    if (str_starts_with($key, 'tempAdjustments.')) {
+        $key = substr($key, strlen('tempAdjustments.'));
     }
 
-    protected function saveAdjustmentForEmployee($employeeId, $type, $amount): void
-    {
-        DB::transaction(function () use ($employeeId, $type, $amount) {
-            $adjustment = PayrollRunAdjustment::firstOrNew([
-                'payroll_run_id' => $this->payrollRunId,
-                'employee_id' => $employeeId,
-                'type' => $type,
-            ]);
+    $parts = explode('.', $key);
+    if (count($parts) !== 2) {
+        Log::warning('Invalid adjustment key format', ['key' => $key]);
+        return;
+    }
 
-            if ($amount == 0 && $adjustment->exists) {
+    $employeeId = (int) $parts[0];
+    $type = $parts[1];
+
+    // Validate type
+    $allowed = ['Bonus', 'Commission', 'Correction', 'Reimbursement', 'Deduction'];
+    if (!in_array($type, $allowed)) {
+        Log::warning('Invalid adjustment type', ['type' => $type]);
+        return;
+    }
+
+    $amount = (float) $value;
+    $this->saveAdjustmentForEmployee($employeeId, $type, $amount);
+}
+
+protected function saveAdjustmentForEmployee($employeeId, $type, $amount): void
+{
+    Log::info('Saving adjustment', ['employeeId' => $employeeId, 'type' => $type, 'amount' => $amount]);
+
+
+    try {
+        DB::transaction(function () use ($employeeId, $type, $amount) {
+            // Find existing record without company scope
+            $adjustment = PayrollRunAdjustment::withoutCompanyScope()
+                ->where('payroll_run_id', $this->payrollRunId)
+                ->where('employee_id', $employeeId)
+                ->where('type', $type)
+                ->first();
+
+            if ($amount == 0 && $adjustment) {
                 $adjustment->delete();
                 unset($this->existingAdjustmentsCache[$employeeId][$type]);
-            } elseif ($amount != 0) {
-                $adjustment->label = $type;
-                $adjustment->amount = $amount;
-                $adjustment->save();
-                $this->existingAdjustmentsCache[$employeeId][$type] = $amount;
+                Log::info('Deleted adjustment', ['id' => $adjustment->id]);
+                return;
             }
+
+            if (!$adjustment) {
+                $adjustment = new PayrollRunAdjustment();
+                $adjustment->payroll_run_id = $this->payrollRunId;
+                $adjustment->employee_id = $employeeId;
+                $adjustment->type = $type;
+                // Set company_id from the employee
+                $companyId = Employee::withoutCompanyScope()
+                    ->where('id', $employeeId)
+                    ->value('company_id');
+                $adjustment->company_id = $companyId;
+            }
+
+            $adjustment->label = $type;
+            $adjustment->amount = $amount;
+            $adjustment->save();
+
+            $this->existingAdjustmentsCache[$employeeId][$type] = $amount;
+            Log::info('Saved adjustment', ['id' => $adjustment->id, 'company_id' => $adjustment->company_id, 'amount' => $amount]);
         });
+    } catch (\Exception $e) {
+        Log::error('Failed to save adjustment', [
+            'employeeId' => $employeeId,
+            'type' => $type,
+            'amount' => $amount,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
     }
+}
+
+
+
 
     public function save(): void
     {
@@ -268,11 +330,11 @@ class PayrollWizardAdjustments extends Component
         // All adjustments are already saved individually via wire:model
 
         // Force recalculation when moving to preview
-        $run = PayrollRun::find($this->payrollRunId);
+        $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
         if ($run) {
             $run->update(['calculation_status' => 'pending']);
             // Delete old payslips to ensure clean slate (the job will recreate them)
-            \App\Modules\Hr\Models\PayrollPayslip::where('payroll_run_id', $this->payrollRunId)->delete();
+            \App\Modules\Hr\Models\PayrollPayslip::withoutCompanyScope()->where('payroll_run_id', $this->payrollRunId)->delete();
         }
 
         $this->dispatch('adjustmentsComplete');
@@ -280,63 +342,107 @@ class PayrollWizardAdjustments extends Component
 
 
 
-    public function render()
+    /**
+     * Check if the user is in "All Companies" mode (session company_id = 0).
+     */
+    public function isAllCompaniesMode(): bool
     {
-        $run = PayrollRun::findOrFail($this->payrollRunId);
+        return session('current_company_id') === 0;
+    }
 
-        // Prepare filter options (same as before)
-        $employeePositions = EmployeePosition::where('pay_schedule_id', $run->pay_schedule_id)
-            ->where('employment_status', 'Active')
-            ->get(['employee_id', 'department_id', 'location_id']);
-
-        $employeeIds = $employeePositions->pluck('employee_id')->unique();
-        $departmentIds = $employeePositions->pluck('department_id')->unique()->filter();
-        $locationIds = $employeePositions->pluck('location_id')->unique()->filter();
-
-        $companies = collect();
-        if ($employeeIds->isNotEmpty()) {
-            $companyIds = Employee::whereIn('id', $employeeIds)
-                ->whereNotNull('company_id')
-                ->pluck('company_id')
-                ->unique();
-            if ($companyIds->isNotEmpty()) {
-                $companies = Company::whereIn('id', $companyIds)->get();
-            }
+    /**
+     * Computed property: current company name for the static label.
+     */
+    public function getCurrentCompanyNameProperty(): string
+    {
+        $companyId = session('current_company_id');
+        if (!$companyId || $companyId === 0) {
+            return 'All Companies';
         }
+        $company = \App\Modules\Admin\Models\Company::find($companyId);
+        return $company->name ?? 'Unknown Company';
+    }
 
-        $departments = Department::whereIn('id', $departmentIds)->get();
-        $locations = Location::whereIn('id', $locationIds)->get();
-
+public function render()
+{
+    $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
+    if (!$run) {
+        $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found.']);
         return view('hr::livewire.payroll.wizard-adjustments', [
-            'employees' => $this->employees,
-            'companies' => $companies,
-            'departments' => $departments,
-            'locations' => $locations,
-            'sortField' => $this->sortField,
-            'sortDirection' => $this->sortDirection,
-            'search' => $this->search,
+            'employees'        => collect(),
+            'companies'        => collect(),
+            'departments'      => collect(),
+            'locations'        => collect(),
+            'sortField'        => $this->sortField,
+            'sortDirection'    => $this->sortDirection,
+            'search'           => $this->search,
+            'isMultiCompany'   => false,
+            'companyName'      => null,
         ]);
     }
+
+    // Base query for active employees (without date filters)
+    $baseQuery = EmployeePosition::withoutCompanyScope()
+        ->where('employment_status', 'Active')
+        ->whereNull('deleted_at');
+
+    // For single‑company, restrict to the run's pay schedule
+    if (!$run->is_multi_company) {
+        $baseQuery->where('pay_schedule_id', $run->pay_schedule_id);
+    }
+
+    $employeeIds = $baseQuery->pluck('employee_id')->unique();
+
+    // Companies with active employees
+    $companies = collect();
+    if ($employeeIds->isNotEmpty()) {
+        $companyIds = Employee::withoutCompanyScope()
+            ->whereIn('id', $employeeIds)
+            ->whereNotNull('company_id')
+            ->pluck('company_id')
+            ->unique();
+        if ($companyIds->isNotEmpty()) {
+            $companies = Company::whereIn('id', $companyIds)->get();
+        }
+    }
+
+    // Departments and locations (using the same base query)
+    $departmentIds = $baseQuery->pluck('department_id')->unique()->filter();
+    $locationIds   = $baseQuery->pluck('location_id')->unique()->filter();
+
+    $departments = Department::whereIn('id', $departmentIds)->get();
+    $locations   = Location::whereIn('id', $locationIds)->get();
+
+    // Single‑company label
+    $companyName = null;
+    if (!$run->is_multi_company && $run->company_id) {
+        $company = Company::find($run->company_id);
+        $companyName = $company ? $company->name : 'Unknown Company';
+    }
+
+    return view('hr::livewire.payroll.wizard-adjustments', [
+        'employees'        => $this->employees,
+        'companies'        => $companies,
+        'departments'      => $departments,
+        'locations'        => $locations,
+        'sortField'        => $this->sortField,
+        'sortDirection'    => $this->sortDirection,
+        'search'           => $this->search,
+        'isMultiCompany'   => $run->is_multi_company,
+        'companyName'      => $companyName,
+    ]);
+}
+
 
     public function hydrate(): void
     {
         if ($this->payrollRunId && !PayrollRun::where('id', $this->payrollRunId)->exists()) {
-            $this->dispatch('wizardError', 'The payroll run session has expired or the record was deleted.');
-            $this->dispatch('redirectToWizardStart');
+            session()->forget('payroll-wizard-' . auth()->id());
+            $this->redirectRoute('payroll-runs.create', ['error' => 'The payroll run has expired or was deleted.']);
         }
     }
 
 }
-
-
-
-
-
-
-
-
-
-
 
 
 

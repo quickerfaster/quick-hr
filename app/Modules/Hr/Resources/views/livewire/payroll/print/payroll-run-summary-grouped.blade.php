@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Payroll Summary by {{ ucfirst($groupBy) }}</title>
     <style>
-        /* Your existing CSS – add .text-end, etc. */
         body { font-family: 'DejaVu Sans', sans-serif; font-size: 10pt; padding: 20px; }
         .header { text-align: center; margin-bottom: 20px; }
         .header h1 { margin: 0; font-size: 22pt; }
@@ -18,19 +17,39 @@
         .text-end { text-align: right; }
         .subtotal-row, .total-row { background-color: #f2f2f2; font-weight: bold; }
         .no-print { text-align: center; margin-top: 30px; }
+        .multi-company-badge {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 10pt;
+        }
         @media print {
             th { background-color: #2c3e50 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .no-print { display: none; }
+            .multi-company-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
 <body>
 <div class="header">
-    <h1>{{ $run->paySchedule->name }} – Payroll Summary by {{ ucfirst($groupBy) }}</h1>
+    <h1>
+        @if($run->paySchedule)
+            {{ $run->paySchedule->name }} –
+        @elseif($run->is_multi_company)
+            <span class="multi-company-badge">All Companies</span> –
+        @else
+            Payroll –
+        @endif
+        Summary by {{ ucfirst($groupBy) }}
+    </h1>
     <p>{{ $run->period_start->format('M d, Y') }} – {{ $run->period_end->format('M d, Y') }}</p>
     <p>Generated: {{ now()->format('F j, Y, g:i a') }}</p>
+    @if($run->is_multi_company)
+        <p><strong>Type:</strong> Multi‑Company Run</p>
+    @endif
 </div>
-
 
 {{-- Sticky print/close buttons --}}
 <div class="no-print sticky-top bg-white pt-2 pb-2 border-bottom mb-3" style="top: 0; z-index: 1020;">
@@ -43,7 +62,6 @@
         </button>
     </div>
 </div>
-
 
 @php
     $groupTotals = [];
@@ -63,10 +81,9 @@
     $grandTaxes = array_sum(array_column($groupTotals, 'taxes'));
     $grandEmployer = array_sum(array_column($groupTotals, 'employer_contributions'));
     $grandNet = array_sum(array_column($groupTotals, 'net'));
-
 @endphp
 
-{{-- Summary Table (with extra columns) --}}
+{{-- Summary Table --}}
 <h2>Summary Totals by {{ ucfirst($groupBy) }}</h2>
 <table class="summary-table">
     <thead>
@@ -106,7 +123,8 @@
     </tfoot>
 </table>
 <br /><br />
-{{-- Detailed Tables (per group) – also include taxes and employer columns --}}
+
+{{-- Detailed Tables (per group) --}}
 <h2>Detailed Breakdown by {{ ucfirst($groupBy) }}</h2>
 @foreach($groups as $groupName => $payslips)
     @php
@@ -153,8 +171,6 @@
     </table>
     <div style="margin-bottom: 20px;"></div>
 @endforeach
-
-
 
 <div class="no-print">
     <button onclick="window.print()">🖨️ Print / Save as PDF</button>

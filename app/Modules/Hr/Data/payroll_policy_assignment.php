@@ -125,32 +125,36 @@ return [
     ],
   ],
   'detailComponent' => '',
+
   'hiddenFields' => [
     'onTable' => [
-      '0' => 'effective_date',
-      '1' => 'expiry_date',
-      '2' => 'created_by',
-      '3' => 'updated_by',
-      '4' => 'created_at',
-      '5' => 'updated_at',
-      '6' => 'deleted_at',
-      '7' => 'company_id',
+        '0' => 'effective_date',
+        '1' => 'expiry_date',
+        '2' => 'created_by',
+        '3' => 'updated_by',
+        '4' => 'created_at',
+        '5' => 'updated_at',
+        '6' => 'deleted_at',
+        '7' => 'company_id',
     ],
     'onNewForm' => [
-      '0' => 'created_by',
-      '1' => 'updated_by',
-      '2' => 'deleted_at',
-      '3' => 'company_id',
+        '0' => 'created_by',
+        '1' => 'updated_by',
+        '2' => 'deleted_at',
+        '3' => 'company_id',
+        '4' => 'assignable_type',  // <-- ADD THIS
     ],
     'onEditForm' => [
-      '0' => 'updated_by',
-      '1' => 'deleted_at',
-      '2' => 'company_id',
+        '0' => 'updated_by',
+        '1' => 'deleted_at',
+        '2' => 'company_id',
+        '3' => 'assignable_type',  // <-- AND THIS
     ],
     'onQuery' => [
-      '0' => 'deleted_at',
+        '0' => 'deleted_at',
     ],
-  ],
+],
+
   'simpleActions' => [
     '0' => 'show',
     '1' => 'edit',
@@ -231,7 +235,7 @@ return [
       'groupType' => 'payroll',
       'icon' => 'fas fa-link',
       'fields' => [
-        '0' => 'payroll_policy_id',
+        // '0' => 'payroll_policy_id',
         '1' => 'assignable_type',
         '2' => 'assignable_id',
         '3' => 'priority',

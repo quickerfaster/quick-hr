@@ -26,6 +26,15 @@ class PayrollGenerator
 {
     public function generatePayroll(PayrollRun $payrollRun)
     {
+        // Guard: This legacy generator does NOT support multi-company runs.
+        // Multi-company runs are handled by PayrollCalculator::calculateMultiCompany().
+        if (!empty($payrollRun->is_multi_company)) {
+            throw new \RuntimeException(
+                'PayrollGenerator does not support multi-company runs. '
+                . 'Use PayrollCalculator for multi-company payroll processing.'
+            );
+        }
+
         if ($payrollRun->status !== 'draft') {
             throw new \Exception('Payroll can only be generated for draft runs');
         }

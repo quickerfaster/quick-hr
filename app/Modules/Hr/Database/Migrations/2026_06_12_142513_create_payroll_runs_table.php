@@ -12,8 +12,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
             $table->index('company_id');
+            $table->boolean('is_multi_company')->default(false);
             $table->string('title');
-            $table->foreignId('pay_schedule_id')->constrained('pay_schedules', 'id')->onDelete('restrict');
+            $table->foreignId('pay_schedule_id')->nullable()->constrained('pay_schedules', 'id')->onDelete('restrict');
             $table->date('period_start');
             $table->date('period_end');
             $table->string('status')->default('draft')->nullable();
@@ -42,6 +43,8 @@ return new class extends Migration
             $table->integer('processed_employees')->default(0)->nullable();
             $table->datetime('failed_at')->nullable();
             $table->text('failure_reason')->nullable();
+            $table->json('per_company_summaries')->nullable();
+
             $table->text('notes')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
@@ -58,6 +61,7 @@ return new class extends Migration
 			$table->index(['status', 'period_start']);
 			$table->index(['period_start', 'period_end']);
 			$table->index(['pay_schedule_id', 'period_start', 'period_end']);
+			$table->index('is_multi_company');
 			$table->unique('title');
 
             $table->timestamps();

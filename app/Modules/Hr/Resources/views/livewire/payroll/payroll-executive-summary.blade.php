@@ -8,7 +8,16 @@
 
     <div>
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2>Executive Summary – {{ $run->paySchedule->name }} </h2>
+<h2>Executive Summary –
+    @if($run->paySchedule)
+        {{ $run->paySchedule->name }}
+    @elseif($run->is_multi_company)
+        Multi‑Company Run
+    @else
+        No Schedule
+    @endif
+</h2>
+
             <div class="btn-group">
                 <button onclick="window.print()" class="btn btn-sm btn-secondary">
                     <i class="fas fa-print"></i> Print

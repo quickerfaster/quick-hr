@@ -9,15 +9,24 @@
 
     {{-- Filters --}}
     <div class="row mb-3 g-2">
-        <div class="col-md-3">
-            <label class="form-label">Company</label>
-            <select wire:model.live="filterCompany" class="form-select form-select-sm">
-                <option value="">All Companies</option>
-                @foreach ($companies as $comp)
-                    <option value="{{ $comp->id }}">{{ $comp->name }}</option>
-                @endforeach
-            </select>
+{{-- Company filter --}}
+<div class="col-md-3">
+    <label class="form-label">Company</label>
+    @if($isMultiCompany)
+        <select wire:model.live="filterCompany" class="form-select form-select-sm">
+            <option value="">All Companies</option>
+            @foreach ($companies as $comp)
+                <option value="{{ $comp->id }}">{{ $comp->name }}</option>
+            @endforeach
+        </select>
+    @else
+        <div class="form-control form-control-sm bg-light text-muted d-flex align-items-center"
+             style="border: 1px solid #dee2e6; height: 31px;">
+            <i class="fas fa-building me-1"></i>
+            <span>{{ $companyName ?? 'N/A' }}</span>
         </div>
+    @endif
+</div>
         <div class="col-md-3">
             <label class="form-label">Department</label>
             <select wire:model.live="filterDepartment" class="form-select form-select-sm">
