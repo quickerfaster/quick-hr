@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('pattern_type')->default('recurring');
             $table->integer('rotation_weeks')->default(2)->nullable();
             $table->foreignId('shift_id')->constrained('shifts', 'id')->onDelete('restrict');
-            $table->text('applicable_days');
+            // $table->text('applicable_days');
+            $table->string('applicable_days', 20);
             $table->time('override_start_time')->nullable();
             $table->time('override_end_time')->nullable();
             $table->date('effective_date');
