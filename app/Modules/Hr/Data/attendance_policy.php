@@ -413,7 +413,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived attendance policy?',
       'requiredPermission' => 'restore_attendance_policy',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -421,7 +421,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this policy?',
       'requiredPermission' => 'force_delete_attendance_policy',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

@@ -407,14 +407,14 @@ return [
       'icon' => 'fas fa-trash-restore',
       'action' => 'restore',
       'confirm' => 'Restore this archived session?',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '3' => [
       'title' => 'Permanently Delete',
       'icon' => 'fas fa-skull-crossbones',
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this session?',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

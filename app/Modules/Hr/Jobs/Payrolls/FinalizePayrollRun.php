@@ -17,7 +17,7 @@ class FinalizePayrollRun implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $timeout = 60;
-    public $tries = 1;
+    public $tries = 3;
 
     protected int $payrollRunId;
 
@@ -31,6 +31,12 @@ class FinalizePayrollRun implements ShouldQueue
         $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
         if (!$run) {
             Log::error("Finalize job: Payroll run #{$this->payrollRunId} not found.");
+            return;
+        }
+
+        // Idempotency guard: skip if already finalized
+        if ($run->finalized_at !== null) {
+            Log::info("Finalize job: Payroll run #{$this->payrollRunId} already finalized. Skipping.");
             return;
         }
 
@@ -56,14 +62,19 @@ $progress = PayrollRunProgress::withoutCompanyScope()
             return;
         }
 
-        // All employees processed – update totals
+        // All employees processed – update totals and aggregations.
+        // calculation_status is now set by ProcessEmployeeBatch when the last batch finishes,
+        // so payslips appear immediately without waiting for this delayed job.
         $calculator->setRun($run);
-        $calculator->updateRunTotals(); // this sets calculation_status = 'completed'
+        $calculator->updateRunTotals();
+
+        // Mark the run as finalized
+        $run->update(['finalized_at' => now()]);
 
         // Update progress status
 PayrollRunProgress::withoutCompanyScope()
     ->where('payroll_run_id', $this->payrollRunId)
-    ->update(['status' => 'completed']);
+    ->update(['status' => 'finalized']);
 
         Log::info("Payroll run #{$this->payrollRunId} finalized successfully.");
     }

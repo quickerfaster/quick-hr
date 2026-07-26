@@ -22,7 +22,7 @@ return [
       'options' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'column' => 'employee_number',
-        'hintField' => 'first_name',
+        'hintField' => 'first_name,last_name',
       ],
     ],
     'company_id' => [
@@ -66,7 +66,7 @@ return [
       'options' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'column' => 'employee_number',
-        'hintField' => 'first_name',
+        'hintField' => 'first_name,last_name',
       ],
     ],
     'approval_level' => [
@@ -233,7 +233,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived approval rule?',
       'requiredPermission' => 'restore_leave_approver',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -241,7 +241,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this approval rule?',
       'requiredPermission' => 'force_delete_leave_approver',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

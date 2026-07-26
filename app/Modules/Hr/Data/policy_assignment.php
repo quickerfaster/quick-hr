@@ -187,7 +187,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived assignment?',
       'requiredPermission' => 'restore_policy_assignment',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -195,7 +195,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this assignment?',
       'requiredPermission' => 'force_delete_policy_assignment',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

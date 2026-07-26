@@ -36,9 +36,9 @@
                 </button>
             @endif
 
-            <button wire:click="queueSummaryPdf" class="btn btn-sm btn-secondary me-1">
+            {{-- -- --<button wire:click="queueSummaryPdf" class="btn btn-sm btn-secondary me-1">
                 <i class="fas fa-file-pdf"></i> Summary PDF
-            </button>
+            </button>--}}
 
             <div class="btn-group">
                 <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown">

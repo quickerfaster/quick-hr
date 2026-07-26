@@ -22,7 +22,7 @@ return [
       'options' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'column' => 'employee_number',
-        'hintField' => 'first_name',
+        'hintField' => 'first_name,last_name',
       ],
     ],
     'company_id' => [
@@ -220,7 +220,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived document?',
       'requiredPermission' => 'restore_document',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -228,7 +228,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this document and its file?',
       'requiredPermission' => 'force_delete_document',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

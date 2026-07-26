@@ -46,6 +46,7 @@ class PayrollWizardPreview extends Component
     public int $processedEmployees = 0;
     public bool $isPolling = false;
     public bool $processingStartedEventSent = false;
+    public bool $isFinalized = false;
 
     // Sorting properties
     public string $sortField = 'employee_name';
@@ -87,6 +88,7 @@ public function mount(int $stepIndex, int $payrollRunId): void
         $this->calculationStatus = $run->calculation_status;
         $this->totalEmployees = $run->total_employees ?? 0;
         $this->processedEmployees = $run->processed_employees ?? 0;
+        $this->isFinalized = $run->finalized_at !== null;
 
         if ($this->totalEmployees > 0) {
             $this->progress = round(($this->processedEmployees / $this->totalEmployees) * 100);
@@ -204,7 +206,13 @@ protected function startCalculation(): void
             $this->progress = $this->totalEmployees ? round(($this->processedEmployees / $this->totalEmployees) * 100) : 0;
         }
 
-        if ($this->calculationStatus === 'completed') {
+        // Check if finalized
+        $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
+        $this->isFinalized = $run && $run->finalized_at !== null;
+
+        $allProcessed = $this->totalEmployees > 0 && $this->processedEmployees >= $this->totalEmployees;
+
+        if ($this->calculationStatus === 'completed' || $allProcessed) {
             $this->dispatch('processingFinished');
             $this->loadCalculatedData();
         } elseif ($this->calculationStatus === 'failed') {
@@ -219,7 +227,11 @@ protected function startCalculation(): void
 
 public function getPayslipsProperty()
 {
-    if ($this->calculationStatus !== 'completed') {
+    // Show payslips when calculation is completed OR when all employees have been
+    // processed (belt-and-suspenders: payslips appear immediately even if the
+    // status hasn't flipped yet due to FinalizePayrollRun's delay).
+    $allProcessed = $this->totalEmployees > 0 && $this->processedEmployees >= $this->totalEmployees;
+    if ($this->calculationStatus !== 'completed' && !$allProcessed) {
         return collect();
     }
 
@@ -289,7 +301,8 @@ public function getPayslipsProperty()
 
     public function toggleDetails($payslipId): void
     {
-        if ($this->calculationStatus !== 'completed')
+        $allProcessed = $this->totalEmployees > 0 && $this->processedEmployees >= $this->totalEmployees;
+        if ($this->calculationStatus !== 'completed' && !$allProcessed)
             return;
 
         if ($this->expandedPayslipId === $payslipId) {
@@ -344,7 +357,8 @@ public function getPayslipsProperty()
 
     public function save(): void
     {
-        if ($this->calculationStatus !== 'completed') {
+        $allProcessed = $this->totalEmployees > 0 && $this->processedEmployees >= $this->totalEmployees;
+        if ($this->calculationStatus !== 'completed' && !$allProcessed) {
             $this->dispatch('showAlert', ['type' => 'warning', 'message' => 'Please wait for calculation to complete.']);
             return;
         }
@@ -481,6 +495,7 @@ public function render()
         'previewData'        => $this->previewData,
         'isMultiCompany'     => $run->is_multi_company,
         'companyName'        => $companyName,
+        'isFinalized'        => $this->isFinalized,
     ]);
 }
 

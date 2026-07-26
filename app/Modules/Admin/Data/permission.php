@@ -140,7 +140,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived permission?',
       'requiredPermission' => 'restore_permission',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -148,7 +148,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this permission?',
       'requiredPermission' => 'force_delete_permission',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

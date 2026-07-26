@@ -300,7 +300,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived employee?',
       'requiredPermission' => 'restore_employee',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -308,7 +308,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this employee record?',
       'requiredPermission' => 'force_delete_employee',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

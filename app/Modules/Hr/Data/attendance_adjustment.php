@@ -236,7 +236,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived adjustment?',
       'requiredPermission' => 'restore_attendance_adjustment',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '2' => [
       'title' => 'Permanently Delete',
@@ -244,7 +244,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this adjustment?',
       'requiredPermission' => 'force_delete_attendance_adjustment',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

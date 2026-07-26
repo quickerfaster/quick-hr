@@ -126,7 +126,7 @@ return array (
       array (
         'label' => 'Complete Leave Request',
         'url' => '/hr/leave-request',
-        'condition' => 'create_leave_request',
+        'condition' => ['create_leave_request' => [true]],
       ),
       2 => 
       array (

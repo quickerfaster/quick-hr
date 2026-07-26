@@ -322,13 +322,14 @@ $oneTime = PayrollRunAdjustment::withoutGlobalScope(\App\Modules\Admin\Scopes\Co
             $q->where('payroll_run_id', $this->run->id);
         })->where('type', 'tax')->sum('amount');
 
+        // NOTE: calculation_status is now set by ProcessEmployeeBatch when the last
+        // batch finishes, so payslips appear immediately without waiting for finalization.
         $this->run->update([
             'total_gross_pay' => $totals->total_gross ?? 0,
             'total_deductions' => $totals->total_deductions ?? 0,
             'total_cash_required' => $totals->total_net ?? 0,
             'total_employer_contributions' => $totalEmployerContributions,
             'total_taxes' => $totalTaxes,
-            'calculation_status' => 'completed',
         ]);
     }
 

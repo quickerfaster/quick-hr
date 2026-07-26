@@ -653,7 +653,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived attendance record?',
       'requiredPermission' => 'restore_attendance',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '8' => [
       'title' => 'Permanently Delete',
@@ -661,7 +661,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this attendance record?',
       'requiredPermission' => 'force_delete_attendance',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

@@ -188,7 +188,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived assignment?',
       'requiredPermission' => 'restore_employee_work_pattern',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -196,7 +196,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this assignment?',
       'requiredPermission' => 'force_delete_employee_work_pattern',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

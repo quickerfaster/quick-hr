@@ -433,7 +433,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived holiday?',
       'requiredPermission' => 'restore_holiday',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -441,7 +441,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this holiday?',
       'requiredPermission' => 'force_delete_holiday',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

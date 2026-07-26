@@ -148,7 +148,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this job title?',
       'requiredPermission' => 'restore_job_title',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -156,7 +156,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this job title?',
       'requiredPermission' => 'force_delete_job_title',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

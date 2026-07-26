@@ -458,11 +458,7 @@ return [
       'fieldValue' => 'confirmed',
       'actionName' => 'confirm_schedule',
       'confirm' => 'Confirm this schedule?',
-      'condition' => [
-        '0' => [
-          'status' => 'scheduled',
-        ],
-      ],
+      'condition' => ['status' => ['scheduled']],
     ],
     '1' => [
       'title' => 'Cancel Schedule',
@@ -472,14 +468,7 @@ return [
       'fieldValue' => 'cancelled',
       'actionName' => 'cancel_schedule',
       'confirm' => 'Cancel this schedule?',
-      'condition' => [
-        '0' => [
-          'status' => [
-            '0' => 'scheduled',
-            '1' => 'confirmed',
-          ],
-        ],
-      ],
+      'condition' => ['status' => ['scheduled', 'confirmed']],
     ],
     '2' => [
       'title' => 'Mark as Completed',
@@ -489,11 +478,7 @@ return [
       'fieldValue' => 'completed',
       'actionName' => 'complete_schedule',
       'confirm' => 'Mark this schedule as completed?',
-      'condition' => [
-        '0' => [
-          'status' => 'confirmed',
-        ],
-      ],
+      'condition' => ['status' => ['confirmed']],
     ],
     '3' => [
       'title' => 'Publish to Employee',
@@ -502,11 +487,7 @@ return [
       'fieldName' => 'is_published',
       'fieldValue' => true,
       'actionName' => 'publish_schedule',
-      'condition' => [
-        '0' => [
-          'is_published' => false,
-        ],
-      ],
+      'condition' => ['is_published' => [false]],
     ],
     '4' => [
       'title' => 'Request Cover',
@@ -515,11 +496,7 @@ return [
       'fieldName' => 'is_cover_required',
       'fieldValue' => true,
       'actionName' => 'request_cover',
-      'condition' => [
-        '0' => [
-          'is_cover_required' => false,
-        ],
-      ],
+      'condition' => ['is_cover_required' => [false]],
     ],
     '5' => [
       'title' => 'Restore',
@@ -527,7 +504,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived schedule?',
       'requiredPermission' => 'restore_shift_schedule',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '6' => [
       'title' => 'Permanently Delete',
@@ -535,7 +512,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this schedule?',
       'requiredPermission' => 'force_delete_shift_schedule',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

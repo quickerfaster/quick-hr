@@ -279,14 +279,14 @@ return [
       'icon' => 'fas fa-trash-restore',
       'action' => 'restore',
       'confirm' => 'Restore this archived clock event?',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
       'icon' => 'fas fa-skull-crossbones',
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this clock event?',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

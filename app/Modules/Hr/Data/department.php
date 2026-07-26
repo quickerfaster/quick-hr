@@ -197,7 +197,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived department?',
       'requiredPermission' => 'restore_department',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -205,7 +205,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this department?',
       'requiredPermission' => 'force_delete_department',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

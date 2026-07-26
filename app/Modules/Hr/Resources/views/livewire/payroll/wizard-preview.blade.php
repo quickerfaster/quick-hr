@@ -38,8 +38,21 @@
         </div>
     @endif
 
-    {{-- Completed (show preview) --}}
-    @if ($calculationStatus === 'completed')
+    {{-- Computing totals (calculation complete, finalization pending) --}}
+    {{-- - @if (($calculationStatus === 'completed' || ($processedEmployees >= $totalEmployees && $totalEmployees > 0)) && !$isFinalized)
+        <div class="card mb-4" wire:poll.2s="checkCalculationStatus">
+            <div class="card-body text-center">
+                <p class="mb-0 text-muted">
+                    <i class="fas fa-calculator me-2"></i>
+                    Computing totals…
+                </p>
+            </div>
+        </div>
+    @endif
+    --}}
+
+    {{-- Completed or all employees processed (show preview) --}}
+    @if ($calculationStatus === 'completed' || ($processedEmployees >= $totalEmployees && $totalEmployees > 0))
         <h4>Review Payroll Run</h4>
         <p class="text-muted">Period: {{ $previewData['period_start'] ?? '' }} – {{ $previewData['period_end'] ?? '' }}
         </p>

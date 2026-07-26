@@ -44,7 +44,7 @@ return [
       'options' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'column' => 'employee_number',
-        'hintField' => 'first_name',
+        'hintField' => 'first_name,last_name',
       ],
       'wizard' => [
         'employee_self_service' => true,
@@ -141,7 +141,7 @@ return [
       'options' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'column' => 'employee_number',
-        'hintField' => 'first_name',
+        'hintField' => 'first_name,last_name',
       ],
     ],
     'approved_at' => [
@@ -321,13 +321,7 @@ return [
         'updateModelField' => 'status',
         'fieldValue' => 'Approved',
         'confirm' => 'Approve selected leave requests?',
-        'condition' => [
-          '0' => [
-            'status' => [
-              '0' => 'Pending',
-            ],
-          ],
-        ],
+        'condition' => ['status' => ['Pending']],
       ],
       'deny' => [
         'label' => 'Deny Selected',
@@ -335,13 +329,7 @@ return [
         'updateModelField' => 'status',
         'fieldValue' => 'Denied',
         'confirm' => 'Deny selected leave requests?',
-        'condition' => [
-          '0' => [
-            'status' => [
-              '0' => 'Pending',
-            ],
-          ],
-        ],
+        'condition' => ['status' => ['Pending']],
       ],
       'delete' => true,
       'restore' => true,
@@ -409,7 +397,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived leave request?',
       'requiredPermission' => 'restore_leave_request',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -417,7 +405,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this leave request?',
       'requiredPermission' => 'force_delete_leave_request',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

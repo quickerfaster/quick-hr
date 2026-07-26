@@ -62,6 +62,7 @@ class PayrollRun extends Model
         'total_employees' => 'integer',
         'processed_employees' => 'integer',
         'failed_at' => 'datetime',
+        'finalized_at' => 'datetime',
         'created_by' => 'integer',
         'updated_by' => 'integer',
         'is_multi_company' => 'boolean',
@@ -162,6 +163,14 @@ class PayrollRun extends Model
     public function company()
     {
         return $this->belongsTo(\App\Modules\Hr\Models\Company::class, 'company_id', 'id');
+    }
+
+    /**
+     * Whether this payroll run has been finalized.
+     */
+    public function getIsFinalizedAttribute(): bool
+    {
+        return $this->finalized_at !== null;
     }
 
     /**

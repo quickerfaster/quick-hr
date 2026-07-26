@@ -457,7 +457,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived location?',
       'requiredPermission' => 'restore_location',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -465,7 +465,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this location?',
       'requiredPermission' => 'force_delete_location',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

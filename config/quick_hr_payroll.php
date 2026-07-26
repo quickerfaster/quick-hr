@@ -20,7 +20,7 @@ return [
     // Number of retry attempts for a failed batch job (1 = no retry)
     'batch_tries' => env('PAYROLL_BATCH_TRIES', 1),
 
-    // Delay (seconds) before the finalization job runs after dispatching all batches
-    'finalization_delay_per_batch' => env('PAYROLL_FINALIZATION_DELAY_PER_BATCH', 0),
-    'finalization_buffer' => env('PAYROLL_FINALIZATION_BUFFER', 30),
+    // DEPRECATED: Finalization is now dispatched immediately by the last ProcessEmployeeBatch.
+    // 'finalization_delay_per_batch' => env('PAYROLL_FINALIZATION_DELAY_PER_BATCH', 0),
+    // 'finalization_buffer' => env('PAYROLL_FINALIZATION_BUFFER', 30),
 ];

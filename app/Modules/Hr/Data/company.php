@@ -313,7 +313,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived company?',
       'requiredPermission' => 'restore_company',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -321,7 +321,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this company?',
       'requiredPermission' => 'force_delete_company',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

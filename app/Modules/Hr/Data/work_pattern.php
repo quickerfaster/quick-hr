@@ -358,7 +358,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived work pattern?',
       'requiredPermission' => 'restore_work_pattern',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -366,7 +366,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this pattern?',
       'requiredPermission' => 'force_delete_work_pattern',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

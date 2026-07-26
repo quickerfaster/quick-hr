@@ -15,7 +15,6 @@ use App\Modules\Hr\Models\PayrollPayslip;
 use App\Modules\Hr\Services\Payroll\PayrollCalculator;
 
 use App\Modules\Hr\Jobs\Payrolls\ProcessEmployeeBatch;
-use App\Modules\Hr\Jobs\Payrolls\FinalizePayrollRun;
 
 
 /**
@@ -162,15 +161,10 @@ class ProcessPayrollRun implements ShouldQueue
             ProcessEmployeeBatch::dispatch($run->id, $chunk);
         }
 
-        // ------------------------------------------------------------
-        // 7. Dispatch finalization job with a delay
-        // ------------------------------------------------------------
-        $delayPerBatch = config('quick_hr_payroll.finalization_delay_per_batch', 5);
-        $buffer = config('quick_hr_payroll.finalization_buffer', 30);
-        $delaySeconds = (count($chunks) * $delayPerBatch) + $buffer;
-        FinalizePayrollRun::dispatch($run->id)->delay(now()->addSeconds($delaySeconds));
+        // NOTE: FinalizePayrollRun is now dispatched by the last ProcessEmployeeBatch
+        // when all employees are processed, instead of with a delay here.
 
-        Log::info("Dispatched " . count($chunks) . " batch jobs for run #{$run->id}, finalization scheduled in {$delaySeconds}s.");
+        Log::info("Dispatched " . count($chunks) . " batch jobs for run #{$run->id}.");
     }
 
     /**

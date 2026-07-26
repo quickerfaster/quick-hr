@@ -19,7 +19,7 @@ class ProcessEmployeeBatch implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $timeout;
-    public $tries;
+    public $tries = 3;
 
     protected int $payrollRunId;
     protected array $employeeIds;
@@ -29,7 +29,6 @@ class ProcessEmployeeBatch implements ShouldQueue
         $this->payrollRunId = $payrollRunId;
         $this->employeeIds = $employeeIds;
         $this->timeout = config('quick_hr_payroll.batch_timeout', 60);
-        $this->tries = config('quick_hr_payroll.batch_tries', 1);
     }
 
     public function handle(PayrollCalculator $calculator): void
@@ -88,6 +87,8 @@ PayrollRunProgress::withoutCompanyScope()
             if ($run && $run->calculation_status !== 'completed') {
                 $run->update(['calculation_status' => 'completed']);
             }
+            // Dispatch finalization immediately from the last batch
+            \App\Modules\Hr\Jobs\Payrolls\FinalizePayrollRun::dispatch($this->payrollRunId);
         }
 
         Log::info("Batch job processed {$count} employees for run #{$this->payrollRunId}");
@@ -95,9 +96,14 @@ PayrollRunProgress::withoutCompanyScope()
 
     public function failed(\Throwable $exception): void
     {
-        Log::error("Employee batch failed for run #{$this->payrollRunId}", [
-            'employee_ids' => $this->employeeIds,
+        Log::error('ProcessEmployeeBatch failed', [
+            'run_id' => $this->payrollRunId,
             'error' => $exception->getMessage(),
         ]);
+
+        $run = \App\Modules\Hr\Models\PayrollRun::find($this->payrollRunId);
+        if ($run) {
+            $run->update(['calculation_status' => 'failed']);
+        }
     }
 }

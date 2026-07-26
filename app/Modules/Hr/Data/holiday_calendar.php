@@ -294,7 +294,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived holiday calendar?',
       'requiredPermission' => 'restore_holiday_calendar',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -302,7 +302,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this calendar?',
       'requiredPermission' => 'force_delete_holiday_calendar',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [

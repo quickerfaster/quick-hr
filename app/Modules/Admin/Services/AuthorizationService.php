@@ -25,7 +25,6 @@ class AuthorizationService
         'payroll-wizard' => 'payroll_run', // payroll_run permission needed
     ];
 
-
     const ADMIN_ROLES = ['super_admin', 'company_admin'];
 
     /**
@@ -82,10 +81,6 @@ class AuthorizationService
             return self::CUSTOM_VIEW_MODEL_NAMES[$view];
         }
 
-        /*if (str_contains($view, 'dashboard') || str_contains($view, 'overview')) {
-            return 'overview';
-        }*/
-
         if (str_starts_with($view, 'dashboard-')) {
             $view = str_replace("dashboard-", "", $view);
         }
@@ -96,6 +91,8 @@ class AuthorizationService
 
     /**
      * Check if user can perform an action on a specific row (record).
+     * Conditions (state-based) are always enforced, even for admins.
+     * Roles/permissions are bypassed for super_admin and company_admin.
      *
      * @param User $user
      * @param array $action  e.g. ['requiredPermission' => 'update_role']
@@ -104,11 +101,20 @@ class AuthorizationService
      */
     public function canPerformAction(User $user, array $action, $row): bool
     {
+        // 1. Check business conditions (state-based) – always apply, even for admins
+        if (isset($action['condition'])) {
+            $conditions = $action['condition'];
+            if (!$this->evaluateConditions($row, $conditions)) {
+                return false;
+            }
+        }
+
+        // 2. Bypass for super admin / company admin (skip role/permission checks)
         if ($this->isBypassAllowed($user)) {
             return true;
         }
 
-        // 1. Check required role
+        // 3. Check required role
         if (isset($action['requiredRole'])) {
             $requiredRoles = (array) $action['requiredRole'];
             if (!$user->hasAnyRole($requiredRoles)) {
@@ -116,23 +122,15 @@ class AuthorizationService
             }
         }
 
-        // 2. Check required permission
+        // 4. Check required permission
         if (isset($action['requiredPermission'])) {
-            $requiredPermissions = (array) $action['requiredPermission']; // This should be fixed with array of requiredPermissions
-            if ($user->hasAnyPermission($requiredPermissions)) {
-                return true;
-            }
-        }
-
-        // 3. Check business conditions (state-based)
-        if (isset($action['condition'])) { // This should be fixed with array of conditions
-            $actions = (array) $action['condition'];
-            if (!$this->checkBusinessConditions($row, $actions)) {
+            $requiredPermissions = (array) $action['requiredPermission'];
+            if (!$user->hasAnyPermission($requiredPermissions)) {
                 return false;
             }
         }
 
-        // 4. Check data scope (can user access this specific record's data?)
+        // 5. Check data scope (multi-tenant / user-level)
         if (!$this->isInUserScope($user, $row)) {
             return false;
         }
@@ -140,82 +138,129 @@ class AuthorizationService
         return true;
     }
 
+/**
+ * Evaluate business conditions on a row.
+ * Supports nested groups: if multiple groups are provided, at least one group must match (OR).
+ * Within a group, all conditions must match (AND).
+ *
+ * @param mixed $row
+ * @param array $conditions
+ * @return bool
+ */
+public function evaluateConditions($row, array $conditions): bool
+{
+    if (empty($conditions)) {
+        return true;
+    }
 
+    // Normalise to an array of groups (each group is an associative array of field => allowedValues)
+    if (!isset($conditions[0]) || !is_array($conditions[0])) {
+        $conditions = [$conditions];
+    }
+
+    foreach ($conditions as $group) {
+        $groupPass = true;
+        foreach ($group as $field => $allowedValues) {
+            // Resolve the actual value from the row
+            $actual = null;
+
+            // 1. Check if it's a direct property
+            if (property_exists($row, $field)) {
+                $actual = $row->$field;
+            }
+            // 2. Check if it's a method (e.g., trashed())
+            elseif (method_exists($row, $field)) {
+                $result = $row->$field();
+                // If it's a relation, we cannot use it directly; treat as not matching
+                if ($result instanceof \Illuminate\Database\Eloquent\Relations\Relation) {
+                    // Optionally, you could check if the relation exists (e.g., $row->relation()->exists())
+                    // But for simple cases like 'trashed', it returns a boolean, not a relation.
+                    // We'll set $actual to null to avoid matching.
+                    $actual = null;
+                } else {
+                    $actual = $result;
+                }
+            }
+            // 3. Fallback to data_get (handles nested relations like 'company.name')
+            else {
+                $actual = data_get($row, $field);
+            }
+
+            // Evaluate against allowed values
+            if (is_array($allowedValues)) {
+                if (!in_array($actual, $allowedValues, true)) {
+                    $groupPass = false;
+                    break;
+                }
+            } else {
+                if ($actual != $allowedValues) {
+                    $groupPass = false;
+                    break;
+                }
+            }
+        }
+        if ($groupPass) {
+            return true; // at least one group matches
+        }
+    }
+
+    return false;
+}
+
+    // -------------------------------------------------------------------------
+    // Bulk permission methods (unchanged)
+    // -------------------------------------------------------------------------
 
     public function canBulkDelete($user, string $modelClass): bool
     {
-        if (!$user)
-            return false;
-        if ($this->isBypassAllowed($user))
-            return true;
+        if (!$user) return false;
+        if ($this->isBypassAllowed($user)) return true;
         $modelName = $this->getModelNameFromClassName($modelClass);
         return $user->can('delete_' . $modelName);
     }
 
-
-
     public function canBulkRestore($user, string $modelClass): bool
     {
-        if (!$user)
-            return false;
-        if ($this->isBypassAllowed($user))
-            return true;
+        if (!$user) return false;
+        if ($this->isBypassAllowed($user)) return true;
         $modelName = $this->getModelNameFromClassName($modelClass);
         return $user->can('restore_' . $modelName);
     }
 
-
     public function canBulkForceDelete($user, string $modelClass): bool
     {
-        if (!$user)
-            return false;
-        if ($this->isBypassAllowed($user))
-            return true;
+        if (!$user) return false;
+        if ($this->isBypassAllowed($user)) return true;
         $modelName = $this->getModelNameFromClassName($modelClass);
         return $user->can('force_delete_' . $modelName);
     }
 
-
-
     public function canBulkExport($user, string $modelClass): bool
     {
-        if (!$user)
-            return false;
-        if ($this->isBypassAllowed($user))
-            return true;
+        if (!$user) return false;
+        if ($this->isBypassAllowed($user)) return true;
         $modelName = $this->getModelNameFromClassName($modelClass);
         return $user->can('export_' . $modelName);
     }
 
-
     public function canBulkUpdate($user, string $modelClass): bool
     {
-        if (!$user)
-            return false;
-        if ($this->isBypassAllowed($user))
-            return true;
+        if (!$user) return false;
+        if ($this->isBypassAllowed($user)) return true;
         $modelName = $this->getModelNameFromClassName($modelClass);
         return $user->can('edit_' . $modelName);
     }
 
+    // -------------------------------------------------------------------------
+    // Generic authorization (aborting) – unchanged
+    // -------------------------------------------------------------------------
 
-
-    /**
-     * Generic authorization for any action on a record (or for creation).
-     *
-     * @param User|null $user
-     * @param string $action  e.g., 'view', 'update', 'delete', 'create'
-     * @param mixed $recordOrId  Model instance, or ID when $modelClass provided
-     * @param string|null $modelClass  Required if $recordOrId is an ID (and for 'create')
-     * @throws HttpException
-     */
     public function authorize($user, string $action, $recordOrId = null, ?string $modelClass = null): void
     {
         if (!$user) {
             abort(403, 'Unauthenticated.');
         }
 
-        // Handle 'create' action (no record needed)
         if ($action === 'create') {
             if (!$modelClass) {
                 throw new \InvalidArgumentException('Model class is required for create authorization.');
@@ -226,7 +271,6 @@ class AuthorizationService
             return;
         }
 
-        // For other actions, resolve the record
         $record = $this->resolveRecord($recordOrId, $modelClass);
         $can = match ($action) {
             'view' => $this->canView($user, $record),
@@ -241,17 +285,11 @@ class AuthorizationService
         }
     }
 
-    /**
-     * Convenience method for view authorization.
-     */
     public function authorizeView($user, $recordOrId, ?string $modelClass = null): void
     {
         $this->authorize($user, 'view', $recordOrId, $modelClass);
     }
 
-    /**
-     * Convenience method for update authorization.
-     */
     public function authorizeUpdate($user, $recordOrId, ?string $modelClass = null): void
     {
         $this->authorize($user, 'edit', $recordOrId, $modelClass);
@@ -262,140 +300,88 @@ class AuthorizationService
         $this->authorize($user, 'edit', $recordOrId, $modelClass);
     }
 
-    /**
-     * Convenience method for create authorization.
-     */
     public function authorizeCreate($user, string $modelClass): void
     {
         $this->authorize($user, 'create', null, $modelClass);
     }
 
-    /**
-     * Convenience method for delete authorization.
-     */
     public function authorizeDelete($user, $recordOrId, ?string $modelClass = null): void
     {
         $this->authorize($user, 'delete', $recordOrId, $modelClass);
     }
 
     // -------------------------------------------------------------------------
-    // Boolean "can" methods (non‑aborting) – all respect bypass
+    // Boolean "can" methods (non‑aborting) – unchanged
     // -------------------------------------------------------------------------
 
-    /**
-     * Check if user can view a record.
-     */
     public function canView($user, $record): bool
     {
-        if (!$user)
-            return false;
-        if ($this->isBypassAllowed($user))
-            return true;
+        if (!$user) return false;
+        if ($this->isBypassAllowed($user)) return true;
         $action = ['requiredPermission' => 'view_' . $this->getModelNameFromRecord($record)];
         return $this->canPerformAction($user, $action, $record);
     }
 
-    /**
-     * Check if user can update a record.
-     */
     public function canUpdate($user, $record): bool
     {
-        // Note that "update" is represented by "edit"
-        if (!$user)
-            return false;
-        if ($this->isBypassAllowed($user))
-            return true;
+        if (!$user) return false;
+        if ($this->isBypassAllowed($user)) return true;
         $action = ['requiredPermission' => 'edit_' . $this->getModelNameFromRecord($record)];
         return $this->canPerformAction($user, $action, $record);
     }
 
-    /**
-     * Check if user can delete a record.
-     */
     public function canDelete($user, $record): bool
     {
-        if (!$user)
-            return false;
-        if ($this->isBypassAllowed($user))
-            return true;
+        if (!$user) return false;
+        if ($this->isBypassAllowed($user)) return true;
         $action = ['requiredPermission' => 'delete_' . $this->getModelNameFromRecord($record)];
         return $this->canPerformAction($user, $action, $record);
     }
 
-    /**
-     * Check if user can create a new record.
-     */
     public function canCreate($user, string $modelClass): bool
     {
-        if (!$user)
-            return false;
-        if ($this->isBypassAllowed($user))
-            return true;
+        if (!$user) return false;
+        if ($this->isBypassAllowed($user)) return true;
         $modelName = $this->getModelNameFromClassName($modelClass);
         return $user->can('create_' . $modelName);
     }
 
-    /**
-     * Check if user can export records.
-     */
     public function canExport($user, string $modelClass): bool
     {
-        if (!$user)
-            return false;
-        if ($this->isBypassAllowed($user))
-            return true;
+        if (!$user) return false;
+        if ($this->isBypassAllowed($user)) return true;
         $modelName = $this->getModelNameFromClassName($modelClass);
         return $user->can('export_' . $modelName);
     }
 
-    /**
-     * Check if user can import records.
-     */
     public function canImport($user, string $modelClass): bool
     {
-        if (!$user)
-            return false;
-        if ($this->isBypassAllowed($user))
-            return true;
+        if (!$user) return false;
+        if ($this->isBypassAllowed($user)) return true;
         $modelName = $this->getModelNameFromClassName($modelClass);
         return $user->can('import_' . $modelName);
     }
 
-    /**
-     * Check if user can print.
-     */
     public function canPrint($user, string $modelClass): bool
     {
-        if (!$user)
-            return false;
-        if ($this->isBypassAllowed($user))
-            return true;
+        if (!$user) return false;
+        if ($this->isBypassAllowed($user)) return true;
         $modelName = $this->getModelNameFromClassName($modelClass);
         return $user->can('print_' . $modelName);
     }
 
-    /**
-     * Check if user can restore a soft‑deleted record.
-     */
     public function canRestore($user, string $modelClass): bool
     {
-        if (!$user)
-            return false;
-        if ($this->isBypassAllowed($user))
-            return true;
+        if (!$user) return false;
+        if ($this->isBypassAllowed($user)) return true;
         $modelName = $this->getModelNameFromClassName($modelClass);
         return $user->can('restore_' . $modelName);
     }
 
-    /**
-     * Check if user can force delete (permanently delete) a record.
-     */
     public function canForceDelete($user, string $modelClass): bool
     {
-        if (!$user)
-            return false;
-        if ($this->isBypassAllowed($user))
-            return true;
+        if (!$user) return false;
+        if ($this->isBypassAllowed($user)) return true;
         $modelName = $this->getModelNameFromClassName($modelClass);
         return $user->can('forceDelete_' . $modelName);
     }
@@ -404,9 +390,6 @@ class AuthorizationService
     // Private Helpers
     // -------------------------------------------------------------------------
 
-    /**
-     * Resolve a record from either a model instance or an ID + class name.
-     */
     private function resolveRecord($recordOrId, ?string $modelClass = null): Model
     {
         if ($recordOrId instanceof Model) {
@@ -418,41 +401,16 @@ class AuthorizationService
         throw new \InvalidArgumentException('Invalid record or ID/class combination.');
     }
 
-    /**
-     * Get the model name (snake_case) from a record instance.
-     */
     private function getModelNameFromRecord(Model $record): string
     {
         return Str::snake(class_basename($record));
     }
 
-    /**
-     * Get the model name from a fully qualified class name.
-     */
     private function getModelNameFromClassName(string $className): string
     {
         return Str::snake(class_basename($className));
     }
 
-    /**
-     * Check business/state conditions on a row.
-     */
-    private function checkBusinessConditions($row, array $conditions): bool
-    {
-        foreach ($conditions as $field => $expectedValue) {
-            $actualValue = data_get($row, $field);
-            if ($actualValue != $expectedValue) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Get the effective company ID for the current user.
-     * For company_admin: uses their own company_id.
-     * For super_admin: uses session current_company_id if set.
-     */
     private function getUserCompanyId(User $user): ?int
     {
         if ($user->hasRole('super_admin')) {
@@ -463,7 +421,6 @@ class AuthorizationService
             return $user->company_id;
         }
 
-        // For employee/manager: derive from their employee record
         if ($user->employee && $user->employee->company_id) {
             return $user->employee->company_id;
         }
@@ -471,9 +428,6 @@ class AuthorizationService
         return null;
     }
 
-    /**
-     * Check if a row/model has a company_id attribute.
-     */
     private function rowHasCompanyId($row): bool
     {
         if (is_array($row)) {
@@ -487,9 +441,6 @@ class AuthorizationService
         return false;
     }
 
-    /**
-     * Check if a row/model has an employee_id attribute.
-     */
     private function rowHasEmployeeId($row): bool
     {
         if (is_array($row)) {
@@ -503,14 +454,6 @@ class AuthorizationService
         return false;
     }
 
-    /**
-     * Check if a row is within the user's data scope.
-     *
-     * Enforces multi-tenant company scoping:
-     * - super_admin: full access (bypassed earlier in canPerformAction)
-     * - company_admin: scoped to their company (from session or user's company_id)
-     * - manager/employee: scoped to their own data + company context
-     */
     private function isInUserScope(User $user, $row): bool
     {
         // Allow user to access their own user record
@@ -518,44 +461,29 @@ class AuthorizationService
             return true;
         }
 
-        // ---- Multi-Tenant Company Scoping ----
-
-        // Determine the user's effective company ID
         $userCompanyId = $this->getUserCompanyId($user);
 
-        // If the row has a company_id column, enforce company scope
         if ($userCompanyId && $this->rowHasCompanyId($row)) {
             $rowCompanyId = $row->company_id;
-
-            // super_admin with no session company: full access
             if ($user->hasRole('super_admin') && !session()->has('current_company_id')) {
                 return true;
             }
-
-            // Must match the user's company scope
             if ($rowCompanyId !== null && (int) $rowCompanyId !== (int) $userCompanyId) {
                 return false;
             }
         }
 
-        // ---- Employee/Manager Data Scoping ----
-
-        // For models that have employee_id, apply employee-level scoping
         if ($this->rowHasEmployeeId($row)) {
             $employeeId = $row->employee_id ?? $row->id;
-
             if ($user->hasRole('employee')) {
                 return $user->employee_id == $employeeId;
             }
-
             if ($user->hasRole('manager')) {
                 $managedEmployeeIds = $user->managedEmployees()->pluck('id')->toArray();
                 return in_array($employeeId, $managedEmployeeIds);
             }
         }
 
-        // company_admin and super_admin: if we reached here, allow access
-        // (they were already company-scoped above if the row has company_id)
         if ($user->hasAnyRole(self::ADMIN_ROLES)) {
             return true;
         }

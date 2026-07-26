@@ -436,16 +436,7 @@ return [
         'updateModelField' => 'status',
         'fieldValue' => 'approved',
         'confirm' => 'Approve selected payroll runs? This will lock them.',
-        'condition' => [
-          '0' => [
-            'status' => [
-              '0' => 'draft',
-              '1' => 'verification_complete',
-              '2' => 'adjustments_pending',
-              '3' => 'ready_for_review',
-            ],
-          ],
-        ],
+        'condition' => ['status' => ['draft', 'verification_complete', 'adjustments_pending', 'ready_for_review']],
       ],
       'cancel' => [
         'label' => 'Cancel Selected',
@@ -453,16 +444,7 @@ return [
         'updateModelField' => 'status',
         'fieldValue' => 'cancelled',
         'confirm' => 'Cancel selected payroll runs? This cannot be undone.',
-        'condition' => [
-          '0' => [
-            'status' => [
-              '0' => 'draft',
-              '1' => 'verification_complete',
-              '2' => 'adjustments_pending',
-              '3' => 'ready_for_review',
-            ],
-          ],
-        ],
+        'condition' => ['status' => ['draft', 'verification_complete', 'adjustments_pending', 'ready_for_review']],
       ],
       'archive' => [
         'label' => 'Archive Selected',
@@ -470,14 +452,7 @@ return [
         'updateModelField' => 'status',
         'fieldValue' => 'archived',
         'confirm' => 'Archive selected runs (they will be hidden from active views)?',
-        'condition' => [
-          '0' => [
-            'status' => [
-              '0' => 'paid',
-              '1' => 'cancelled',
-            ],
-          ],
-        ],
+        'condition' => ['status' => ['paid', 'cancelled']],
       ],
     ],
   ],
@@ -567,141 +542,92 @@ return [
       ],
     ],
   ],
-  'moreActions' => [
-    '0' => [
-      'title' => 'Continue Wizard',
-      'icon' => 'fas fa-edit',
-      'url' => '/hr/payroll-wizard?id={id}',
-      'condition' => [
-        'status' => [
-          '0' => 'draft',
-          '1' => 'verification_complete',
-          '2' => 'adjustments_pending',
-          '3' => 'ready_for_review',
+
+'moreActions' => [
+    [
+        'title' => 'Continue Wizard',
+        'icon' => 'fas fa-edit',
+        'url' => '/hr/payroll-wizard?id={id}',
+        'condition' => [
+            // 'status' => ['draft', 'verification_complete', 'adjustments_pending', 'ready_for_review'],
+            'status' => ['draft'],
         ],
-        'another_field' => [
-          '0' => 'draft',
-          '1' => 'verification_complete',
-          '2' => 'adjustments_pending',
-          '3' => 'ready_for_review',
+        'requiredRole' => ['payroll_officer', 'hr_admin'],
+    ],
+    [
+        'title' => 'Approve Run',
+        'icon' => 'fas fa-check-circle',
+        'updateModelField' => true,
+        'fieldName' => 'status',
+        'fieldValue' => 'approved',
+        'actionName' => 'approve_payroll_run',
+        'confirm' => 'Approve this payroll run? All data will be locked.',
+        'condition' => [
+            // 'status' => ['draft', 'verification_complete', 'adjustments_pending', 'ready_for_review'],
+            'status' => ['verification_complete', 'ready_for_review'],
         ],
-      ],
-      'requiredRole' => [
-        '0' => 'payroll_officer',
-        '1' => 'hr_admin',
-      ],
+        'requiredRole' => ['hr_admin', 'payroll_manager'],
     ],
-    '1' => [
-      'title' => 'Approve Run',
-      'icon' => 'fas fa-check-circle',
-      'updateModelField' => true,
-      'fieldName' => 'status',
-      'fieldValue' => 'approved',
-      'actionName' => 'approve_payroll_run',
-      'confirm' => 'Approve this payroll run? All data will be locked.',
-      'condition' => [
-        '0' => [
-          'status' => [
-            '0' => 'draft',
-            '1' => 'verification_complete',
-            '2' => 'adjustments_pending',
-            '3' => 'ready_for_review',
-          ],
+    [
+        'title' => 'Mark as Paid',
+        'icon' => 'fas fa-money-check',
+        'updateModelField' => true,
+        'fieldName' => 'status',
+        'fieldValue' => 'paid',
+        'actionName' => 'mark_paid',
+        'confirm' => 'Confirm that payment has been processed externally?',
+        'condition' => [
+            'status' => ['approved'], // only approved runs can be marked paid
         ],
-      ],
-      'requiredRole' => [
-        '0' => 'hr_admin',
-        '1' => 'payroll_manager',
-      ],
+        'requiredRole' => ['payroll_officer', 'hr_admin'],
     ],
-    '2' => [
-      'title' => 'Mark as Paid',
-      'icon' => 'fas fa-money-check',
-      'updateModelField' => true,
-      'fieldName' => 'status',
-      'fieldValue' => 'paid',
-      'actionName' => 'mark_paid',
-      'confirm' => 'Confirm that payment has been processed externally?',
-      'condition' => [
-        '0' => [
-          'status' => [
-            '0' => 'approved',
-            '1' => 'processing',
-          ],
+    [
+        'title' => 'Cancel Run',
+        'icon' => 'fas fa-ban',
+        'updateModelField' => true,
+        'fieldName' => 'status',
+        'fieldValue' => 'cancelled',
+        'actionName' => 'cancel_payroll_run',
+        'confirm' => 'Cancel this payroll run? This cannot be undone.',
+        'condition' => [
+            // 'status' => ['draft', 'verification_complete', 'adjustments_pending', 'ready_for_review', 'approved'],
+            'status' => ['draft', 'verification_complete', 'adjustments_pending', 'ready_for_review', 'approved'],
         ],
-      ],
-      'requiredRole' => [
-        '0' => 'payroll_officer',
-        '1' => 'hr_admin',
-      ],
+        'requiredRole' => ['hr_admin'],
     ],
-    '3' => [
-      'title' => 'Cancel Run',
-      'icon' => 'fas fa-ban',
-      'updateModelField' => true,
-      'fieldName' => 'status',
-      'fieldValue' => 'cancelled',
-      'actionName' => 'cancel_payroll_run',
-      'confirm' => 'Cancel this payroll run? This cannot be undone.',
-      'condition' => [
-        '0' => [
-          'status' => [
-            '0' => 'draft',
-            '1' => 'verification_complete',
-            '2' => 'adjustments_pending',
-            '3' => 'ready_for_review',
-            '4' => 'approved',
-          ],
+    [
+        'title' => 'View Payslips',
+        'icon' => 'fas fa-receipt',
+        'url' => '/hr/payroll-payslips?filters[payroll_run_id]={id}',
+        'newTab' => true,
+        // No condition – available for all statuses
+    ],
+    [
+        'title' => 'Full Employee List Report',
+        'icon' => 'fas fa-list',
+        'route' => 'payroll-run.print-summary',
+        'params' => ['run' => '{id}'],
+        'newTab' => true,
+        'requiredRole' => ['payroll_officer', 'hr_admin', 'manager'],
+        // No condition – available for all statuses (reports may be empty but that’s OK)
+    ],
+    [
+        'title' => 'Export Bank File',
+        'icon' => 'fas fa-file-export',
+        'route' => 'payroll.bank-file',
+        'params' => ['run' => '{id}'],
+        'confirm' => 'Generate ACH/SEPA bank file for this run?',
+        'condition' => [
+            'status' => ['approved', 'paid'],
+            // We cannot easily check 'pay_schedule_id is not null' with the current evaluator.
+            // As a workaround, we rely on the controller to show a friendly error.
+            // Better: extend condition evaluator to support 'not_null'.
         ],
-      ],
-      'requiredRole' => [
-        '0' => 'hr_admin',
-      ],
+        'requiredRole' => ['payroll_officer'],
     ],
-    '4' => [
-      'title' => 'View Payslips',
-      'icon' => 'fas fa-receipt',
-      'route' => 'payroll-payslips.index',
-      'params' => [
-        'filters[payroll_run_id]' => '{id}',
-      ],
-      'newTab' => true,
-    ],
-    '5' => [
-      'title' => 'Run Reports',
-      'icon' => 'fas fa-chart-bar',
-      'dispatchEvent' => true,
-      'eventName' => 'openPayrollReportModal',
-      'params' => [
-        'payroll_run_id' => '{id}',
-      ],
-      'requiredRole' => [
-        '0' => 'payroll_officer',
-        '1' => 'hr_admin',
-        '2' => 'manager',
-      ],
-    ],
-    '6' => [
-      'title' => 'Export Bank File',
-      'icon' => 'fas fa-file-export',
-      'route' => 'payroll-runs.export-bank-file',
-      'params' => [
-        'id' => '{id}',
-      ],
-      'confirm' => 'Generate ACH/SEPA bank file for this run?',
-      'condition' => [
-        '0' => [
-          'status' => [
-            '0' => 'approved',
-            '1' => 'paid',
-          ],
-        ],
-      ],
-      'requiredRole' => [
-        '0' => 'payroll_officer',
-      ],
-    ],
-  ],
+],
+
+
   'switchViews' => [
     'default' => 'list',
     'table' => [

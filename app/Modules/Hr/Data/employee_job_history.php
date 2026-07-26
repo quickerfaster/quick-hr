@@ -22,7 +22,7 @@ return [
       'options' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'column' => 'employee_number',
-        'hintField' => 'first_name',
+        'hintField' => 'first_name,last_name',
       ],
     ],
     'company_id' => [

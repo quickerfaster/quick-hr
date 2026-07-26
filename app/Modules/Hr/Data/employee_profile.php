@@ -22,7 +22,7 @@ return [
       'options' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'column' => 'employee_number',
-        'hintField' => 'first_name',
+        'hintField' => 'first_name,last_name',
       ],
     ],
     'company_id' => [
@@ -377,7 +377,7 @@ return [
       'action' => 'restore',
       'confirm' => 'Restore this archived employee profile?',
       'requiredPermission' => 'restore_employee_profile',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
     '1' => [
       'title' => 'Permanently Delete',
@@ -385,7 +385,7 @@ return [
       'action' => 'forceDelete',
       'confirm' => 'This action cannot be undone. Permanently delete this profile?',
       'requiredPermission' => 'force_delete_employee_profile',
-      'condition' => 'trashed',
+      'condition' => ['trashed' => [true]],
     ],
   ],
   'switchViews' => [
