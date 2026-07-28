@@ -6,6 +6,7 @@ return [
     'company_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Company',
       'validation' => 'required|integer|exists:companies,id',
@@ -28,6 +29,7 @@ return [
     'payslip_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Payslip',
       'validation' => 'required|exists:payroll_payslips,id',
@@ -50,6 +52,7 @@ return [
     'type' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Item Type',
       'validation' => 'required|in:earning,deduction,tax,reimbursement',
@@ -64,6 +67,7 @@ return [
     'label' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Description',
       'validation' => 'required|string|max:255',
@@ -73,6 +77,7 @@ return [
     'amount' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Amount',
       'validation' => 'required|numeric',
@@ -80,6 +85,7 @@ return [
     'policy_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Linked Policy',
       'validation' => 'nullable|exists:payroll_policies,id',
@@ -100,6 +106,7 @@ return [
     'adjustment_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Linked Adjustment',
       'validation' => 'nullable|exists:payroll_run_adjustments,id',
@@ -120,6 +127,7 @@ return [
     'employee_adjustment_profile_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Recurring Adjustment Profile',
       'validation' => 'nullable|exists:employee_adjustment_profiles,id',
@@ -140,6 +148,7 @@ return [
     'calculation_metadata' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'json',
       'label' => 'Calculation Metadata',
       'validation' => 'nullable|json',
@@ -201,6 +210,7 @@ return [
     ],
     'search' => true,
     'showHideColumns' => true,
+    'editable' => true,
     'filterColumns' => true,
     'bulkActions' => [
       'export' => [

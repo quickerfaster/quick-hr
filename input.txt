@@ -1,412 +1,126 @@
-perfect. next, check the  all the wizard code to figure out where possible error could occur when the session is not available or reset. i notice some error at this line "PayrollRun::findOrFail($payrollRunId);" when i ran php artisan migrate:fresh --seed
-Analysis of Wizard Components for Missing Run Handling
-After a migrate:fresh --seed, any stored session data referencing old payroll run IDs becomes invalid. The wizard components must fail gracefully and redirect the user to a safe location (e.g., the payroll runs list or the wizard start) without throwing exceptions.
+Role: You are a Senior QA Automation Engineer and System Analyst with expertise in Laravel, multi‑tenancy, and attendance/payroll systems. Your task is to thoroughly verify the recent code changes in the attendance module (specifically AttendanceCalculator and HandlesAttendanceRecord) and ensure they meet the requirements, fix multi‑tenancy issues, and do not introduce regressions.
 
-Identified Risk Points
-Component	Method / Line	Current Behavior	Risk
-PayrollWizardPreview	mount()	Uses find() and redirects with redirect()->route(...) but does not return the redirect.	The redirect is ignored; $run is null, causing subsequent loadPreviewData() to throw ModelNotFoundException.
-PayrollWizardPreview	loadPreviewData()	Uses findOrFail() directly.	Will throw if run missing.
-PayrollWizardPreview	getPayslipsProperty()	Uses findOrFail().	Will throw if run missing.
-PayrollWizardPreview	checkCalculationStatus()	Uses findOrFail() in fallback.	Will throw if run missing.
-PayrollWizardPreview	retryCalculation()	Uses findOrFail().	Will throw if run missing.
-PayrollWizardPreview	render()	Uses findOrFail().	Will throw if run missing.
-PayrollWizardAdjustments	mount()	Uses find() and throws RuntimeException if not found.	Will throw if run missing.
-PayrollWizardAdjustments	initializeAllTempAdjustments()	Uses find() and dispatches events, but does not stop execution.	If run missing, it may continue with null and cause errors.
-PayrollWizardAdjustments	getEmployeesProperty()	Uses findOrFail().	Will throw if run missing.
-PayrollWizardAdjustments	render()	Uses findOrFail().	Will throw if run missing.
-PayrollWizardAdjustments	save()	Uses find(), but if null, update fails silently.	Not critical, but could be improved.
-PayrollWizardAdjustments	hydrate()	Dispatches events but does not redirect.	May cause confusion but not fatal.
-PayrollRunWizard	goToStep2()	Uses find() and updates; if null, may cause errors.	Risk moderate.
-PayrollRunWizard	finalize()	Uses findOrFail().	Will throw if run missing.
-PayrollRunWizard	render()	Uses PaySchedule::find() but not findOrFail.	Safe.
-PayrollRunWizard	getCompaniesProperty()	Safe (no run dependency).	Safe.
-Recommended Fixes
-PayrollWizardPreview::mount() – replace redirect() with $this->redirect() and return it to stop execution.
+Objective
+Validate that:
 
-All findOrFail calls – replace with find() and an early return or redirect if null.
+Multi‑tenancy is correctly enforced – employees only see policies, shifts, work patterns, and shift schedules belonging to their own company.
 
-PayrollWizardAdjustments::mount() – use redirect instead of throwing an exception.
+Attendance calculation logic is correct – status, hours, overtime, breaks, lateness/early departure are computed according to the assigned policy.
 
-PayrollWizardAdjustments::initializeAllTempAdjustments() – check for null and redirect.
+Special cases (holidays, approved leaves, unplanned absences) are handled properly.
 
-PayrollWizardPreview::render() – use find() and handle null.
+Performance is acceptable (no N+1 queries, caching works).
 
-PayrollWizardPreview::loadPreviewData() – use find() and handle null.
+No regressions are introduced in existing functionality.
 
-PayrollWizardPreview::getPayslipsProperty() – use find() and return empty collection on null.
+Environment Setup
+Use a fresh copy of the staging database with at least two companies (e.g., Company A and Company B).
 
-PayrollWizardPreview::checkCalculationStatus() – use find() and handle null.
+Create two employees – one in Company A, one in Company B.
 
-PayrollRunWizard::goToStep2() – use find() and handle null.
+Create separate attendance policies, shifts, work patterns, and shift schedules for each company (with overlapping IDs if possible to test isolation).
 
-PayrollRunWizard::finalize() – use find() and handle null.
+Use test data that includes:
 
-Code Fixes
-1. PayrollWizardPreview
-File: app/Modules/Hr/Http/Livewire/Payroll/PayrollWizardPreview.php
+Clock‑in/out events for several days.
 
-a) mount()
-Replace the current mount() with:
+A holiday date.
 
-php
-public function mount(int $stepIndex, int $payrollRunId): void
-{
-    $this->stepIndex = $stepIndex;
-    $this->payrollRunId = $payrollRunId;
+An approved leave request.
 
-    $run = PayrollRun::withoutCompanyScope()->find($payrollRunId);
-    if (!$run) {
-        session()->forget('payroll-wizard-' . auth()->id());
-        $this->redirectRoute('payroll-runs.create', ['error' => 'The payroll run was not found. Please start again.']);
-        return;
-    }
+A day with no events (to test unplanned absence).
 
-    if (!$run->is_multi_company) {
-        $this->filterCompany = $run->company_id;
-    }
+Test Cases
+1. Multi‑Tenancy Isolation
+ID	Description	Steps	Expected Outcome
+MT‑01	Employee from Company A sees only Company A policies	1. Fetch applicable policy for Employee A using AttendanceCalculator::getApplicablePolicy().
+2. Check that returned policy has company_id = Company A.	Policy belongs to Company A. No policy from Company B returned.
+MT‑02	Employee from Company A sees only Company A work patterns	1. Fetch work pattern for Employee A using AttendanceCalculator::getApplicableWorkPattern().
+2. Verify company_id.	Work pattern belongs to Company A.
+MT‑03	Employee from Company A sees only Company A shifts and schedules	1. Run getExpectedSchedule() for Employee A.
+2. Check that any shift or shift schedule returned belongs to Company A.	All shifts have company_id = Company A.
+MT‑04	Cross‑company policy assignment is ignored	1. Create a PolicyAssignment for a shift in Company B.
+2. Assign that shift to Employee A (should not be possible normally, but if it exists, test that getPolicyForEntity() filters by company).	The policy assignment is not returned for Employee A because company_id filter excludes it.
+2. Attendance Calculation Accuracy
+ID	Description	Steps	Expected Outcome
+AC‑01	Normal day – on time, full shift	1. Provide clock‑in at shift start, clock‑out at shift end.
+2. Run calculateForDay().	Status = present, net_hours = shift duration, regular_hours = shift duration, no lateness or early departure.
+AC‑02	Late arrival (beyond grace period)	1. Clock‑in 15 minutes after shift start.
+2. Run calculation.	Status = late, minutes_late = 15, regular/overtime hours adjusted accordingly.
+AC‑03	Early departure (before shift end, beyond grace)	1. Clock‑out 20 minutes before shift end.
+2. Run calculation.	Status = early_departure, minutes_early_departure = 20, hours reduced.
+AC‑04	Overtime (daily)	1. Work 10 hours on an 8‑hour shift, with policy threshold 8h and overtime multiplier 1.5.
+2. Run calculation.	regular_hours = 8, overtime_hours = 2, double_time_hours = 0 (if threshold not met).
+AC‑05	Double‑time (if configured)	1. Work 13 hours, with double‑time threshold 12h.
+2. Run calculation.	overtime_hours = 4 (12‑8), double_time_hours = 1 (13‑12).
+AC‑06	Unpaid break deduction	1. Policy has unpaid_break_minutes = 30.
+2. Work 8 hours, clock‑in/out accordingly.
+3. Run calculation.	net_hours = 7.5, regular_hours = 7.5 (or adjusted), break_deduction noted in metadata.
+AC‑07	Break compliance (missed break)	1. Work 6 hours without a long enough gap (break). Policy requires break after 5h, 30min.
+2. Run calculation.	Status may be present but missed_break_minutes = 30, violation recorded.
+AC‑08	Half‑day	1. Work 4 hours on an 8‑hour shift.
+2. Run calculation.	Status = half_day, net_hours = 4, regular_hours = 4.
+AC‑09	Absent	1. No clock events on a work day.
+2. Run calculation.	Status = absent, net_hours = 0, needs_review = true.
+3. Special Cases
+ID	Description	Steps	Expected Outcome
+SC‑01	Company holiday	1. Insert a holiday record for the date.
+2. Employee has no clock events.
+3. Run recalculateForDay().	Status = holiday, net_hours = 0, sessions cleared.
+SC‑02	Approved leave	1. Create an approved leave request for the date.
+2. Run calculation.	Status = leave, net_hours = standard hours (e.g., 8), regular_hours = 8, leave_request_id linked.
+SC‑03	Unplanned absence	1. No clock events, no holiday, no leave.
+2. Run calculation.	Status = absent, is_unplanned = true, needs_review = true, hours_deducted set to standard hours.
+4. Performance & Caching
+ID	Description	Steps	Expected Outcome
+PF‑01	Caching reduces DB queries	1. Run getPolicyForEntity() twice with same parameters.
+2. Monitor query log.	The second call does not hit the database (cache hit).
+PF‑02	Bulk recalculation performance	1. Recalculate 30 days for 10 employees (simulate via script).
+2. Measure time and DB query count.	Time should be reasonable (< 5 seconds) and no N+1 queries.
+5. Regression Testing
+ID	Description	Steps	Expected Outcome
+RG‑01	Existing data not corrupted	1. Run recalculateForDay() for a date that already has an attendance record.
+2. Verify that the record is updated, not duplicated, and sessions are refreshed.	Attendance record updated, old sessions replaced.
+RG‑02	UI data table still shows correct records	1. Open the Attendance list view.
+2. Ensure company filter (from session) works as before.	Data table shows records only for the selected company.
+RG‑03	Manual adjustments (AttendanceAdjustment) still work	1. Manually adjust an attendance record.
+2. Later, run recalculation for that day.	The adjustment history is preserved (if soft‑delete not used, this may need separate handling, but at least the adjustment record remains).
+Testing Procedure
+Set up test data using seeders or factories.
 
-    $this->loadPreviewData();
-}
-b) loadPreviewData()
-php
-public function loadPreviewData(): void
-{
-    $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
-    if (!$run) {
-        $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found.']);
-        return;
-    }
+Execute each test case by calling the appropriate methods (e.g., via Tinker or unit tests).
 
-    $this->calculationStatus = $run->calculation_status;
-    $this->totalEmployees = $run->total_employees ?? 0;
-    $this->processedEmployees = $run->processed_employees ?? 0;
+Inspect the database to confirm values.
 
-    if ($this->totalEmployees > 0) {
-        $this->progress = round(($this->processedEmployees / $this->totalEmployees) * 100);
-    }
+Log all queries to verify company filters are applied (use Laravel Debugbar or query log).
 
-    if ($this->calculationStatus === 'completed') {
-        $this->loadCalculatedData();
-    } elseif ($this->calculationStatus === 'failed') {
-        $this->dispatch('showAlert', [
-            'type' => 'error',
-            'message' => 'Payroll calculation failed. Please check logs or try again.'
-        ]);
-    } elseif ($this->calculationStatus === 'pending' || $this->calculationStatus === 'processing') {
-        $this->startCalculation();
-    }
-}
-c) getPayslipsProperty()
-php
-public function getPayslipsProperty()
-{
-    if ($this->calculationStatus !== 'completed') {
-        return collect();
-    }
+Run unit/integration tests if available.
 
-    $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
-    if (!$run) {
-        return collect();
-    }
+Report any failures with clear steps to reproduce.
 
-    // ... rest of the method unchanged
-}
-d) checkCalculationStatus()
-php
-public function checkCalculationStatus(): void
-{
-    $progress = \App\Modules\Hr\Models\PayrollRunProgress::withoutCompanyScope()
-        ->where('payroll_run_id', $this->payrollRunId)->first();
+Expected Output
+Provide a test report summarizing:
 
-    if ($progress) {
-        $this->calculationStatus = $progress->status;
-        $this->totalEmployees = $progress->total_employees ?? 0;
-        $this->processedEmployees = $progress->processed_employees ?? 0;
+Pass/Fail status for each test case.
 
-        if ($this->totalEmployees > 0) {
-            $this->progress = round(($this->processedEmployees / $this->totalEmployees) * 100);
-        }
-    } else {
-        $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
-        if (!$run) {
-            $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found.']);
-            return;
-        }
-        $this->calculationStatus = $run->calculation_status;
-        $this->totalEmployees = $run->total_employees ?? 0;
-        $this->processedEmployees = $run->processed_employees ?? 0;
-        $this->progress = $this->totalEmployees ? round(($this->processedEmployees / $this->totalEmployees) * 100) : 0;
-    }
+Screenshots or logs of query execution (showing where company_id = ... clauses).
 
-    if ($this->calculationStatus === 'completed') {
-        $this->dispatch('processingFinished');
-        $this->loadCalculatedData();
-    } elseif ($this->calculationStatus === 'failed') {
-        $this->isPolling = false;
-        $this->dispatch('showAlert', ['type' => 'error', 'message' => 'Calculation failed.']);
-    }
+Performance metrics (if applicable).
 
-    if ($this->progress && $this->progress > 0 && $this->calculationStatus != 'completed')
-        $this->dispatch('processingStarted');
-}
-e) retryCalculation()
-php
-public function retryCalculation(): void
-{
-    $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
-    if (!$run) {
-        $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found.']);
-        return;
-    }
+Any edge cases discovered that were not covered.
 
-    $run->update([
-        'calculation_status' => 'pending',
-        'failed_at' => null,
-        'failure_reason' => null,
-    ]);
+Additional Notes
+Pay special attention to applicable_days parsing – ensure it correctly handles comma‑separated strings.
 
-    $this->loadPreviewData();
-}
-f) render()
-php
-public function render()
-{
-    $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
-    if (!$run) {
-        $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found.']);
-        return view('hr::livewire.payroll.wizard-preview', [
-            'payslips' => collect(),
-            'companies' => collect(),
-            'departments' => collect(),
-            'locations' => collect(),
-            // ... other safe defaults
-        ]);
-    }
+Verify that policy_assignments are correctly filtered by company_id.
 
-    // ... rest unchanged
-}
-2. PayrollWizardAdjustments
-File: app/Modules/Hr/Http/Livewire/Payroll/PayrollWizardAdjustments.php
+If you encounter any ambiguity, refer to the business rules document or ask the development team.
 
-a) mount()
-php
-public function mount(int $stepIndex, int $payrollRunId): void
-{
-    $this->stepIndex = $stepIndex;
-    $this->payrollRunId = $payrollRunId;
+Success Criteria
+All critical test cases (MT‑01 to MT‑04, AC‑01 to AC‑09, SC‑01 to SC‑03) pass.
 
-    $this->filterCompany = null;
-    $this->filterDepartment = null;
-    $this->filterLocation = null;
-    $this->filterEmploymentStatus = 'Active';
-    $this->search = '';
-    $this->sortField = 'employee_name';
-    $this->sortDirection = 'asc';
+No cross‑company data leakage occurs.
 
-    $run = PayrollRun::withoutCompanyScope()->find($payrollRunId);
-    if (!$run) {
-        session()->forget('payroll-wizard-' . auth()->id());
-        $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found. Please start again.']);
-        return;
-    }
+Performance is within acceptable limits.
 
-    $this->loadAdjustmentsCache();
-    $this->initializeAllTempAdjustments();
-}
-b) initializeAllTempAdjustments()
-php
-protected function initializeAllTempAdjustments(): void
-{
-    $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
-    if (!$run) {
-        $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found.']);
-        return;
-    }
-
-    $positionQuery = EmployeePosition::withoutCompanyScope();
-    if (!$run->is_multi_company) {
-        $positionQuery->where('pay_schedule_id', $run->pay_schedule_id);
-    }
-
-    $allEmployeeIds = $positionQuery->pluck('employee_id');
-
-    foreach ($allEmployeeIds as $employeeId) {
-        $this->tempAdjustments[$employeeId] = [
-            'Bonus' => $this->existingAdjustmentsCache[$employeeId]['Bonus'] ?? 0,
-            'Commission' => $this->existingAdjustmentsCache[$employeeId]['Commission'] ?? 0,
-            'Correction' => $this->existingAdjustmentsCache[$employeeId]['Correction'] ?? 0,
-            'Reimbursement' => $this->existingAdjustmentsCache[$employeeId]['Reimbursement'] ?? 0,
-            'Deduction' => $this->existingAdjustmentsCache[$employeeId]['Deduction'] ?? 0,
-        ];
-    }
-}
-c) getEmployeesProperty()
-php
-public function getEmployeesProperty()
-{
-    $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
-    if (!$run) {
-        return collect();
-    }
-
-    // ... rest unchanged
-}
-d) save()
-php
-public function save(): void
-{
-    $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
-    if (!$run) {
-        $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found.']);
-        return;
-    }
-
-    $run->update(['calculation_status' => 'pending']);
-    \App\Modules\Hr\Models\PayrollPayslip::withoutCompanyScope()
-        ->where('payroll_run_id', $this->payrollRunId)->delete();
-
-    $this->dispatch('adjustmentsComplete');
-}
-e) render()
-php
-public function render()
-{
-    $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
-    if (!$run) {
-        $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found.']);
-        return view('hr::livewire.payroll.wizard-adjustments', [
-            'employees' => collect(),
-            'companies' => collect(),
-            // ... safe defaults
-        ]);
-    }
-
-    // ... rest unchanged
-}
-f) hydrate() – ensure it redirects
-php
-public function hydrate(): void
-{
-    if ($this->payrollRunId && !PayrollRun::where('id', $this->payrollRunId)->exists()) {
-        session()->forget('payroll-wizard-' . auth()->id());
-        $this->redirectRoute('payroll-runs.create', ['error' => 'The payroll run has expired or was deleted.']);
-    }
-}
-3. PayrollRunWizard
-File: app/Modules/Hr/Http/Livewire/Payroll/PayrollRunWizard.php
-
-a) goToStep2() – use find() and handle null
-php
-public function goToStep2()
-{
-    // ... validation rules unchanged
-
-    $this->validate($rules);
-
-    if (!$this->isMultiCompany && $this->isAllCompaniesMode() && $this->companyId) {
-        $eligible = $this->computeEligibleCompanies();
-        $companyIds = array_column($eligible, 'company_id');
-        if (!in_array($this->companyId, $companyIds)) {
-            $this->addError('companyId', 'The selected company has no active employees on the chosen pay schedule.');
-            return;
-        }
-    }
-
-    DB::transaction(function () {
-        if ($this->isMultiCompany) {
-            $runCompanyId = null;
-            $payScheduleId = null;
-        } else {
-            $runCompanyId = $this->companyId;
-            $payScheduleId = $this->pay_schedule_id;
-        }
-
-        if (!$this->payrollRunId) {
-            $run = PayrollRun::create([
-                'pay_schedule_id'   => $payScheduleId,
-                'period_start'      => $this->period_start,
-                'period_end'        => $this->period_end,
-                'status'            => 'draft',
-                'calculation_status'=> 'pending',
-                'current_step'      => 2,
-                'title'             => $this->title,
-                'company_id'        => $runCompanyId,
-                'is_multi_company'  => $this->isMultiCompany,
-            ]);
-            $this->payrollRunId = $run->id;
-        } else {
-            $run = PayrollRun::find($this->payrollRunId);
-            if ($run) {
-                $run->update([
-                    'pay_schedule_id'   => $payScheduleId,
-                    'period_start'      => $this->period_start,
-                    'period_end'        => $this->period_end,
-                    'title'             => $this->title,
-                    'company_id'        => $runCompanyId,
-                    'is_multi_company'  => $this->isMultiCompany,
-                ]);
-            } else {
-                // If run missing, create a new one
-                $run = PayrollRun::create([
-                    'pay_schedule_id'   => $payScheduleId,
-                    'period_start'      => $this->period_start,
-                    'period_end'        => $this->period_end,
-                    'status'            => 'draft',
-                    'calculation_status'=> 'pending',
-                    'current_step'      => 2,
-                    'title'             => $this->title,
-                    'company_id'        => $runCompanyId,
-                    'is_multi_company'  => $this->isMultiCompany,
-                ]);
-                $this->payrollRunId = $run->id;
-            }
-        }
-    });
-
-    $this->currentStep = 2;
-    $this->saveToSession();
-}
-b) finalize()
-php
-public function finalize()
-{
-    $run = PayrollRun::find($this->payrollRunId);
-    if (!$run) {
-        session()->forget($this->getWizardId());
-        $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found.']);
-        return;
-    }
-
-    $run->update([
-        'status' => 'ready_for_review',
-        'current_step' => 4,
-    ]);
-
-    // ... rest unchanged
-}
-4. Additional Safeguard in PayrollRunWizard::mount()
-The mount method already validates session data, but we should also handle the case where $payrollRunId is passed directly and not found:
-
-php
-public function mount($payrollRunId = null)
-{
-    // ... existing session validation
-
-    if (session()->has($wizardId)) {
-        // ... existing restore
-    } elseif ($payrollRunId) {
-        $run = PayrollRun::withoutCompanyScope()->find($payrollRunId);
-        if (!$run) {
-            $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found.']);
-            return;
-        }
-        // ... populate from run
-    } else {
-        // ... new wizard
-    }
-}
-Summary
-By replacing all findOrFail with find() and adding proper null checks with redirects, we ensure the wizard components never throw ModelNotFoundException – even after a database reset. The user will be redirected to a safe page with a clear error message, and the wizard session will be cleared to prevent further issues.
-
-Apply these changes to all affected files and test by running php artisan migrate:fresh --seed and then attempting to access a stale wizard URL. The system should now handle the missing run gracefully.
-
+No regression in existing functionality.

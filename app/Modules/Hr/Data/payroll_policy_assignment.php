@@ -6,6 +6,7 @@ return [
     'company_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Company',
       'validation' => 'required|integer|exists:companies,id',
@@ -28,6 +29,7 @@ return [
     'payroll_policy_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Payroll Policy',
       'validation' => 'required|exists:payroll_policies,id',
@@ -50,8 +52,10 @@ return [
     'assignable_type' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Entity Type',
+      'validation' => 'required|in:company,location,department,shift,employee_group',
       'options' => [
         'company' => 'Company',
         'location' => 'Location',
@@ -64,8 +68,10 @@ return [
     'assignable_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'morph_to_select',
       'label' => 'Entity',
+      'validation' => 'required|integer',
       'filterable' => true,
       'searchable' => true,
       'morph_relation' => 'assignable',
@@ -81,13 +87,15 @@ return [
     'priority' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Priority',
-      'validation' => 'integer|min:0',
+      'validation' => 'nullable|integer|min:0',
     ],
     'effective_date' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'datepicker',
       'label' => 'Effective From',
       'validation' => 'nullable|date',
@@ -96,6 +104,7 @@ return [
     'expiry_date' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'datepicker',
       'label' => 'Expiry Date',
       'validation' => 'nullable|date|after:effective_date',
@@ -104,6 +113,7 @@ return [
     'is_active' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
@@ -191,6 +201,7 @@ return [
     ],
     'search' => true,
     'showHideColumns' => true,
+    'editable' => true,
     'filterColumns' => true,
     'softDelete' => true,
     'restore' => true,
@@ -235,7 +246,7 @@ return [
       'groupType' => 'payroll',
       'icon' => 'fas fa-link',
       'fields' => [
-        // '0' => 'payroll_policy_id',
+        '0' => 'payroll_policy_id',
         '1' => 'assignable_type',
         '2' => 'assignable_id',
         '3' => 'priority',

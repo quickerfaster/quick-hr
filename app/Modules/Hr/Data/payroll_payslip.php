@@ -6,6 +6,7 @@ return [
     'company_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Company',
       'validation' => 'required|integer|exists:companies,id',
@@ -28,6 +29,7 @@ return [
     'payslip_number' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Payslip Number',
       'validation' => 'required|string|max:50|unique:payroll_payslips,payslip_number',
@@ -38,6 +40,7 @@ return [
     'payroll_run_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Payroll Run',
       'validation' => 'required|exists:payroll_runs,id',
@@ -60,6 +63,7 @@ return [
     'employee_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
@@ -82,6 +86,7 @@ return [
     'base_salary' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Base Salary (Period)',
       'validation' => 'required|numeric|min:0',
@@ -89,6 +94,7 @@ return [
     'gross_pay' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Gross Pay',
       'validation' => 'required|numeric|min:0',
@@ -96,6 +102,7 @@ return [
     'total_deductions' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Total Deductions',
       'validation' => 'required|numeric|min:0',
@@ -103,6 +110,7 @@ return [
     'total_taxes' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Total Taxes',
       'validation' => 'nullable|numeric|min:0',
@@ -110,6 +118,7 @@ return [
     'total_benefit_deductions' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Benefit Deductions',
       'validation' => 'nullable|numeric|min:0',
@@ -117,6 +126,7 @@ return [
     'net_pay' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Net Pay',
       'validation' => 'required|numeric|min:0',
@@ -124,6 +134,7 @@ return [
     'currency_code' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Currency',
       'validation' => 'nullable|string|size:3',
@@ -140,6 +151,7 @@ return [
     'exchange_rate' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Exchange Rate',
       'validation' => 'nullable|numeric|min:0',
@@ -147,6 +159,7 @@ return [
     'employer_contribution_total' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Employer Contributions',
       'validation' => 'nullable|numeric|min:0',
@@ -154,6 +167,7 @@ return [
     'taxable_earnings' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Taxable Earnings',
       'validation' => 'nullable|numeric|min:0',
@@ -161,6 +175,7 @@ return [
     'income_tax' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Income Tax',
       'validation' => 'nullable|numeric|min:0',
@@ -168,6 +183,7 @@ return [
     'social_security_tax' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Social Security Tax',
       'validation' => 'nullable|numeric|min:0',
@@ -175,6 +191,7 @@ return [
     'medicare_tax' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Medicare Tax',
       'validation' => 'nullable|numeric|min:0',
@@ -182,6 +199,7 @@ return [
     'pension_employee' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Pension (Employee)',
       'validation' => 'nullable|numeric|min:0',
@@ -189,6 +207,7 @@ return [
     'pension_employer' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Pension (Employer)',
       'validation' => 'nullable|numeric|min:0',
@@ -196,6 +215,7 @@ return [
     'health_insurance_employee' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Health Insurance (Employee)',
       'validation' => 'nullable|numeric|min:0',
@@ -203,6 +223,7 @@ return [
     'health_insurance_employer' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Health Insurance (Employer)',
       'validation' => 'nullable|numeric|min:0',
@@ -210,6 +231,7 @@ return [
     'other_earnings' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Other Earnings',
       'validation' => 'nullable|numeric|min:0',
@@ -217,6 +239,7 @@ return [
     'other_deductions' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Other Deductions',
       'validation' => 'nullable|numeric|min:0',
@@ -224,6 +247,7 @@ return [
     'net_pay_in_words' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'textarea',
       'label' => 'Net Pay (in words)',
       'validation' => 'nullable|string|max:255',
@@ -231,6 +255,7 @@ return [
     'payslip_pdf_url' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Payslip PDF URL',
       'validation' => 'nullable|url|max:500',
@@ -238,6 +263,7 @@ return [
     'payment_status' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Payment Status',
       'validation' => 'required|in:pending,processing,paid,failed,cancelled',
@@ -253,6 +279,7 @@ return [
     'paid_at' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'datetimepicker',
       'label' => 'Paid At',
       'validation' => 'nullable|date',
@@ -260,6 +287,7 @@ return [
     'payment_reference' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Payment Reference',
       'validation' => 'nullable|string|max:255',
@@ -267,6 +295,7 @@ return [
     'bank_account_snapshot' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'json',
       'label' => 'Bank Account Snapshot',
       'validation' => 'nullable|json',
@@ -274,6 +303,7 @@ return [
     'notes' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'textarea',
       'label' => 'Notes',
       'validation' => 'nullable|string|max:1000',
@@ -357,6 +387,7 @@ return [
     ],
     'search' => true,
     'showHideColumns' => true,
+    'editable' => true,
     'filterColumns' => true,
     'bulkActions' => [
       'export' => [

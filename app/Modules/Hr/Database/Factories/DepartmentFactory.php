@@ -14,12 +14,12 @@ class DepartmentFactory extends Factory
     {
         return [
             'name' => $this->faker->randomElement([
-                'Human Resources', 'Finance', 'Engineering', 'Sales', 
+                'Human Resources', 'Finance', 'Engineering', 'Sales',
                 'Marketing', 'Operations', 'Legal', 'IT', 'Customer Support'
             ]),
             'code' => strtoupper($this->faker->unique()->bothify('DEPT-###')),
             'description' => $this->faker->optional(0.7)->sentence(),
-            'company_id' => null,
+            'company_id' => Company::factory(),
             'parent_department_id' => null,
             'cost_center' => $this->faker->optional(0.5)->bothify('CC-####'),
             'is_active' => true,

@@ -12,25 +12,19 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
             $table->index('company_id');
+            $table->foreignId('department_id')->nullable()->constrained('departments')->onDelete('set null');
             $table->foreignId('employee_id')->nullable()->constrained('employees', 'id')->onDelete('restrict');
+            $table->string('company')->nullable();
+            $table->string('department')->nullable();
             $table->date('date');
             $table->foreignId('shift_id')->nullable()->constrained('shifts', 'id')->onDelete('restrict');
             $table->string('status')->default('present');
             $table->decimal('net_hours', 6, 2)->nullable();
-            $table->decimal('regular_hours', 6, 2)->default(0);
-            $table->decimal('overtime_hours', 6, 2)->default(0);
-            $table->decimal('double_time_hours', 6, 2)->default(0);
             $table->string('absence_type')->nullable();
             $table->text('absence_reason')->nullable();
             $table->foreignId('leave_request_id')->nullable()->constrained('leave_requests', 'id')->onDelete('set null');
-            $table->boolean('is_paid_absence')->default(true);
             $table->decimal('hours_deducted', 6, 2)->default(0)->nullable();
-            $table->boolean('is_approved')->default(false);
-            $table->boolean('needs_review')->default(true);
             $table->text('notes')->nullable();
-            $table->integer('minutes_late')->default(0);
-            $table->integer('minutes_early_departure')->default(0);
-            $table->integer('missed_break_minutes')->default(0);
             $table->json('sessions')->nullable();
             $table->string('approved_by')->nullable();
             $table->datetime('approved_at')->nullable();
@@ -38,11 +32,27 @@ return new class extends Migration
             $table->string('calculation_method')->default('auto')->nullable();
             $table->foreignId('attendance_policy_id')->nullable()->constrained('attendance_policies', 'id')->onDelete('set null');
             $table->foreignId('work_pattern_id')->nullable()->constrained('work_patterns', 'id')->onDelete('set null');
-            $table->boolean('is_unplanned')->default(false);
             $table->json('calculation_metadata')->nullable();
             $table->string('calculation_version')->nullable();
 
-            			$table->index('employee_id');
+
+            // Make numeric fields nullable (they currently have default 0)
+            $table->decimal('regular_hours', 6, 2)->nullable();
+            $table->decimal('overtime_hours', 6, 2)->nullable();
+            $table->decimal('double_time_hours', 6, 2)->nullable();
+            $table->integer('minutes_late')->nullable();
+            $table->integer('minutes_early_departure')->nullable();
+            $table->integer('missed_break_minutes')->nullable();
+
+            // Make boolean flags nullable (default values remain in code)
+            $table->boolean('is_paid_absence')->nullable();
+            $table->boolean('is_approved')->nullable();
+            $table->boolean('needs_review')->nullable();
+            $table->boolean('is_unplanned')->nullable();
+
+
+
+            $table->index('employee_id');
 			$table->index('date');
 			$table->index('status');
 			$table->index('is_approved');

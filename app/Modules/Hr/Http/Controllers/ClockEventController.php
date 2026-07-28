@@ -3,7 +3,9 @@
 namespace App\Modules\Hr\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Hr\Jobs\ProcessAttendanceJob;
 use App\Modules\Hr\Models\ClockEvent;
+use App\Modules\Hr\Models\Employee;
 use App\Modules\Hr\Services\AttendanceAggregator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -76,7 +78,6 @@ class ClockEventController extends Controller
         $timestamp = $this->convertAndroidTimestamp($validatedEvent['timestamp']);
 
         return [
-            'employee_id' => $validatedEvent['employee_number'], // Store employee_number as employee_id
             'employee_number' => $validatedEvent['employee_number'],
             'attendance_type' => $validatedEvent['event_type'],
             'attendance_time' => $timestamp->format('Y-m-d H:i:s'),
@@ -97,6 +98,16 @@ class ClockEventController extends Controller
      */
     private function processClockEvent(array $internalData, Request $request)
     {
+        // Resolve integer employee_id from employee_number
+        $employeeId = Employee::where('employee_number', $internalData['employee_number'])->value('id');
+        if (!$employeeId) {
+            return [
+                'status' => 'error',
+                'message' => 'Employee not found',
+                'employee_number' => $internalData['employee_number'],
+            ];
+        }
+
         // Convert microdegrees to decimal for storage
         $lat = $internalData['latitude'] ? round($internalData['latitude'] / 1_000_000, 8) : null;
         $lng = $internalData['longitude'] ? round($internalData['longitude'] / 1_000_000, 8) : null;
@@ -105,9 +116,8 @@ class ClockEventController extends Controller
         $eventType = $this->convertEventType($internalData['attendance_type']);
         $timestamp = $internalData['attendance_time'];
 
-        // 🔑 IDEMPOTENCY CHECK: Prevent duplicate events
-        // $existing = ClockEvent::where('employee_number', $internalData['employee_id'])
-        $existing = ClockEvent::where('employee_id', $internalData['employee_id'])
+        // IDEMPOTENCY CHECK: Prevent duplicate events using integer employee_id
+        $existing = ClockEvent::where('employee_id', $employeeId)
             ->where('timestamp', $timestamp)
             ->where('event_type', $eventType)
             ->exists();
@@ -116,16 +126,16 @@ class ClockEventController extends Controller
             return [
                 'status' => 'duplicate',
                 'message' => 'Duplicate event ignored',
-                'employee_number' => $internalData['employee_id'],
+                'employee_number' => $internalData['employee_number'],
                 'timestamp' => $timestamp,
                 'event_type' => $eventType
             ];
         }
 
-        // Save raw event with all fields
+        // Save raw event with both integer employee_id and string employee_number
         $event = ClockEvent::create([
-            'employee_id' => $internalData['employee_id'], // Stores employee_number
-            // 'employee_number' => $internalData['employee_id'], // Also store in dedicated field
+            'employee_id' => $employeeId,
+            'employee_number' => $internalData['employee_number'],
             'event_type' => $eventType,
             'timestamp' => $timestamp,
             'method' => 'device',
@@ -133,21 +143,20 @@ class ClockEventController extends Controller
             'device_name' => $internalData['device_name'],
             'location_name' => $internalData['location_name'],
             'timezone' => $internalData['timezone'],
-            // 'notes' => $internalData['notes'],
             'latitude' => $lat,
             'longitude' => $lng,
             'ip_address' => $request->ip(),
             'sync_status' => 'synced',
         ]);
 
-        // Trigger daily aggregation CLIENT SEND employee_id AS A STRING EG EMP-2006-001
-        $this->aggregator->recalculateForDay($internalData['employee_id'], $internalData['attendance_date']);
+        // Dispatch queue job with integer employee_id
+        ProcessAttendanceJob::dispatch($employeeId, $internalData['attendance_date']);
 
         return [
             'status' => 'created',
             'event_id' => $event->id,
             'message' => 'Clock event recorded',
-            'employee_number' => $internalData['employee_id'],
+            'employee_number' => $internalData['employee_number'],
             'timestamp' => $timestamp,
             'event_type' => $eventType
         ];
@@ -179,6 +188,13 @@ class ClockEventController extends Controller
                         'event_type' => $result['event_type']
                     ]
                 ], 200);
+            }
+
+            if ($result['status'] === 'error') {
+                return response()->json([
+                    'success' => false,
+                    'message' => $result['message'],
+                ], 404);
             }
 
             return response()->json([
@@ -254,6 +270,8 @@ class ClockEventController extends Controller
                         $results['created']++;
                     } elseif ($result['status'] === 'duplicate') {
                         $results['duplicates']++;
+                    } else {
+                        $results['failed']++;
                     }
 
                 } catch (\Illuminate\Validation\ValidationException $e) {

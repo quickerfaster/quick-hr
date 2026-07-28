@@ -6,6 +6,7 @@ return [
     'company_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Company',
       'validation' => 'required|integer|exists:companies,id',
@@ -28,6 +29,7 @@ return [
     'payroll_run_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Payroll Run',
       'validation' => 'required|exists:payroll_runs,id',
@@ -50,6 +52,7 @@ return [
     'employee_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
@@ -72,6 +75,7 @@ return [
     'type' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Adjustment Type',
       'validation' => 'required|in:bonus,commission,correction,reimbursement,deduction',
@@ -87,6 +91,7 @@ return [
     'label' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Description',
       'validation' => 'required|string|max:255',
@@ -96,6 +101,7 @@ return [
     'amount' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Amount',
       'validation' => 'required|numeric',
@@ -103,6 +109,7 @@ return [
     'note' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'textarea',
       'label' => 'Note / Reason',
       'validation' => 'nullable|string|max:1000',
@@ -110,6 +117,7 @@ return [
     'source_type' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Source Type',
       'validation' => 'nullable|string|max:50',
@@ -124,6 +132,7 @@ return [
     'source_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Source ID',
       'validation' => 'nullable|integer',
@@ -192,6 +201,7 @@ return [
   'addRoutes' => false,
   'dispatchEvents' => false,
   'controls' => [
+    'addButton' => true,
     'files' => [
       'export' => [
         '0' => 'xls',
@@ -208,6 +218,7 @@ return [
     ],
     'search' => true,
     'showHideColumns' => true,
+    'editable' => true,
     'filterColumns' => true,
     'softDelete' => true,
     'restore' => true,

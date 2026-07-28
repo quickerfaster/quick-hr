@@ -6,6 +6,7 @@ return [
     'company_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Company',
       'validation' => 'required|integer|exists:companies,id',
@@ -28,6 +29,7 @@ return [
     'title' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Payroll Title',
       'validation' => 'required|unique:payroll_runs,title',
@@ -37,6 +39,7 @@ return [
     'pay_schedule_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Pay Schedule',
       'validation' => 'required|exists:pay_schedules,id',
@@ -59,6 +62,7 @@ return [
     'period_start' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'datepicker',
       'label' => 'Period Start',
       'validation' => 'required|date',
@@ -67,6 +71,7 @@ return [
     'period_end' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'datepicker',
       'label' => 'Period End',
       'validation' => 'required|date|after:period_start',
@@ -75,6 +80,7 @@ return [
     'status' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Status',
       'validation' => 'nullable|in:draft,verification_complete,adjustments_pending,ready_for_review,approved,processing,paid,cancelled,archived',
@@ -94,6 +100,7 @@ return [
     'current_step' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Wizard Step',
       'validation' => 'nullable|integer|min:1|max:4',
@@ -101,6 +108,7 @@ return [
     'calculation_status' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Calculation Status',
       'validation' => 'nullable|in:pending,processing,completed,failed',
@@ -115,6 +123,7 @@ return [
     'total_gross_pay' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Total Gross Pay',
       'validation' => 'nullable|numeric|min:0',
@@ -122,6 +131,7 @@ return [
     'total_deductions' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Total Deductions',
       'validation' => 'nullable|numeric|min:0',
@@ -129,6 +139,7 @@ return [
     'total_taxes' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Total Taxes',
       'validation' => 'nullable|numeric|min:0',
@@ -136,6 +147,7 @@ return [
     'total_employer_contributions' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Total Employer Contributions',
       'validation' => 'nullable|numeric|min:0',
@@ -143,6 +155,7 @@ return [
     'total_cash_required' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Total Cash Required',
       'validation' => 'nullable|numeric|min:0',
@@ -150,6 +163,7 @@ return [
     'processed_by' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Processed By',
       'validation' => 'nullable|string|max:255',
@@ -157,6 +171,7 @@ return [
     'processed_at' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'datetimepicker',
       'label' => 'Processed At',
       'validation' => 'nullable|date',
@@ -164,6 +179,7 @@ return [
     'base_currency' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Base Currency',
       'validation' => 'nullable|string|size:3',
@@ -180,6 +196,7 @@ return [
     'payment_date' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'datepicker',
       'label' => 'Payment Date',
       'validation' => 'nullable|date',
@@ -188,6 +205,7 @@ return [
     'reconciliation_status' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Reconciliation Status',
       'validation' => 'nullable|in:pending,reconciled,failed',
@@ -201,6 +219,7 @@ return [
     'reconciled_at' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'datetimepicker',
       'label' => 'Reconciled At',
       'validation' => 'nullable|date',
@@ -208,6 +227,7 @@ return [
     'payment_batch_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Payment Batch ID',
       'validation' => 'nullable|string|max:255',
@@ -216,6 +236,7 @@ return [
     'total_employee_contributions' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Total Employee Contributions',
       'validation' => 'nullable|numeric|min:0',
@@ -223,6 +244,7 @@ return [
     'total_income_tax' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Total Income Tax',
       'validation' => 'nullable|numeric|min:0',
@@ -230,6 +252,7 @@ return [
     'total_bonus' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Total Bonuses',
       'validation' => 'nullable|numeric|min:0',
@@ -237,6 +260,7 @@ return [
     'total_commission' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Total Commissions',
       'validation' => 'nullable|numeric|min:0',
@@ -244,6 +268,7 @@ return [
     'total_reimbursement' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Total Reimbursements',
       'validation' => 'nullable|numeric|min:0',
@@ -251,6 +276,7 @@ return [
     'approved_by_user_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Approved By (User)',
       'validation' => 'nullable|exists:users,id',
@@ -272,6 +298,7 @@ return [
     'approved_at' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'datetimepicker',
       'label' => 'Approved At',
       'validation' => 'nullable|date',
@@ -279,6 +306,7 @@ return [
     'total_employees' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Total Employees',
       'validation' => 'nullable|integer',
@@ -286,6 +314,7 @@ return [
     'processed_employees' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Processed Employees',
       'validation' => 'nullable|integer',
@@ -307,6 +336,7 @@ return [
     'notes' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'textarea',
       'label' => 'Notes',
       'validation' => 'nullable|string|max:1000',
@@ -423,6 +453,7 @@ return [
     ],
     'search' => true,
     'showHideColumns' => true,
+    'editable' => true,
     'filterColumns' => true,
     'bulkActions' => [
       'export' => [

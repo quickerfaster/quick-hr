@@ -6,6 +6,7 @@ return [
     'company_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Company',
       'validation' => 'required|integer|exists:companies,id',
@@ -28,6 +29,7 @@ return [
     'name' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Schedule Name',
       'validation' => 'required|string|max:255|unique:pay_schedules,name',
@@ -37,6 +39,7 @@ return [
     'code' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Schedule Code',
       'validation' => 'required|string|max:50|unique:pay_schedules,code',
@@ -47,6 +50,7 @@ return [
     'frequency' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Pay Frequency',
       'validation' => 'required|in:weekly,biweekly,semi_monthly,monthly,quarterly,yearly',
@@ -63,6 +67,7 @@ return [
     'description' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string|max:1000',
@@ -71,6 +76,7 @@ return [
     'first_period_start_date' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'datepicker',
       'label' => 'First Period Start Date',
       'validation' => 'required|date',
@@ -79,6 +85,7 @@ return [
     'next_pay_date' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'datepicker',
       'label' => 'Next Pay Date',
       'validation' => 'required|date|after_or_equal:first_period_start_date',
@@ -87,6 +94,7 @@ return [
     'payment_delay_days' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Payment Delay (Days)',
       'validation' => 'nullable|integer|min:0|max:30',
@@ -94,6 +102,7 @@ return [
     'country_code' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Default Country',
       'validation' => 'required|string|size:2',
@@ -114,6 +123,7 @@ return [
     'state_code' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Default State/Province',
       'validation' => 'nullable|string|max:20',
@@ -123,6 +133,7 @@ return [
     'currency_code' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Default Currency',
       'validation' => 'required|string|size:3',
@@ -136,6 +147,7 @@ return [
     'timezone' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Timezone',
       'validation' => 'required|string|max:64',
@@ -149,6 +161,7 @@ return [
     'is_active' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
@@ -157,6 +170,7 @@ return [
     'is_default' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'checkbox',
       'label' => 'Default Schedule',
       'validation' => 'nullable|boolean',
@@ -241,6 +255,7 @@ return [
     ],
     'search' => true,
     'showHideColumns' => true,
+    'editable' => true,
     'filterColumns' => true,
     'softDelete' => true,
     'restore' => true,

@@ -102,208 +102,112 @@ public function setRun(PayrollRun $run): void
 
 
 /**
-     * Calculate payslip for a single employee.
-     */
-    public function calculateForEmployee(EmployeePosition $position): PayrollPayslip
-    {
-        $employeeId = $position->employee_id;
-        $items = [];
+ * Calculate payslip for a single employee.
+ * Check if attendance integration is enabled globally.
+ */
+protected function isAttendanceIntegrationEnabled(): bool
+{
+    return (bool) config('quick_hr_payroll.attendance_integration.enabled', true);
+}
 
-        // 1. Base salary
-        $baseSalary = $position->base_salary;
-        $items[] = $this->makeItem(null, 'earning', 'Base Salary', $baseSalary);
 
-        // 2. Recurring adjustments (EmployeeAdjustmentProfile)
-        $recurring = EmployeeAdjustmentProfile::withoutCompanyScope()->where('employee_id', $employeeId)
-            ->where('is_active', true)
-            ->where('effective_date', '<=', $this->run->period_end)
-            ->where(function ($q) {
-                $q->whereNull('expiry_date')->orWhere('expiry_date', '>=', $this->run->period_start);
-            })->get();
+/**
+ * Get attendance summary for an employee within a date range.
+ */
+protected function getAttendanceSummary(int $employeeId, Carbon $start, Carbon $end): array
+{
+    $attendance = \App\Modules\Hr\Models\Attendance::withoutCompanyScope()
+        ->where('employee_id', $employeeId)
+        ->whereBetween('date', [$start, $end])
+        ->get();
 
-        $overridePolicies = [];
-        $standaloneAdjustments = collect();
+    $summary = [
+        'regular_hours' => 0,
+        'overtime_hours' => 0,
+        'double_time_hours' => 0,
+        'worked_days' => 0,
+    ];
 
-        foreach ($recurring as $adj) {
-            if ($adj->policy_id) {
-                $policy = $adj->policy;
-                if (!$policy || !$policy->is_active) continue;
-                $overridePolicy = clone $policy;
-                $overridePolicy->calculation_logic = json_encode([
-                    'calculation_type' => $adj->calculation_type,
-                    'employee_value' => (float) $adj->value,
-                    'employer_value' => (float) $adj->value,
-                ]);
-                $overridePolicy->name = $adj->label ?: $policy->name;
-                $overridePolicies[$policy->id] = $overridePolicy;
-            } else {
-                $standaloneAdjustments->push($adj);
-            }
+    foreach ($attendance as $day) {
+        // Count as worked day if:
+        // - net_hours > 0 (has actual work)
+        // - OR status is not 'absent' (e.g., on leave, but still paid)
+        // - OR it's a paid absence
+        if ($day->net_hours > 0 || $day->status !== 'absent' || $day->is_paid_absence) {
+            $summary['worked_days']++;
+            $summary['regular_hours'] += $day->regular_hours ?? 0;
+            $summary['overtime_hours'] += $day->overtime_hours ?? 0;
+            $summary['double_time_hours'] += $day->double_time_hours ?? 0;
         }
-
-        // Process standalone adjustments (no policy link)
-        foreach ($standaloneAdjustments as $adj) {
-            $amount = strtolower($adj->calculation_type) === 'percentage'
-                ? $baseSalary * ($adj->value / 100)
-                : $adj->value;
-            $type = strtolower($adj->type) === 'earning' ? 'earning' : 'deduction';
-            $items[] = $this->makeItem(null, $type, $adj->label, $amount);
-        }
-
-        // 3. One‑time adjustments for this run
-$oneTime = PayrollRunAdjustment::withoutGlobalScope(\App\Modules\Admin\Scopes\CompanyScope::class)
-    ->where('payroll_run_id', $this->run->id)
-    ->where('employee_id', $employeeId)
-    ->get();
-
-
-
-
-
-
-        foreach ($oneTime as $adj) {
-            $amount = $adj->amount;
-            if ($amount == 0) continue;
-            switch (strtolower($adj->type)) {
-                case 'bonus':
-                case 'commission':
-                case 'reimbursement':
-                    $type = 'earning';
-                    $absAmount = abs($amount);
-                    break;
-                case 'deduction':
-                    $type = 'deduction';
-                    $absAmount = abs($amount);
-                    break;
-                case 'correction':
-                    $type = $amount > 0 ? 'earning' : 'deduction';
-                    $absAmount = abs($amount);
-                    break;
-                default:
-                    continue 2;
-            }
-            $items[] = $this->makeItem(null, $type, ucfirst($adj->type) . ': ' . $adj->label, $absAmount, $adj->id);
-        }
-
-        // 4. Resolve normally assigned and global policies
-        $normalPolicies = $this->resolvePoliciesForEmployee($position);
-
-
-
-        // 5. Merge policies, giving precedence to overrides
-        $allPolicies = [];
-        foreach ($normalPolicies as $policy) {
-            if (!$policy) continue;
-            $allPolicies[$policy->id] = $policy;
-        }
-        foreach ($overridePolicies as $id => $overridePolicy) {
-            $allPolicies[$id] = $overridePolicy;
-        }
-
-        // 6. Apply policies with proration
-        $periodStart = $this->run->period_start;
-        $periodEnd = $this->run->period_end;
-        $totalDays = $periodStart->diffInDays($periodEnd) + 1;
-
-        foreach ($allPolicies as $policy) {
-            $effectivePolicy = $this->resolveEffectivePolicy($policy);
-
-            $activeDays = $this->getActiveDaysInRun($effectivePolicy, $periodStart, $periodEnd);
-            if ($activeDays <= 0) continue;
-            $prorationFactor = $activeDays / $totalDays;
-
-            // Get employee and employer amounts
-            $annualSalary = $this->annualizeSalary($position->base_salary, $position->pay_frequency);
-            $amounts = $this->applyPolicyLogic($effectivePolicy, $items, $baseSalary, $prorationFactor, $annualSalary);
-
-            // Build metadata for auditing
-            $metadata = [
-                'proration_factor' => $prorationFactor,
-                'effective_policy_id' => $effectivePolicy->id,
-            ];
-
-            // For non‑tax policies, also store original calculation values
-            if ($effectivePolicy->type !== 'tax') {
-                $logic = json_decode($effectivePolicy->calculation_logic, true);
-                $metadata['calculation_type'] = $logic['calculation_type'] ?? 'percentage';
-                $metadata['employee_value'] = $logic['employee_value'] ?? 0;
-                $metadata['employer_value'] = $logic['employer_value'] ?? 0;
-            } else {
-                $metadata['calculation_type'] = 'tax_bands';
-                // Optionally store band summary
-                $logic = json_decode($effectivePolicy->calculation_logic, true);
-                $metadata['bands'] = $logic['bands'] ?? [];
-            }
-
-            // Employee share
-            if ($amounts['employee'] != 0) {
-                $itemType = match ($effectivePolicy->effect) {
-                    'addition' => 'earning',
-                    default => ($effectivePolicy->type === 'tax' ? 'tax' : 'deduction'),
-                };
-                // Label: for tax, just policy name; otherwise include value
-                if ($effectivePolicy->type === 'tax') {
-                    $label = $effectivePolicy->name;
-                } else {
-                    $calcType = $metadata['calculation_type'];
-                    $val = $metadata['employee_value'];
-                    $suffix = $calcType === 'percentage' ? number_format($val, 2) . '%' : number_format($val, 2);
-                    $label = $effectivePolicy->name . " (Employee: {$suffix})";
-                }
-                $items[] = $this->makeItem($policy->id, $itemType, $label, $amounts['employee'], null, $metadata);
-            }
-
-            // Employer share (informational)
-            if ($amounts['employer'] != 0) {
-                $calcType = $metadata['calculation_type'] ?? 'percentage';
-                $val = $metadata['employer_value'] ?? 0;
-                $suffix = $calcType === 'percentage' ? number_format($val, 2) . '%' : number_format($val, 2);
-                $label = $effectivePolicy->name . " (Employer: {$suffix})";
-                $items[] = $this->makeItem($policy->id, 'employer_contribution', $label, $amounts['employer'], null, $metadata);
-            }
-        }
-
-        // Calculate totals
-        $grossPay = collect($items)->whereIn('type', ['earning'])->sum('amount');
-        $totalDeductions = collect($items)->whereIn('type', ['deduction'])->sum('amount');
-        $totalTaxes = collect($items)->where('type', 'tax')->sum('amount');
-        $netPay = $grossPay - $totalDeductions - $totalTaxes;
-
-        // Determine company_id from employee
-        $companyId = $position->employee->company_id ?? $this->run->company_id;
-
-        // Create payslip
-        $payslip = PayrollPayslip::create([
-            'company_id' => $companyId,
-            'payslip_number' => $this->generatePayslipNumber($position->employee->employee_number),
-            'payroll_run_id' => $this->run->id,
-            'employee_id' => $employeeId,
-            'base_salary' => $baseSalary,
-            'gross_pay' => $grossPay,
-            'total_deductions' => $totalDeductions + $totalTaxes, // legacy: sum of all deductions
-            'total_taxes' => $totalTaxes,
-            'total_benefit_deductions' => $totalDeductions,
-            'net_pay' => $netPay,
-            'payment_status' => 'pending',
-        ]);
-
-        // Create line items
-        foreach ($items as $item) {
-            PayslipItem::create([
-                'company_id' => $companyId,
-                'payslip_id' => $payslip->id,
-                'type' => $item['type'],
-                'label' => $item['label'],
-                'amount' => $item['amount'],
-                'policy_id' => $item['policy_id'],
-                'adjustment_id' => $item['adjustment_id'] ?? null,
-                'employee_adjustment_profile_id' => $item['employee_adjustment_profile_id'] ?? null,
-                'calculation_metadata' => $item['calculation_metadata'] ?? null,
-            ]);
-        }
-
-        return $payslip;
     }
+
+    return $summary;
+}
+
+
+/**
+ * Calculate the number of workdays in a given period based on work pattern.
+ */
+protected function getWorkdaysInPeriod(Carbon $start, Carbon $end, ?int $workPatternId): int
+{
+    if ($workPatternId) {
+        $workPattern = \App\Modules\Hr\Models\WorkPattern::find($workPatternId);
+        if ($workPattern && !empty($workPattern->applicable_days)) {
+            // Normalize applicable_days to an array of integers.
+            // DB may store as comma-separated string "1,2,3,4,5" or JSON array [1,2,3,4,5].
+            // 1=Monday, 2=Tuesday, ..., 7=Sunday
+            // Carbon::dayOfWeek returns 1 (Monday) through 7 (Sunday).
+            $applicableDays = $workPattern->applicable_days;
+            if (is_string($applicableDays)) {
+                $applicableDays = array_map('intval', explode(',', $applicableDays));
+            }
+
+            $days = 0;
+            $current = $start->copy();
+            while ($current <= $end) {
+                if (in_array($current->dayOfWeek, $applicableDays)) {
+                    $days++;
+                }
+                $current->addDay();
+            }
+            return $days;
+        }
+    }
+
+    // Fallback: count weekdays (Mon–Fri) in the period.
+    $days = 0;
+    $current = $start->copy();
+    while ($current <= $end) {
+        if ($current->isWeekday()) {
+            $days++;
+        }
+        $current->addDay();
+    }
+    return $days;
+}
+
+/**
+ * Resolve the work pattern ID for an employee position.
+ * Looks up EmployeeWorkPattern for the employee that overlaps the payroll period.
+ */
+protected function resolveWorkPatternId(EmployeePosition $position): ?int
+{
+    $employeeId = $position->employee_id;
+
+    // Try to find an active work pattern assignment that overlaps the payroll period
+    $assignment = \App\Modules\Hr\Models\EmployeeWorkPattern::withoutCompanyScope()
+        ->where('employee_id', $employeeId)
+        ->where(function ($q) {
+            $q->whereNull('end_date')
+              ->orWhere('end_date', '>=', $this->run->period_start);
+        })
+        ->where('start_date', '<=', $this->run->period_end)
+        ->orderBy('start_date', 'desc')
+        ->first();
+
+    return $assignment?->work_pattern_id;
+}
+
 
     /**
      * Update payroll run totals after all employees processed.
@@ -533,8 +437,6 @@ protected function applyPolicyLogic(PayrollPolicy $policy, array $items, float $
         // 1. Determine the correct ANNUAL income
         $annualIncome = $annualSalary ?? ($baseSalary * 12);
 
-
-
         // 2. Calculate annual tax using the universal bracket logic
         $tax = 0;
         $bands = collect($logic['bands'] ?? [])->sortBy('start')->values()->toArray();
@@ -543,10 +445,6 @@ protected function applyPolicyLogic(PayrollPolicy $policy, array $items, float $
             $start = (float) ($band['start'] ?? 0);
             $end = $band['end'] ?? PHP_FLOAT_MAX;
             $rate = (float) ($band['rate'] ?? 0) / 100;
-
-
-
-
 
             // If annual income doesn't reach this bracket's start, stop entirely.
             if ($annualIncome <= $start) {
@@ -877,5 +775,289 @@ public function calculateMultiCompany(PayrollRun $run): void
             'processed_at' => now()->toIso8601String(),
         ];
     }
+
+    /**
+     * Calculate payslip for a single employee.
+     *
+     * Determines gross pay based on pay type and attendance integration,
+     * applies policies, and creates the payslip with line items.
+     *
+     * @param EmployeePosition $position
+     * @return PayrollPayslip
+     */
+/**
+ * Calculate payslip for a single employee.
+ */
+public function calculateForEmployee(EmployeePosition $position): PayrollPayslip
+{
+    $employeeId = $position->employee_id;
+    $payType = $position->pay_type;
+    $hourlyRate = $position->hourly_rate ?? 0;
+    $baseSalary = $position->base_salary ?? 0;
+    $periodStart = $this->run->period_start;
+    $periodEnd = $this->run->period_end;
+    $items = [];
+
+    // -------------------------------------------------------------
+    // 1. Determine if attendance integration is active
+    // -------------------------------------------------------------
+    $attendanceEnabled = $this->isAttendanceIntegrationEnabled();
+
+    // If disabled, force pay_type to 'salaried_full' for calculation purposes
+    $effectivePayType = $attendanceEnabled ? $payType : 'salaried_full';
+
+    // -------------------------------------------------------------
+    // 2. Compute gross pay based on effective pay type
+    // -------------------------------------------------------------
+    $grossPay = 0;
+    $regularPay = 0;
+    $overtimePay = 0;
+    $attendanceSummary = [];
+
+    if ($effectivePayType === 'salaried_full') {
+        // Salaried full – use base salary as is
+        $grossPay = $baseSalary;
+        $regularPay = $baseSalary;
+    } else {
+        // For salaried_daily and hourly, we need attendance data
+        if (!$attendanceEnabled) {
+            // If attendance is disabled, treat as salaried_full
+            $grossPay = $baseSalary;
+            $regularPay = $baseSalary;
+        } else {
+            // Fetch attendance summary for the period
+            $attendanceSummary = $this->getAttendanceSummary($employeeId, $periodStart, $periodEnd);
+
+            if ($effectivePayType === 'salaried_daily') {
+                // Calculate daily rate
+                $workPatternId = $position->work_pattern_id ?? null;
+                $totalWorkdays = $this->getWorkdaysInPeriod($periodStart, $periodEnd, $workPatternId);
+                $dailyRate = $totalWorkdays > 0 ? $baseSalary / $totalWorkdays : 0;
+                $workedDays = $attendanceSummary['worked_days'] ?? 0;
+                $grossPay = $dailyRate * $workedDays;
+                $regularPay = $grossPay;
+            } elseif ($effectivePayType === 'hourly') {
+                $regularHours = $attendanceSummary['regular_hours'] ?? 0;
+                $overtimeHours = $attendanceSummary['overtime_hours'] ?? 0;
+                $doubleTimeHours = $attendanceSummary['double_time_hours'] ?? 0;
+
+                $regularPay = $regularHours * $hourlyRate;
+                // Overtime rates – you may fetch from a policy; using defaults here
+                $overtimeRate = $hourlyRate * 1.5;
+                $doubleTimeRate = $hourlyRate * 2.0;
+                $overtimePay = ($overtimeHours * $overtimeRate) + ($doubleTimeHours * $doubleTimeRate);
+                $grossPay = $regularPay + $overtimePay;
+            } else {
+                // Fallback – shouldn't happen
+                $grossPay = $baseSalary;
+                $regularPay = $baseSalary;
+            }
+        }
+    }
+
+    // -------------------------------------------------------------
+    // 3. Add base salary and overtime line items
+    // -------------------------------------------------------------
+    $items[] = $this->makeItem(null, 'earning', 'Base Salary', $regularPay);
+    if ($effectivePayType === 'hourly' && $overtimePay > 0) {
+        $items[] = $this->makeItem(null, 'earning', 'Overtime Pay', $overtimePay);
+    }
+
+    // (Optional) For salaried_daily, you might store worked_days in metadata.
+    // We'll add a note in the payslip notes later.
+
+    // -------------------------------------------------------------
+    // 4. Recurring adjustments (EmployeeAdjustmentProfile)
+    // -------------------------------------------------------------
+    $recurring = EmployeeAdjustmentProfile::withoutCompanyScope()
+        ->where('employee_id', $employeeId)
+        ->where('is_active', true)
+        ->where('effective_date', '<=', $this->run->period_end)
+        ->where(function ($q) {
+            $q->whereNull('expiry_date')->orWhere('expiry_date', '>=', $this->run->period_start);
+        })->get();
+
+    $overridePolicies = [];
+    $standaloneAdjustments = collect();
+
+    foreach ($recurring as $adj) {
+        if ($adj->policy_id) {
+            $policy = $adj->policy;
+            if (!$policy || !$policy->is_active) continue;
+            $overridePolicy = clone $policy;
+            $overridePolicy->calculation_logic = json_encode([
+                'calculation_type' => $adj->calculation_type,
+                'employee_value' => (float) $adj->value,
+                'employer_value' => (float) $adj->value,
+            ]);
+            $overridePolicy->name = $adj->label ?: $policy->name;
+            $overridePolicies[$policy->id] = $overridePolicy;
+        } else {
+            $standaloneAdjustments->push($adj);
+        }
+    }
+
+    // Process standalone adjustments (no policy link)
+    foreach ($standaloneAdjustments as $adj) {
+        $amount = strtolower($adj->calculation_type) === 'percentage'
+            ? $grossPay * ($adj->value / 100)
+            : $adj->value;
+        $type = strtolower($adj->type) === 'earning' ? 'earning' : 'deduction';
+        $items[] = $this->makeItem(null, $type, $adj->label, $amount);
+    }
+
+    // -------------------------------------------------------------
+    // 5. One‑time adjustments for this run
+    // -------------------------------------------------------------
+    $oneTime = PayrollRunAdjustment::withoutGlobalScope(\App\Modules\Admin\Scopes\CompanyScope::class)
+        ->where('payroll_run_id', $this->run->id)
+        ->where('employee_id', $employeeId)
+        ->get();
+
+    foreach ($oneTime as $adj) {
+        $amount = $adj->amount;
+        if ($amount == 0) continue;
+        switch (strtolower($adj->type)) {
+            case 'bonus':
+            case 'commission':
+            case 'reimbursement':
+                $type = 'earning';
+                $absAmount = abs($amount);
+                break;
+            case 'deduction':
+                $type = 'deduction';
+                $absAmount = abs($amount);
+                break;
+            case 'correction':
+                $type = $amount > 0 ? 'earning' : 'deduction';
+                $absAmount = abs($amount);
+                break;
+            default:
+                continue 2;
+        }
+        $items[] = $this->makeItem(null, $type, ucfirst($adj->type) . ': ' . $adj->label, $absAmount, $adj->id);
+    }
+
+    // -------------------------------------------------------------
+    // 6. Resolve assigned & global policies
+    // -------------------------------------------------------------
+    $normalPolicies = $this->resolvePoliciesForEmployee($position);
+
+    // Merge policies, giving precedence to overrides
+    $allPolicies = [];
+    foreach ($normalPolicies as $policy) {
+        if (!$policy) continue;
+        $allPolicies[$policy->id] = $policy;
+    }
+    foreach ($overridePolicies as $id => $overridePolicy) {
+        $allPolicies[$id] = $overridePolicy;
+    }
+
+    // -------------------------------------------------------------
+    // 7. Apply policies with proration, using $grossPay as base
+    // -------------------------------------------------------------
+    $periodStart = $this->run->period_start;
+    $periodEnd = $this->run->period_end;
+    $totalDays = $periodStart->diffInDays($periodEnd) + 1;
+
+    foreach ($allPolicies as $policy) {
+        $effectivePolicy = $this->resolveEffectivePolicy($policy);
+
+        $activeDays = $this->getActiveDaysInRun($effectivePolicy, $periodStart, $periodEnd);
+        if ($activeDays <= 0) continue;
+        $prorationFactor = $activeDays / $totalDays;
+
+        // Get employee and employer amounts – pass $grossPay as base
+        $annualSalary = $this->annualizeSalary($position->base_salary, $position->pay_frequency);
+        $amounts = $this->applyPolicyLogic($effectivePolicy, $items, $grossPay, $prorationFactor, $annualSalary);
+
+        // Build metadata for auditing
+        $metadata = [
+            'proration_factor' => $prorationFactor,
+            'effective_policy_id' => $effectivePolicy->id,
+        ];
+
+        if ($effectivePolicy->type !== 'tax') {
+            $logic = json_decode($effectivePolicy->calculation_logic, true);
+            $metadata['calculation_type'] = $logic['calculation_type'] ?? 'percentage';
+            $metadata['employee_value'] = $logic['employee_value'] ?? 0;
+            $metadata['employer_value'] = $logic['employer_value'] ?? 0;
+        } else {
+            $metadata['calculation_type'] = 'tax_bands';
+            $logic = json_decode($effectivePolicy->calculation_logic, true);
+            $metadata['bands'] = $logic['bands'] ?? [];
+        }
+
+        // Employee share
+        if ($amounts['employee'] != 0) {
+            $itemType = match ($effectivePolicy->effect) {
+                'addition' => 'earning',
+                default => ($effectivePolicy->type === 'tax' ? 'tax' : 'deduction'),
+            };
+            if ($effectivePolicy->type === 'tax') {
+                $label = $effectivePolicy->name;
+            } else {
+                $calcType = $metadata['calculation_type'];
+                $val = $metadata['employee_value'];
+                $suffix = $calcType === 'percentage' ? number_format($val, 2) . '%' : number_format($val, 2);
+                $label = $effectivePolicy->name . " (Employee: {$suffix})";
+            }
+            $items[] = $this->makeItem($policy->id, $itemType, $label, $amounts['employee'], null, $metadata);
+        }
+
+        // Employer share (informational)
+        if ($amounts['employer'] != 0) {
+            $calcType = $metadata['calculation_type'] ?? 'percentage';
+            $val = $metadata['employer_value'] ?? 0;
+            $suffix = $calcType === 'percentage' ? number_format($val, 2) . '%' : number_format($val, 2);
+            $label = $effectivePolicy->name . " (Employer: {$suffix})";
+            $items[] = $this->makeItem($policy->id, 'employer_contribution', $label, $amounts['employer'], null, $metadata);
+        }
+    }
+
+    // -------------------------------------------------------------
+    // 8. Calculate totals
+    // -------------------------------------------------------------
+    $grossPayTotal = collect($items)->whereIn('type', ['earning'])->sum('amount');
+    $totalDeductions = collect($items)->whereIn('type', ['deduction'])->sum('amount');
+    $totalTaxes = collect($items)->where('type', 'tax')->sum('amount');
+    $netPay = $grossPayTotal - $totalDeductions - $totalTaxes;
+
+    $companyId = $position->employee->company_id ?? $this->run->company_id;
+
+    // -------------------------------------------------------------
+    // 9. Create payslip
+    // -------------------------------------------------------------
+    $payslip = PayrollPayslip::create([
+        'company_id' => $companyId,
+        'payslip_number' => $this->generatePayslipNumber($position->employee->employee_number),
+        'payroll_run_id' => $this->run->id,
+        'employee_id' => $employeeId,
+        'base_salary' => $baseSalary,
+        'gross_pay' => $grossPayTotal,
+        'total_deductions' => $totalDeductions + $totalTaxes,
+        'total_taxes' => $totalTaxes,
+        'total_benefit_deductions' => $totalDeductions,
+        'net_pay' => $netPay,
+        'payment_status' => 'pending',
+    ]);
+
+    // Create line items
+    foreach ($items as $item) {
+        PayslipItem::create([
+            'company_id' => $companyId,
+            'payslip_id' => $payslip->id,
+            'type' => $item['type'],
+            'label' => $item['label'],
+            'amount' => $item['amount'],
+            'policy_id' => $item['policy_id'],
+            'adjustment_id' => $item['adjustment_id'] ?? null,
+            'employee_adjustment_profile_id' => $item['employee_adjustment_profile_id'] ?? null,
+            'calculation_metadata' => $item['calculation_metadata'] ?? null,
+        ]);
+    }
+
+    return $payslip;
+}
 
 }

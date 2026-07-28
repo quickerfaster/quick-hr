@@ -9,6 +9,7 @@ return [
       'field_type' => 'string',
       'label' => 'Dummy',
       'validation' => 'nullable|string|max:255',
+      'editable' => false,
     ],
     'company_id' => [
       'display' => 'inline',
@@ -18,6 +19,7 @@ return [
       'validation' => 'required|integer|exists:companies,id',
       'filterable' => true,
       'searchable' => true,
+      'editable' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Company',
         'type' => 'belongsTo',
@@ -55,7 +57,9 @@ return [
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,
-  'controls' => [],
+  'controls' => [
+    'editable' => false,
+  ],
   'fieldGroups' => [
     'company' => [
       'title' => 'Company',
@@ -67,7 +71,36 @@ return [
     ],
   ],
   'moreActions' => [],
-  'switchViews' => [],
+  'switchViews' => [
+    'default' => 'table',
+    'table' => [
+      'enabled' => true,
+    ],
+    'list' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'company.name',
+      ],
+      'subtitleFields' => [
+        '0' => 'dummy',
+      ],
+      'contentFields' => [],
+      'badgeField' => 'dummy',
+      'badgeColors' => [],
+    ],
+    'card' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'company.name',
+      ],
+      'subtitleFields' => [
+        '0' => 'dummy',
+      ],
+      'contentFields' => [],
+      'badgeField' => 'dummy',
+      'badgeColors' => [],
+    ],
+  ],
   'relations' => [],
   'report' => [],
 ];

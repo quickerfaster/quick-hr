@@ -6,6 +6,7 @@ return [
     'company_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Company',
       'validation' => 'required|integer|exists:companies,id',
@@ -28,6 +29,7 @@ return [
     'name' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Policy Name',
       'validation' => 'required|string|max:255|unique:payroll_policies,name',
@@ -37,6 +39,7 @@ return [
     'type' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Policy Type',
       'validation' => 'required|in:tax,pension,insurance,benefit,bonus,deduction',
@@ -53,6 +56,7 @@ return [
     'effect' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Effect on Pay',
       'validation' => 'required|in:addition,subtraction',
@@ -65,6 +69,7 @@ return [
     'description' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'textarea',
       'label' => 'Description',
       'validation' => 'nullable|string|max:1000',
@@ -73,6 +78,7 @@ return [
     'country_code' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Country',
       'validation' => 'required|string|size:2',
@@ -93,6 +99,7 @@ return [
     'state_code' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'State/Province',
       'validation' => 'nullable|string|max:20',
@@ -102,6 +109,7 @@ return [
     'calculation_logic' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'policy_calculation_builder',
       'label' => 'Calculation Rules',
       'validation' => 'required|json',
@@ -109,6 +117,7 @@ return [
     'is_statutory' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'checkbox',
       'label' => 'Statutory (Government Mandated)',
       'validation' => 'nullable|boolean',
@@ -117,6 +126,7 @@ return [
     'effective_date' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'datepicker',
       'label' => 'Effective From',
       'validation' => 'required|date',
@@ -125,6 +135,7 @@ return [
     'expiry_date' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'datepicker',
       'label' => 'Expiry Date',
       'validation' => 'nullable|date|after:effective_date',
@@ -133,6 +144,7 @@ return [
     'is_active' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
@@ -141,6 +153,7 @@ return [
     'parent_policy_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Parent Policy',
       'validation' => 'nullable|exists:payroll_policies,id',
@@ -237,6 +250,7 @@ return [
     ],
     'search' => true,
     'showHideColumns' => true,
+    'editable' => true,
     'filterColumns' => true,
     'softDelete' => true,
     'restore' => true,

@@ -3,14 +3,16 @@
 return [
   'model' => 'App\Modules\Hr\Models\Attendance',
   'fieldDefinitions' => [
+    // ===== CORE IDENTITY =====
     'employee_id' => [
       'display' => 'inline',
       'fillable' => true,
-      'field_type' => 'select',
+      'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id',
       'filterable' => true,
       'searchable' => true,
+      'editable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Employee',
         'type' => 'belongsTo',
@@ -25,6 +27,17 @@ return [
         'hintField' => 'first_name,last_name',
       ],
     ],
+    'date' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'datepicker',
+      'label' => 'Attendance Date',
+      'validation' => 'required|date',
+      'filterable' => true,
+      'editable' => true,
+    ],
+
+    // ===== ORGANIZATION =====
     'company_id' => [
       'display' => 'inline',
       'fillable' => true,
@@ -33,6 +46,7 @@ return [
       'validation' => 'required|integer|exists:companies,id',
       'filterable' => true,
       'searchable' => true,
+      'editable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Company',
         'type' => 'belongsTo',
@@ -47,22 +61,61 @@ return [
         'hintField' => '',
       ],
     ],
-    'date' => [
+    'department_id' => [
       'display' => 'inline',
       'fillable' => true,
-      'field_type' => 'datepicker',
-      'label' => 'Attendance Date',
-      'validation' => 'required|date',
+      'field_type' => 'select',
+      'label' => 'Department',
+      'validation' => 'nullable|integer|exists:departments,id',
       'filterable' => true,
+      'searchable' => true,
+      'editable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Hr\Models\Department',
+        'type' => 'belongsTo',
+        'display_field' => 'name',
+        'dynamic_property' => 'departmentRelation',
+        'foreign_key' => 'department_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Hr\Models\Department',
+        'column' => 'name',
+        'hintField' => '',
+      ],
     ],
+
+    // ===== HISTORICAL SNAPSHOTS (Read-Only) =====
+    'company' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'string',
+      'label' => 'Company (at time of attendance)',
+      'validation' => 'nullable|string|max:255',
+      'editable' => false,
+      'help_text' => 'Historical snapshot – set automatically on creation',
+    ],
+    'department' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'string',
+      'label' => 'Department (at time of attendance)',
+      'validation' => 'nullable|string|max:255',
+      'editable' => false,
+      'help_text' => 'Historical snapshot – set automatically on creation',
+    ],
+
+    // ===== SCHEDULE & STATUS =====
     'shift_id' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'select',
       'label' => 'Shift',
-      'validation' => 'required|exists:shifts,id',
+      'validation' => 'nullable|exists:shifts,id',
       'filterable' => true,
       'searchable' => true,
+      'editable' => true,
+      'help_text' => 'Auto-assigned from work pattern or schedule; optional for unscheduled days',
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Shift',
         'type' => 'belongsTo',
@@ -74,7 +127,7 @@ return [
       'options' => [
         'model' => 'App\Modules\Hr\Models\Shift',
         'column' => 'name',
-        'hintField' => '',
+        'hintField' => 'start_time,end_time',
       ],
     ],
     'status' => [
@@ -86,44 +139,54 @@ return [
       'options' => [
         'present' => 'Present',
         'absent' => 'Absent',
-        'unscheduled' => 'Unscheduled',
         'late' => 'Late Arrival',
         'early_departure' => 'Early Departure',
         'half_day' => 'Half Day',
+        'unscheduled' => 'Unscheduled',
         'incomplete' => 'Incomplete',
-        'holiday' => 'Holiday',
         'leave' => 'On Leave',
+        'holiday' => 'Holiday',
       ],
       'filterable' => true,
+      'editable' => true,
     ],
+
+    // ===== HOURS =====
     'net_hours' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'number',
       'label' => 'Total Hours Worked',
-      'validation' => 'required|numeric|min:0',
+      'validation' => 'required|numeric|min:0',  // ← changed to nullable
+      'editable' => true,
+      'help_text' => 'Net payable hours after all deductions',
     ],
     'regular_hours' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'number',
       'label' => 'Regular Hours',
-      'validation' => 'nullable|numeric|min:0',
+      'validation' => 'required|numeric|min:0',
+      'editable' => true,
     ],
     'overtime_hours' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'number',
       'label' => 'Overtime Hours',
-      'validation' => 'nullable|numeric|min:0',
+      'validation' => 'required|numeric|min:0',
+      'editable' => true,
     ],
     'double_time_hours' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'number',
       'label' => 'Double Time Hours',
-      'validation' => 'nullable|numeric|min:0',
+      'validation' => 'required|numeric|min:0',
+      'editable' => true,
     ],
+
+    // ===== ABSENCE =====
     'absence_type' => [
       'display' => 'inline',
       'fillable' => true,
@@ -132,13 +195,13 @@ return [
       'validation' => 'nullable',
       'options' => [
         'planned_leave' => 'Planned Leave',
-        'sick_leave' => 'Sick Leave (Reported)',
+        'sick_leave' => 'Sick Leave',
         'unplanned_absent' => 'Unplanned Absence',
-        'late' => 'Late Arrival',
-        'half_day' => 'Half Day',
         'excused' => 'Excused Absence',
       ],
       'filterable' => true,
+      'editable' => true,
+      'help_text' => 'Only for absence-related statuses',
     ],
     'absence_reason' => [
       'display' => 'inline',
@@ -146,6 +209,7 @@ return [
       'field_type' => 'textarea',
       'label' => 'Absence Reason',
       'validation' => 'nullable|string|max:1000',
+      'editable' => true,
     ],
     'leave_request_id' => [
       'display' => 'inline',
@@ -154,6 +218,7 @@ return [
       'label' => 'Linked Leave Request',
       'validation' => 'nullable|exists:leave_requests,id',
       'filterable' => true,
+      'editable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\LeaveRequest',
         'type' => 'belongsTo',
@@ -173,8 +238,9 @@ return [
       'fillable' => true,
       'field_type' => 'checkbox',
       'label' => 'Paid Absence',
-      'validation' => 'boolean',
+      'validation' => 'nullable|boolean',
       'filterable' => true,
+      'editable' => true,
     ],
     'hours_deducted' => [
       'display' => 'inline',
@@ -182,36 +248,17 @@ return [
       'field_type' => 'number',
       'label' => 'Hours Deducted',
       'validation' => 'nullable|numeric|min:0|max:24',
+      'editable' => true,
     ],
-    'is_approved' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'checkbox',
-      'label' => 'Approved for Payroll',
-      'validation' => 'boolean',
-      'filterable' => true,
-    ],
-    'needs_review' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'checkbox',
-      'label' => 'Needs Review',
-      'validation' => 'boolean',
-      'filterable' => true,
-    ],
-    'notes' => [
-      'display' => 'inline',
-      'fillable' => true,
-      'field_type' => 'textarea',
-      'label' => 'Notes',
-      'validation' => 'nullable|string|max:1000',
-    ],
+
+    // ===== VIOLATIONS =====
     'minutes_late' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'number',
       'label' => 'Minutes Late',
       'validation' => 'nullable|integer',
+      'editable' => true,
     ],
     'minutes_early_departure' => [
       'display' => 'inline',
@@ -219,20 +266,26 @@ return [
       'field_type' => 'number',
       'label' => 'Minutes Early Departure',
       'validation' => 'nullable|integer',
+      'editable' => true,
     ],
     'missed_break_minutes' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'number',
-      'label' => 'Missed Break (min)',
+      'label' => 'Missed Break (minutes)',
       'validation' => 'nullable|integer',
+      'editable' => true,
     ],
-    'sessions' => [
+
+    // ===== APPROVAL =====
+    'is_approved' => [
       'display' => 'inline',
       'fillable' => true,
-      'field_type' => 'json',
-      'label' => 'Sessions',
-      'validation' => 'nullable|json',
+      'field_type' => 'checkbox',
+      'label' => 'Approved for Payroll',
+      'validation' => 'nullable|boolean',
+      'filterable' => true,
+      'editable' => true,
     ],
     'approved_by' => [
       'display' => 'inline',
@@ -240,6 +293,7 @@ return [
       'field_type' => 'string',
       'label' => 'Approved By',
       'validation' => 'nullable|string|max:255',
+      'editable' => false,
     ],
     'approved_at' => [
       'display' => 'inline',
@@ -247,13 +301,36 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Approved At',
       'validation' => 'nullable|date',
+      'editable' => false,
     ],
-    'last_calculated_at' => [
+    'needs_review' => [
       'display' => 'inline',
       'fillable' => true,
-      'field_type' => 'datetimepicker',
-      'label' => 'Last Calculated At',
-      'validation' => 'nullable|date',
+      'field_type' => 'checkbox',
+      'label' => 'Needs Review',
+      'validation' => 'nullable|boolean',
+      'filterable' => true,
+      'editable' => true,
+      'help_text' => 'Flag for attendance discrepancies requiring manual attention',
+    ],
+    'notes' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'textarea',
+      'label' => 'Notes',
+      'validation' => 'nullable|string|max:1000',
+      'editable' => true,
+    ],
+
+    // ===== SYSTEM (Read-Only, Hidden on Forms) =====
+    'sessions' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'json',
+      'label' => 'Work Sessions',
+      'validation' => 'nullable|json',
+      'editable' => false,
+      'hide_on_form' => true,
     ],
     'calculation_method' => [
       'display' => 'inline',
@@ -266,13 +343,23 @@ return [
         'manual' => 'Manually Entered',
         'adjusted' => 'Manually Adjusted',
       ],
+      'editable' => false,
+    ],
+    'is_unplanned' => [
+      'display' => 'inline',
+      'fillable' => true,
+      'field_type' => 'checkbox',
+      'label' => 'Unplanned Absence',
+      'validation' => 'nullable|boolean',
+      'editable' => false,
     ],
     'attendance_policy_id' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'select',
-      'label' => 'Attendance Policy',
+      'label' => 'Applied Policy',
       'validation' => 'nullable|string',
+      'editable' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\AttendancePolicy',
         'type' => 'belongsTo',
@@ -291,8 +378,9 @@ return [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'select',
-      'label' => 'Work Pattern',
+      'label' => 'Applied Work Pattern',
       'validation' => 'nullable|string',
+      'editable' => false,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\WorkPattern',
         'type' => 'belongsTo',
@@ -307,12 +395,13 @@ return [
         'hintField' => '',
       ],
     ],
-    'is_unplanned' => [
+    'last_calculated_at' => [
       'display' => 'inline',
       'fillable' => true,
-      'field_type' => 'checkbox',
-      'label' => 'Is Unplanned',
-      'validation' => 'nullable|boolean',
+      'field_type' => 'datetimepicker',
+      'label' => 'Last Calculated At',
+      'validation' => 'nullable|date',
+      'editable' => false,
     ],
     'calculation_metadata' => [
       'display' => 'inline',
@@ -320,6 +409,8 @@ return [
       'field_type' => 'json',
       'label' => 'Calculation Metadata',
       'validation' => 'nullable|json',
+      'editable' => false,
+      'hide_on_form' => true,
     ],
     'calculation_version' => [
       'display' => 'inline',
@@ -327,13 +418,16 @@ return [
       'field_type' => 'string',
       'label' => 'Calculation Version',
       'validation' => 'nullable|string|max:255',
+      'editable' => false,
+      'hide_on_form' => true,
     ],
   ],
+
   'detailComponent' => '',
   'hiddenFields' => [
     'onTable' => [
-      '0' => 'employee_id',
-      '1' => 'shift_id',
+      '0' => 'company_id',
+      '1' => 'department_id',
       '2' => 'minutes_late',
       '3' => 'minutes_early_departure',
       '4' => 'missed_break_minutes',
@@ -342,15 +436,14 @@ return [
       '7' => 'approved_at',
       '8' => 'last_calculated_at',
       '9' => 'calculation_method',
-      '10' => 'attendance_policy_id',
-      '11' => 'work_pattern_id',
-      '12' => 'is_unplanned',
-      '13' => 'calculation_metadata',
-      '14' => 'calculation_version',
+      '10' => 'is_unplanned',
+      '11' => 'calculation_metadata',
+      '12' => 'calculation_version',
+      '13' => 'attendance_policy_id',
+      '14' => 'work_pattern_id',
       '15' => 'created_at',
       '16' => 'updated_at',
       '17' => 'deleted_at',
-      '18' => 'company_id',
     ],
     'onNewForm' => [
       '0' => 'sessions',
@@ -367,6 +460,8 @@ return [
       '11' => 'updated_at',
       '12' => 'deleted_at',
       '13' => 'company_id',
+      '14' => 'company',
+      '15' => 'department',
     ],
     'onEditForm' => [
       '0' => 'sessions',
@@ -382,27 +477,36 @@ return [
       '10' => 'updated_at',
       '11' => 'deleted_at',
       '12' => 'company_id',
+      '13' => 'company',
+      '14' => 'department',
     ],
     'onQuery' => [
       '0' => 'deleted_at',
     ],
   ],
+
   'simpleActions' => [
     '0' => 'show',
+    '1' => 'edit',
+    '2' => 'delete',
   ],
+
   'isTransaction' => false,
   'crudType' => 'pages',
   'includeControllers' => false,
   'tableDefaultFields' => [
-    '0' => 'company_id',
-    '1' => 'employee_id',
-    '2' => 'date',
-    '3' => 'status',
-    '4' => 'net_hours',
-    '5' => 'is_approved',
+    '0' => 'employee_id',
+    '1' => 'date',
+    '2' => 'company',
+    '3' => 'department',
+    '4' => 'status',
+    '5' => 'net_hours',
+    '6' => 'is_approved',
+    '7' => 'needs_review',
   ],
   'addRoutes' => false,
   'dispatchEvents' => false,
+
   'controls' => [
     'addButton' => [
       '0' => [
@@ -436,6 +540,7 @@ return [
     'search' => true,
     'showHideColumns' => true,
     'filterColumns' => true,
+    'editable' => true,
     'softDelete' => true,
     'restore' => true,
     'forceDelete' => true,
@@ -463,79 +568,58 @@ return [
       'forceDelete' => true,
     ],
   ],
+
   'fieldGroups' => [
-    'company' => [
-      'title' => 'Company',
-      'groupType' => 'hr',
-      'icon' => 'fas fa-building',
-      'fields' => [
-        '0' => 'company_id',
-      ],
-    ],
     'employee_info' => [
       'title' => 'Employee & Date',
       'groupType' => 'hr',
       'icon' => 'fas fa-user',
-      'fields' => [
-        '0' => 'employee_id',
-        '1' => 'date',
-        '2' => 'shift_id',
-        '3' => 'status',
-      ],
+      'fields' => ['employee_id', 'date', 'shift_id', 'status'],
+    ],
+    'organization' => [
+      'title' => 'Organization',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-building',
+      'fields' => ['company', 'department'],
     ],
     'hours_summary' => [
       'title' => 'Hours Summary',
       'groupType' => 'hr',
       'icon' => 'fas fa-clock',
-      'fields' => [
-        '0' => 'net_hours',
-        '1' => 'regular_hours',
-        '2' => 'overtime_hours',
-        '3' => 'double_time_hours',
-      ],
+      'fields' => ['net_hours', 'regular_hours', 'overtime_hours', 'double_time_hours'],
+    ],
+    'applied_configurations' => [
+      'title' => 'Applied Policies & Rules',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-gavel',
+      'fields' => ['attendance_policy_id', 'work_pattern_id'],
     ],
     'absence_details' => [
-      'title' => 'Leave & Absence Details',
+      'title' => 'Leave & Absence',
       'groupType' => 'hr',
       'icon' => 'fas fa-calendar-times',
-      'fields' => [
-        '0' => 'leave_request_id',
-        '1' => 'absence_type',
-        '2' => 'absence_reason',
-        '3' => 'is_paid_absence',
-        '4' => 'hours_deducted',
-      ],
-    ],
-    'approval' => [
-      'title' => 'Approval & Review',
-      'groupType' => 'hr',
-      'icon' => 'fas fa-check-double',
-      'fields' => [
-        '0' => 'is_approved',
-        '1' => 'needs_review',
-        '2' => 'notes',
-      ],
+      'fields' => ['leave_request_id', 'absence_type', 'absence_reason', 'is_paid_absence', 'hours_deducted'],
     ],
     'violations' => [
       'title' => 'Attendance Violations',
       'groupType' => 'hr',
       'icon' => 'fas fa-exclamation-triangle',
-      'fields' => [
-        '0' => 'minutes_late',
-        '1' => 'minutes_early_departure',
-        '2' => 'missed_break_minutes',
-      ],
+      'fields' => ['minutes_late', 'minutes_early_departure', 'missed_break_minutes'],
+    ],
+    'approval' => [
+      'title' => 'Approval & Review',
+      'groupType' => 'hr',
+      'icon' => 'fas fa-check-double',
+      'fields' => ['is_approved', 'needs_review', 'notes'],
     ],
     'system_info' => [
       'title' => 'System Information',
       'groupType' => 'hr',
       'icon' => 'fas fa-server',
-      'fields' => [
-        '0' => 'calculation_method',
-        '1' => 'last_calculated_at',
-      ],
+      'fields' => ['calculation_method', 'last_calculated_at'],
     ],
   ],
+
   'moreActions' => [
     '0' => [
       'title' => 'Approve for Payroll',
@@ -545,13 +629,8 @@ return [
       'fieldValue' => true,
       'actionName' => 'approve_attendance',
       'confirm' => 'Approve this attendance for payroll processing?',
-      'requiredRole' => [
-        '0' => 'payroll_officer',
-        '1' => 'hr_admin',
-      ],
-      'condition' => [
-        'is_approved' => false,
-      ],
+      'requiredRole' => ['payroll_officer', 'hr_admin'],
+      'condition' => ['is_approved' => false],
     ],
     '1' => [
       'title' => 'Request Review',
@@ -560,16 +639,8 @@ return [
       'fieldName' => 'needs_review',
       'fieldValue' => true,
       'actionName' => 'request_attendance_review',
-      'requiredRole' => [
-        '0' => 'supervisor',
-        '1' => 'manager',
-        '2' => 'hr_admin',
-        '3' => 'payroll_officer',
-      ],
-      'condition' => [
-        'needs_review' => false,
-        'is_approved' => false,
-      ],
+      'requiredRole' => ['supervisor', 'manager', 'hr_admin', 'payroll_officer'],
+      'condition' => ['needs_review' => false, 'is_approved' => false],
     ],
     '2' => [
       'title' => 'Mark as Resolved',
@@ -578,74 +649,40 @@ return [
       'fieldName' => 'needs_review',
       'fieldValue' => false,
       'actionName' => 'resolve_attendance_review',
-      'requiredRole' => [
-        '0' => 'manager',
-        '1' => 'hr_admin',
-      ],
-      'condition' => [
-        'needs_review' => true,
-      ],
+      'requiredRole' => ['manager', 'hr_admin'],
+      'condition' => ['needs_review' => true],
     ],
     '3' => [
       'title' => 'Adjust Attendance',
       'icon' => 'fas fa-edit',
       'url' => 'adjust-attendance',
-      'params' => [
-        'attendance_id' => '{id}',
-      ],
-      'requiredRole' => [
-        '0' => 'manager',
-        '1' => 'hr_admin',
-      ],
-      'condition' => [
-        'is_approved' => false,
-      ],
+      'params' => ['attendance_id' => '{id}'],
+      'requiredRole' => ['manager', 'hr_admin'],
+      'condition' => ['is_approved' => false],
     ],
     '4' => [
       'title' => 'Recalculate Hours',
       'icon' => 'fas fa-redo-alt',
       'dispatchStandardEvent' => true,
       'eventClass' => 'App\Modules\System\Events\DataTableFormEvent',
-      'params' => [
-        'attendance_id' => '{id}',
-        'actions' => [
-          '0' => 'recalculateAttendanceHours',
-        ],
-      ],
+      'params' => ['attendance_id' => '{id}', 'actions' => ['recalculateAttendanceHours']],
       'confirm' => 'Recalculate hours from clock events? This will overwrite manual adjustments.',
-      'requiredRole' => [
-        '0' => 'hr_admin',
-        '1' => 'system_admin',
-      ],
-      'condition' => [
-        'is_approved' => false,
-      ],
+      'requiredRole' => ['hr_admin', 'system_admin'],
+      'condition' => ['is_approved' => false],
     ],
     '5' => [
       'title' => 'View Work Sessions',
       'icon' => 'fas fa-history',
       'url' => 'hr/attendance-work-sessions',
       'newTab' => true,
-      'params' => [
-        'attendance_id' => '{id}',
-      ],
-      'requiredRole' => [
-        '0' => 'employee',
-        '1' => 'supervisor',
-        '2' => 'manager',
-        '3' => 'hr_admin',
-        '4' => 'payroll_officer',
-      ],
+      'params' => ['attendance_id' => '{id}'],
+      'requiredRole' => ['employee', 'supervisor', 'manager', 'hr_admin', 'payroll_officer'],
     ],
     '6' => [
       'title' => 'Export Timesheet',
       'icon' => 'fas fa-file-export',
-      'requiredRole' => [
-        '0' => 'payroll_officer',
-      ],
-      'params' => [
-        'attendance_id' => '{id}',
-      ],
+      'requiredRole' => ['payroll_officer'],
+      'params' => ['attendance_id' => '{id}'],
     ],
     '7' => [
       'title' => 'Restore',
@@ -664,38 +701,28 @@ return [
       'condition' => ['trashed' => [true]],
     ],
   ],
+
   'switchViews' => [
     'default' => 'list',
-    'card' => [
-      'titleFields' => [
-        '0' => 'employee.first_name',
-        '1' => 'employee.last_name',
-      ],
-      'subtitleFields' => [
-        '0' => 'date',
-        '1' => 'status',
-      ],
-      'contentFields' => [
-        '0' => 'net_hours',
-      ],
-      'badgeField' => 'is_approved',
-      'badgeColors' => [
-        'true' => 'success',
-        'false' => 'warning',
-      ],
-    ],
+    'table' => ['enabled' => true],
     'list' => [
+      'enabled' => true,
       'titleFields' => [
-        '0' => 'employee.first_name',
-        '1' => 'employee.last_name',
+        'employee.first_name',
+        'employee.last_name',
+        'employee.employee_number',
       ],
       'subtitleFields' => [
-        '0' => 'date',
-        '1' => 'status',
+        'date',
+        'status',
+        'net_hours',
       ],
       'contentFields' => [
-        '0' => 'net_hours',
-        '1' => 'absence_type',
+        'net_hours',
+        'absence_type',
+        'attendancePolicy.name',
+        'workPattern.name',
+        'shift.name',
       ],
       'badgeField' => 'needs_review',
       'badgeColors' => [
@@ -703,49 +730,75 @@ return [
         'false' => 'secondary',
       ],
     ],
+    'card' => [
+      'enabled' => true,
+      'titleFields' => [
+        'employee.first_name',
+        'employee.last_name',
+        'employee.employee_number',
+      ],
+      'subtitleFields' => [
+        'date',
+        'status',
+      ],
+      'contentFields' => [
+        'net_hours',
+        'regular_hours',
+        'overtime_hours',
+        'attendancePolicy.name',
+        'workPattern.name',
+      ],
+      'badgeField' => 'is_approved',
+      'badgeColors' => [
+        'true' => 'success',
+        'false' => 'warning',
+      ],
+      'ribbonField' => 'needs_review',
+      'ribbonText' => 'Needs Review',
+      'ribbonColor' => 'warning',
+    ],
   ],
+
   'relations' => [
     'employee' => [
       'type' => 'belongsTo',
       'model' => 'App\Modules\Hr\Models\Employee',
       'foreignKey' => 'employee_id',
-      'localKey' => '',
+    ],
+    'department' => [
+      'type' => 'belongsTo',
+      'model' => 'App\Modules\Hr\Models\Department',
+      'foreignKey' => 'department_id',
     ],
     'attendanceSessions' => [
       'type' => 'hasMany',
       'model' => 'App\Modules\Hr\Models\AttendanceSession',
       'foreignKey' => 'attendance_id',
-      'localKey' => '',
     ],
     'adjustments' => [
       'type' => 'hasMany',
       'model' => 'App\Modules\Hr\Models\AttendanceAdjustment',
       'foreignKey' => 'attendance_id',
-      'localKey' => '',
     ],
     'leaveRequest' => [
       'type' => 'belongsTo',
       'model' => 'App\Modules\Hr\Models\LeaveRequest',
       'foreignKey' => 'leave_request_id',
-      'localKey' => '',
     ],
     'shift' => [
       'type' => 'belongsTo',
       'model' => 'App\Modules\Hr\Models\Shift',
       'foreignKey' => 'shift_id',
-      'localKey' => '',
     ],
     'attendancePolicy' => [
       'type' => 'belongsTo',
       'model' => 'App\Modules\Hr\Models\AttendancePolicy',
       'foreignKey' => 'attendance_policy_id',
-      'localKey' => '',
     ],
     'workPattern' => [
       'type' => 'belongsTo',
       'model' => 'App\Modules\Hr\Models\WorkPattern',
       'foreignKey' => 'work_pattern_id',
-      'localKey' => '',
     ],
   ],
   'report' => [],

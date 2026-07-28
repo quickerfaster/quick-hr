@@ -80,9 +80,36 @@ Examples:
 | **Percentage** | Percentage of the employee's base salary (e.g. 5% of ₦100,000 = ₦5,000) |
 | **Tax Brackets** | Progressive tax rates applied to annual income, then divided across the pay periods |
 
+
+> **Note:** Percentage calculations are based on the employee's **Gross Pay** (which may include overtime for hourly employees). This ensures deductions are proportional to total earnings.
+
 ---
 
-## 2.4 Who Does a Policy Apply To?
+
+## 2.4 Pay Types & Attendance Integration
+
+Employees can have one of three pay types, defined in their **Employee Position** record:
+
+| Pay Type | Description | Gross Pay Calculation |
+|----------|-------------|------------------------|
+| **Salaried Full** | Fixed monthly salary. No attendance required. | Gross Pay = Base Salary (full amount). |
+| **Salaried Daily** | Paid per day worked. Requires clock‑in on workdays. | Gross Pay = Daily Rate × Worked Days. Daily Rate = Base Salary / Number of Workdays in Period. |
+| **Hourly** | Paid per hour worked. Overtime may apply. | Gross Pay = (Regular Hours × Hourly Rate) + (Overtime Hours × Overtime Rate) + (Double‑Time Hours × Double‑Time Rate). |
+
+### Attendance Integration
+
+The system can be configured to **use or ignore attendance data** for payroll calculations. This is controlled by a global setting (`PAYROLL_ATTENDANCE_INTEGRATION_ENABLED`).
+
+- **Enabled (default):** Attendance records are used to calculate `salaried_daily` and `hourly` pay.  
+- **Disabled:** All employees are treated as `salaried_full`, regardless of their assigned pay type. No attendance queries are executed.
+
+> **Important:** Percentage‑based policies (e.g., Pension, Insurance) are calculated on the **Gross Pay** amount (which may include overtime for hourly employees). This ensures deductions are proportional to total earnings.
+
+---
+
+
+
+## 2.5 Who Does a Policy Apply To?
 
 A policy may be assigned to one or more of the following:
 
@@ -245,13 +272,17 @@ For every payroll run:
 
 ---
 
-# 6. How Everything Fits Together
+## 6. How Everything Fits Together
 
 The payroll calculator processes each employee in the following order.
 
-## Step 1
+### Step 1 – Determine Gross Pay
 
-Base Salary
+- **Salaried Full** → Gross Pay = Base Salary.
+- **Salaried Daily** → Gross Pay = Daily Rate × Worked Days (from attendance).
+- **Hourly** → Gross Pay = (Regular Hours × Hourly Rate) + (Overtime / Double‑Time components).
+
+If attendance integration is disabled, **all employees** use the Salaried Full logic.
 
 ---
 
@@ -436,7 +467,9 @@ Everyone else contributes **5%**.
 | One-time adjustment missing | Adjustment was entered but not saved | Click **Save & Continue** in Step 2 |
 | Policy override not working | Adjustment profile inactive or expired | Verify Effective and Expiry Dates |
 | Parent policy not inherited | Parent inactive or child overrides the field | Verify Parent Policy and overridden fields |
-
+| **Hourly employee shows full salary despite no clock‑ins** | Attendance integration is disabled. | Enable attendance integration in Settings → Payroll. |
+| **Salaried daily employee paid zero days** | No attendance records found for the period. | Verify attendance records exist and employee has clock‑ins. |
+| **Pension deduction seems too high/low** | Percentage based on gross pay, not base salary. | Check if overtime is affecting gross pay. |
 ---
 
 # 10. Glossary

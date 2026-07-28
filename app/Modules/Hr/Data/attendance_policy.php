@@ -11,6 +11,7 @@ return [
       'validation' => 'required|string|max:255',
       'filterable' => true,
       'searchable' => true,
+      'editable' => true,
     ],
     'company_id' => [
       'display' => 'inline',
@@ -20,6 +21,7 @@ return [
       'validation' => 'required|integer|exists:companies,id',
       'filterable' => true,
       'searchable' => true,
+      'editable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Company',
         'type' => 'belongsTo',
@@ -43,6 +45,7 @@ return [
       'autoGenerate' => true,
       'filterable' => true,
       'searchable' => true,
+      'editable' => true,
     ],
     'description' => [
       'display' => 'inline',
@@ -51,6 +54,7 @@ return [
       'label' => 'Description',
       'validation' => 'nullable|string|max:1000',
       'searchable' => true,
+      'editable' => true,
     ],
     'grace_period_minutes' => [
       'display' => 'inline',
@@ -58,6 +62,7 @@ return [
       'field_type' => 'number',
       'label' => 'Late Grace Period (minutes)',
       'validation' => 'required|integer|min:0|max:60',
+      'editable' => true,
     ],
     'early_departure_grace_minutes' => [
       'display' => 'inline',
@@ -65,6 +70,7 @@ return [
       'field_type' => 'number',
       'label' => 'Early Departure Grace (minutes)',
       'validation' => 'required|integer|min:0|max:60',
+      'editable' => true,
     ],
     'overtime_daily_threshold_hours' => [
       'display' => 'inline',
@@ -72,6 +78,7 @@ return [
       'field_type' => 'number',
       'label' => 'Daily Overtime Starts After (hours)',
       'validation' => 'required|numeric|min:0|max:24',
+      'editable' => true,
     ],
     'overtime_weekly_threshold_hours' => [
       'display' => 'inline',
@@ -79,6 +86,7 @@ return [
       'field_type' => 'number',
       'label' => 'Weekly Overtime Starts After (hours)',
       'validation' => 'required|numeric|min:0|max:168',
+      'editable' => true,
     ],
     'max_daily_overtime_hours' => [
       'display' => 'inline',
@@ -86,6 +94,7 @@ return [
       'field_type' => 'number',
       'label' => 'Maximum Daily Overtime (hours)',
       'validation' => 'nullable|numeric|min:0|max:24',
+      'editable' => true,
     ],
     'overtime_multiplier' => [
       'display' => 'inline',
@@ -93,6 +102,7 @@ return [
       'field_type' => 'number',
       'label' => 'Overtime Pay Multiplier',
       'validation' => 'required|numeric|min:1.0|max:3.0',
+      'editable' => true,
     ],
     'double_time_threshold_hours' => [
       'display' => 'inline',
@@ -100,6 +110,7 @@ return [
       'field_type' => 'number',
       'label' => 'Double Time Starts After (hours)',
       'validation' => 'nullable|numeric|min:0|max:24',
+      'editable' => true,
     ],
     'double_time_multiplier' => [
       'display' => 'inline',
@@ -107,20 +118,25 @@ return [
       'field_type' => 'number',
       'label' => 'Double Time Multiplier',
       'validation' => 'nullable|numeric|min:1.0|max:3.0',
+      'editable' => true,
     ],
     'requires_break_after_hours' => [
       'display' => 'inline',
       'fillable' => true,
-      'field_type' => 'number',
+      'field_type' => 'string',
       'label' => 'Break Required After (hours)',
-      'validation' => 'nullable|numeric|min:0|max:24',
+      'validation' => 'nullable|string|max:255',
+      'hint' => 'Scalar (e.g. 5) or JSON array (e.g. [4, 8])',
+      'editable' => true,
     ],
     'break_duration_minutes' => [
       'display' => 'inline',
       'fillable' => true,
-      'field_type' => 'number',
+      'field_type' => 'string',
       'label' => 'Break Duration (minutes)',
-      'validation' => 'nullable|integer|min:0|max:240',
+      'validation' => 'nullable|string|max:255',
+      'hint' => 'Scalar (e.g. 30) or JSON array (e.g. [30, 30])',
+      'editable' => true,
     ],
     'unpaid_break_minutes' => [
       'display' => 'inline',
@@ -128,6 +144,7 @@ return [
       'field_type' => 'number',
       'label' => 'Daily Unpaid Break (minutes)',
       'validation' => 'required|integer|min:0|max:240',
+      'editable' => true,
     ],
     'country_code' => [
       'display' => 'inline',
@@ -144,6 +161,7 @@ return [
         'NG' => 'Nigeria',
       ],
       'filterable' => true,
+      'editable' => true,
     ],
     'state_code' => [
       'display' => 'inline',
@@ -152,6 +170,7 @@ return [
       'label' => 'State/Province Code',
       'validation' => 'nullable|string|max:10',
       'filterable' => true,
+      'editable' => true,
     ],
     'applies_to_shift_categories' => [
       'display' => 'inline',
@@ -168,6 +187,7 @@ return [
         'training' => 'Training Shifts',
       ],
       'multiSelect' => true,
+      'editable' => true,
     ],
     'effective_date' => [
       'display' => 'inline',
@@ -176,6 +196,7 @@ return [
       'label' => 'Effective Date',
       'validation' => 'required|date',
       'filterable' => true,
+      'editable' => true,
     ],
     'expiration_date' => [
       'display' => 'inline',
@@ -184,6 +205,7 @@ return [
       'label' => 'Expiration Date',
       'validation' => 'nullable|date|after:effective_date',
       'filterable' => true,
+      'editable' => true,
     ],
     'is_active' => [
       'display' => 'inline',
@@ -192,6 +214,7 @@ return [
       'label' => 'Active',
       'validation' => 'nullable|boolean',
       'filterable' => true,
+      'editable' => true,
     ],
     'is_default' => [
       'display' => 'inline',
@@ -200,6 +223,7 @@ return [
       'label' => 'Default Policy',
       'validation' => 'nullable|boolean',
       'filterable' => true,
+      'editable' => true,
     ],
     'version' => [
       'display' => 'inline',
@@ -207,6 +231,7 @@ return [
       'field_type' => 'number',
       'label' => 'Version',
       'validation' => 'nullable|integer',
+      'editable' => false,
     ],
     'last_updated_by' => [
       'display' => 'inline',
@@ -214,6 +239,7 @@ return [
       'field_type' => 'string',
       'label' => 'Last Updated By',
       'validation' => 'nullable|string|max:255',
+      'editable' => false,
     ],
     'last_updated_at' => [
       'display' => 'inline',
@@ -221,6 +247,7 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Last Updated At',
       'validation' => 'nullable|date',
+      'editable' => false,
     ],
   ],
   'detailComponent' => '',
@@ -303,6 +330,7 @@ return [
     'search' => true,
     'showHideColumns' => true,
     'filterColumns' => true,
+    'editable' => true,
     'softDelete' => true,
     'restore' => true,
     'forceDelete' => true,
@@ -425,29 +453,12 @@ return [
     ],
   ],
   'switchViews' => [
-    'default' => 'list',
-    'card' => [
-      'titleFields' => [
-        '0' => 'name',
-      ],
-      'subtitleFields' => [
-        '0' => 'code',
-        '1' => 'country_code',
-      ],
-      'contentFields' => [
-        '0' => 'overtime_daily_threshold_hours',
-        '1' => 'overtime_multiplier',
-      ],
-      'badgeField' => 'is_active',
-      'badgeColors' => [
-        'true' => 'success',
-        'false' => 'secondary',
-      ],
-      'ribbonField' => 'is_default',
-      'ribbonText' => 'Default',
-      'ribbonColor' => 'warning',
+    'default' => 'table',
+    'table' => [
+      'enabled' => true,
     ],
     'list' => [
+      'enabled' => true,
       'titleFields' => [
         '0' => 'name',
       ],
@@ -468,6 +479,28 @@ return [
       'tagField' => 'is_default',
       'tagText' => 'Default',
       'tagColor' => 'warning',
+    ],
+    'card' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'name',
+      ],
+      'subtitleFields' => [
+        '0' => 'code',
+        '1' => 'country_code',
+      ],
+      'contentFields' => [
+        '0' => 'overtime_daily_threshold_hours',
+        '1' => 'overtime_multiplier',
+      ],
+      'badgeField' => 'is_active',
+      'badgeColors' => [
+        'true' => 'success',
+        'false' => 'secondary',
+      ],
+      'ribbonField' => 'is_default',
+      'ribbonText' => 'Default',
+      'ribbonColor' => 'warning',
     ],
   ],
   'relations' => [],

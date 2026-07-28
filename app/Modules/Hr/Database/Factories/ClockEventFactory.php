@@ -4,6 +4,7 @@ namespace App\Modules\Hr\Database\Factories;
 
 use App\Modules\Hr\Models\ClockEvent;
 use App\Modules\Hr\Models\Company;
+use App\Modules\Hr\Models\Employee;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ClockEventFactory extends Factory
@@ -15,7 +16,8 @@ class ClockEventFactory extends Factory
         $timestamp = $this->faker->dateTimeThisMonth();
 
         return [
-            'employee_id' => $this->faker->bothify('EMP-####-###'), // string employee_number
+            'employee_id' => Employee::factory(),
+            'employee_number' => $this->faker->bothify('EMP-####-###'),
             'event_type' => $this->faker->randomElement(['clock_in', 'clock_out']),
             'timestamp' => $timestamp,
             'method' => $this->faker->randomElement(['device', 'web', 'mobile', 'biometric', 'kiosk', 'manual']),
@@ -51,7 +53,7 @@ class ClockEventFactory extends Factory
     {
         return $this->state(function (array $attributes) use ($employeeNumber) {
             return [
-                'employee_id' => $employeeNumber,
+                'employee_number' => $employeeNumber,
             ];
         });
     }

@@ -26,6 +26,14 @@ class AttendanceCalculatorStatusTest extends TestCase
     {
         parent::setUp();
 
+        // Create a company for multi-tenancy context
+        $this->company = \App\Modules\Hr\Models\Company::factory()->create();
+
+        // Create a department belonging to the company
+        $department = \App\Modules\Hr\Models\Department::factory()->create([
+            'company_id' => $this->company->id,
+        ]);
+
         // Create base shift (not default)
         $this->shift = Shift::factory()->create([
             'name' => 'Standard 8-5',
@@ -34,6 +42,7 @@ class AttendanceCalculatorStatusTest extends TestCase
             'duration_hours' => 8.0,
             'is_overnight' => false,
             'is_default' => false,
+            'company_id' => $this->company->id,
         ]);
 
         // Create default work pattern (system-wide fallback)
@@ -45,6 +54,7 @@ class AttendanceCalculatorStatusTest extends TestCase
             'effective_date' => '2026-01-01',
             'is_active' => true,
             'is_default' => true,
+            'company_id' => $this->company->id,
         ]);
 
         // Create employee
@@ -52,10 +62,11 @@ class AttendanceCalculatorStatusTest extends TestCase
             'employee_number' => 'EMP-TEST-001',
             'first_name' => 'John',
             'last_name' => 'Doe',
+            'company_id' => $this->company->id,
         ]);
 
         // Create default attendance policy (system-wide fallback)
-        $this->defaultPolicy = AttendancePolicy::factory()->create([
+        $this->defaultPolicy = AttendancePolicy::factory()->create(['company_id' => $this->employee->company_id,
             'name' => 'Default Policy',
             'grace_period_minutes' => 5,
             'early_departure_grace_minutes' => 5,
@@ -71,6 +82,7 @@ class AttendanceCalculatorStatusTest extends TestCase
             'effective_date' => '2026-01-01',
             'is_active' => true,
             'is_default' => true,
+            'company_id' => $this->company->id,
         ]);
 
         // Create employee position (without direct work_pattern_id or attendance_policy_id)
@@ -80,6 +92,8 @@ class AttendanceCalculatorStatusTest extends TestCase
             'attendance_policy_id' => null, // employee-specific override
             'pay_type' => 'hourly',
             'hourly_rate' => 20.00,
+            'department_id' => $department->id,
+            'company_id' => $this->company->id,
             // 'start_date' => '2026-01-01',
         ]);
 
@@ -97,11 +111,11 @@ class AttendanceCalculatorStatusTest extends TestCase
     // ------------------------------------------------------------------------
     // Helper method to create clock events for the current employee
     // ------------------------------------------------------------------------
-    protected function createClockEvent(string $type, Carbon $timestamp, ?string $employeeNumber = null): ClockEvent
+    protected function createClockEvent(string $type, Carbon $timestamp, ?int $employeeId = null): ClockEvent
     {
-        $employeeNumber = $employeeNumber ?? $this->employee->employee_number;
+        $employeeId = $employeeId ?? $this->employee->id;
         return ClockEvent::factory()->create([
-            'employee_id' => $employeeNumber,
+            'employee_id' => $employeeId,
             'event_type' => $type,
             'timestamp' => $timestamp,
             'method' => 'test',
@@ -127,7 +141,7 @@ class AttendanceCalculatorStatusTest extends TestCase
 
         $this->calculator->calculateForDay($this->employee->employee_number, $date);
 
-        $attendance = Attendance::where('employee_number', $this->employee->employee_number)
+        $attendance = Attendance::where('employee_id', $this->employee->id)
             ->whereDate('date', $date)
             ->first();
 
@@ -151,7 +165,7 @@ class AttendanceCalculatorStatusTest extends TestCase
 
         $this->calculator->calculateForDay($this->employee->employee_number, $date);
 
-        $attendance = Attendance::where('employee_number', $this->employee->employee_number)
+        $attendance = Attendance::where('employee_id', $this->employee->id)
             ->whereDate('date', $date)
             ->first();
 
@@ -172,7 +186,7 @@ class AttendanceCalculatorStatusTest extends TestCase
 
         $this->calculator->calculateForDay($this->employee->employee_number, $date);
 
-        $attendance = Attendance::where('employee_number', $this->employee->employee_number)
+        $attendance = Attendance::where('employee_id', $this->employee->id)
             ->whereDate('date', $date)
             ->first();
 
@@ -191,7 +205,7 @@ class AttendanceCalculatorStatusTest extends TestCase
 
         $this->calculator->calculateForDay($this->employee->employee_number, $date);
 
-        $attendance = Attendance::where('employee_number', $this->employee->employee_number)
+        $attendance = Attendance::where('employee_id', $this->employee->id)
             ->whereDate('date', $date)
             ->first();
 
@@ -210,7 +224,7 @@ class AttendanceCalculatorStatusTest extends TestCase
 
         $this->calculator->calculateForDay($this->employee->employee_number, $date);
 
-        $attendance = Attendance::where('employee_number', $this->employee->employee_number)
+        $attendance = Attendance::where('employee_id', $this->employee->id)
             ->whereDate('date', $date)
             ->first();
 
@@ -229,7 +243,7 @@ class AttendanceCalculatorStatusTest extends TestCase
 
         $this->calculator->calculateForDay($this->employee->employee_number, $date);
 
-        $attendance = Attendance::where('employee_number', $this->employee->employee_number)
+        $attendance = Attendance::where('employee_id', $this->employee->id)
             ->whereDate('date', $date)
             ->first();
 
@@ -247,10 +261,11 @@ class AttendanceCalculatorStatusTest extends TestCase
     // Deactivate the default policy so it's not used as fallback
     $this->defaultPolicy->update(['is_active' => false, 'is_default' => false]);
 
-    $shiftPolicy = AttendancePolicy::factory()->create([
+    $shiftPolicy = AttendancePolicy::factory()->create(['company_id' => $this->employee->company_id,
         'name' => 'Shift Policy',
         'is_active' => true,
         'is_default' => false,
+            'company_id' => $this->company->id,
     ]);
 
     $shift = Shift::factory()->create([
@@ -286,12 +301,12 @@ class AttendanceCalculatorStatusTest extends TestCase
         'is_published' => true,
     ]);
 
-    $this->createClockEvent('clock_in', $date->copy()->setTime(9, 0), $employee->employee_number);
-    $this->createClockEvent('clock_out', $date->copy()->setTime(18, 0), $employee->employee_number);
+    $this->createClockEvent('clock_in', $date->copy()->setTime(9, 0), $employee->id);
+    $this->createClockEvent('clock_out', $date->copy()->setTime(18, 0), $employee->id);
 
     $this->calculator->calculateForDay($employee->employee_number, $date);
 
-    $attendance = Attendance::where('employee_number', $employee->employee_number)
+    $attendance = Attendance::where('employee_id', $employee->id)
         ->whereDate('date', $date)
         ->first();
 
@@ -301,14 +316,15 @@ class AttendanceCalculatorStatusTest extends TestCase
 /** @test */
 public function shift_policy_is_overridden_by_higher_level_policies()
 {
-    $employeePolicy = AttendancePolicy::factory()->create(['name' => 'Employee Policy']);
-    $shiftPolicy = AttendancePolicy::factory()->create(['name' => 'Shift Policy']);
+    $employeePolicy = AttendancePolicy::factory()->create(['company_id' => $this->employee->company_id, 'name' => 'Employee Policy']);
+    $shiftPolicy = AttendancePolicy::factory()->create(['company_id' => $this->employee->company_id, 'name' => 'Shift Policy']);
 
     $shift = Shift::factory()->create();
 
     // Assign shift policy via PolicyAssignment
     PolicyAssignment::create([
-        'shift_id' => $shift->id,
+        'assignable_type' => \App\Modules\Hr\Models\Shift::class,
+        'assignable_id' => $shift->id,
         'attendance_policy_id' => $shiftPolicy->id,
     ]);
 
@@ -318,6 +334,7 @@ public function shift_policy_is_overridden_by_higher_level_policies()
 
     $date = Carbon::parse('2026-02-16');
     $policy = $this->calculator->getApplicablePolicy(
+        $this->employee,
         $this->employee->employeePosition,
         $date,
         $shift
@@ -329,7 +346,7 @@ public function shift_policy_is_overridden_by_higher_level_policies()
 /** @test */
 /*public function shift_policy_is_used_when_higher_policies_are_inactive_or_expired()
 {
-    $shiftPolicy = AttendancePolicy::factory()->create([
+    $shiftPolicy = AttendancePolicy::factory()->create(['company_id' => $this->employee->company_id,
         'name' => 'Shift Policy',
         'effective_date' => '2026-01-01',
         'is_active' => true,
@@ -344,7 +361,7 @@ public function shift_policy_is_overridden_by_higher_level_policies()
     ]);
 
     // Higher-level policy exists but is inactive
-    $inactivePolicy = AttendancePolicy::factory()->create([
+    $inactivePolicy = AttendancePolicy::factory()->create(['company_id' => $this->employee->company_id,
         'name' => 'Inactive Policy',
         'is_active' => false,
     ]);
@@ -366,7 +383,7 @@ public function shift_policy_is_skipped_if_shift_has_no_assigned_policy()
 {
     $shift = Shift::factory()->create();
 
-    $employee = Employee::factory()->create(['employee_number' => 'EMP-TEST-002']);
+    $employee = Employee::factory()->create(['employee_number' => 'EMP-TEST-002', 'company_id' => $this->company->id]);
     EmployeePosition::factory()->create([
         'employee_id' => $employee->id,
         'shift_id' => $shift->id,
@@ -380,6 +397,7 @@ public function shift_policy_is_skipped_if_shift_has_no_assigned_policy()
 
     $date = Carbon::parse('2026-02-16');
     $policy = $this->calculator->getApplicablePolicy(
+        $employee,
         $employee->employeePosition,
         $date,
         $shift
@@ -405,7 +423,7 @@ public function shift_policy_is_skipped_if_shift_has_no_assigned_policy()
 
         $this->calculator->calculateForDay($this->employee->employee_number, $date);
 
-        $attendance = Attendance::where('employee_number', $this->employee->employee_number)
+        $attendance = Attendance::where('employee_id', $this->employee->id)
             ->whereDate('date', $date)
             ->first();
 
@@ -424,7 +442,7 @@ public function shift_policy_is_skipped_if_shift_has_no_assigned_policy()
 
         $this->calculator->calculateForDay($this->employee->employee_number, $date);
 
-        $attendance = Attendance::where('employee_number', $this->employee->employee_number)
+        $attendance = Attendance::where('employee_id', $this->employee->id)
             ->whereDate('date', $date)
             ->first();
 
@@ -452,7 +470,7 @@ public function shift_policy_is_skipped_if_shift_has_no_assigned_policy()
 
         $this->calculator->calculateForDay($this->employee->employee_number, $date);
 
-        $attendance = Attendance::where('employee_number', $this->employee->employee_number)
+        $attendance = Attendance::where('employee_id', $this->employee->id)
             ->whereDate('date', $date)
             ->first();
 
@@ -479,9 +497,10 @@ public function shift_policy_is_skipped_if_shift_has_no_assigned_policy()
             'effective_date' => '2026-01-01',
             'is_active' => true,
             'is_default' => false,
+            'company_id' => $this->company->id,
         ]);
 
-        $employee = Employee::factory()->create(['employee_number' => 'EMP-TEST-002']);
+        $employee = Employee::factory()->create(['employee_number' => 'EMP-TEST-002', 'company_id' => $this->company->id]);
         EmployeePosition::factory()->create([
             'employee_id' => $employee->id,
             'shift_id' => $shift->id,
@@ -500,12 +519,12 @@ public function shift_policy_is_skipped_if_shift_has_no_assigned_policy()
 
         $date = Carbon::parse('2026-02-16');
 
-        $this->createClockEvent('clock_in', $date->copy()->setTime(8, 0), $employee->employee_number);
-        $this->createClockEvent('clock_out', $date->copy()->setTime(17, 0), $employee->employee_number);
+        $this->createClockEvent('clock_in', $date->copy()->setTime(8, 0), $employee->id);
+        $this->createClockEvent('clock_out', $date->copy()->setTime(17, 0), $employee->id);
 
         $this->calculator->calculateForDay($employee->employee_number, $date);
 
-        $attendance = Attendance::where('employee_number', $employee->employee_number)
+        $attendance = Attendance::where('employee_id', $employee->id)
             ->whereDate('date', $date)
             ->first();
 
@@ -519,7 +538,7 @@ public function shift_policy_is_skipped_if_shift_has_no_assigned_policy()
         // Deactivate the default work pattern so no schedule is found
         $this->workPattern->update(['is_active' => false, 'is_default' => false]);
 
-        $employee = Employee::factory()->create(['employee_number' => 'EMP-TEST-002']);
+        $employee = Employee::factory()->create(['employee_number' => 'EMP-TEST-002', 'company_id' => $this->company->id]);
         EmployeePosition::factory()->create([
             'employee_id' => $employee->id,
             'shift_id' => null,
@@ -531,17 +550,55 @@ public function shift_policy_is_skipped_if_shift_has_no_assigned_policy()
 
         $date = Carbon::parse('2026-02-16');
 
-        $this->createClockEvent('clock_in', $date->copy()->setTime(8, 0), $employee->employee_number);
-        $this->createClockEvent('clock_out', $date->copy()->setTime(17, 0), $employee->employee_number);
+        $this->createClockEvent('clock_in', $date->copy()->setTime(8, 0), $employee->id);
+        $this->createClockEvent('clock_out', $date->copy()->setTime(17, 0), $employee->id);
 
         $this->calculator->calculateForDay($employee->employee_number, $date);
 
-        $attendance = Attendance::where('employee_number', $employee->employee_number)
+        $attendance = Attendance::where('employee_id', $employee->id)
             ->whereDate('date', $date)
             ->first();
 
         $this->assertEquals('unscheduled', $attendance->status);
         $this->assertEquals(0.0, $attendance->net_hours);
         $this->assertTrue((bool) $attendance->needs_review);
+    }
+
+    /** @test */
+    public function it_creates_unpaid_break_session_when_policy_has_unpaid_break()
+    {
+        $this->defaultPolicy->update(['unpaid_break_minutes' => 30]);
+
+        $date = Carbon::now();
+
+        $this->createClockEvent('clock_in', $date->copy()->setHour(8)->setMinute(0)->setSecond(0));
+        $this->createClockEvent('clock_out', $date->copy()->setHour(17)->setMinute(0)->setSecond(0));
+
+        $this->calculator->calculateForDay($this->employee->employee_number, $date);
+
+        $attendance = Attendance::where('employee_id', $this->employee->id)
+            ->where('date', $date->format('Y-m-d'))
+            ->first();
+
+        $this->assertNotNull($attendance);
+
+        // Check sessions JSON contains unpaid_break entry (has null start/end times)
+        $sessions = $attendance->sessions;
+        $this->assertIsArray($sessions);
+
+        $unpaidBreaks = array_filter($sessions, function ($s) {
+            return ($s['start'] ?? null) === null && ($s['end'] ?? null) === null;
+        });
+        $this->assertCount(1, $unpaidBreaks);
+
+        $unpaidBreak = reset($unpaidBreaks);
+        $this->assertEquals(0.5, $unpaidBreak['duration']);
+
+        // Verify AttendanceSession record exists
+        $unpaidSession = AttendanceSession::where('attendance_id', $attendance->id)
+            ->where('session_type', 'unpaid_break')
+            ->first();
+        $this->assertNotNull($unpaidSession);
+        $this->assertEquals(0.5, (float) $unpaidSession->duration_hours);
     }
 }

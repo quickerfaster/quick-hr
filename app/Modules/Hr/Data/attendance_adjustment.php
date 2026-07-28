@@ -11,6 +11,7 @@ return [
       'validation' => 'required|exists:attendances,id',
       'filterable' => true,
       'searchable' => true,
+      'editable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Attendance',
         'type' => 'belongsTo',
@@ -33,6 +34,7 @@ return [
       'validation' => 'required|integer|exists:companies,id',
       'filterable' => true,
       'searchable' => true,
+      'editable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Company',
         'type' => 'belongsTo',
@@ -53,6 +55,7 @@ return [
       'field_type' => 'number',
       'label' => 'Original Hours',
       'validation' => 'nullable|numeric',
+      'editable' => false,
     ],
     'original_status' => [
       'display' => 'inline',
@@ -61,6 +64,7 @@ return [
       'label' => 'Original Status',
       'validation' => 'nullable|string',
       'filterable' => true,
+      'editable' => false,
     ],
     'adjusted_net_hours' => [
       'display' => 'inline',
@@ -68,6 +72,7 @@ return [
       'field_type' => 'number',
       'label' => 'New Hours',
       'validation' => 'required|numeric|min:0|max:24',
+      'editable' => true,
     ],
     'adjusted_status' => [
       'display' => 'inline',
@@ -80,10 +85,13 @@ return [
         'absent' => 'Absent',
         'late' => 'Late Arrival',
         'half_day' => 'Half Day',
+        'unscheduled' => 'Unscheduled',
+        'incomplete' => 'Incomplete',
+        'on_leave' => 'On Leave',
         'holiday' => 'Holiday',
-        'leave' => 'On Leave',
       ],
       'filterable' => true,
+      'editable' => true,
     ],
     'reason' => [
       'display' => 'inline',
@@ -92,6 +100,7 @@ return [
       'label' => 'Reason for Change',
       'validation' => 'required|string|max:500',
       'searchable' => true,
+      'editable' => true,
     ],
     'adjusted_by' => [
       'display' => 'inline',
@@ -99,6 +108,7 @@ return [
       'field_type' => 'string',
       'label' => 'Adjusted By',
       'validation' => 'nullable|string|max:255',
+      'editable' => false,
     ],
     'adjusted_at' => [
       'display' => 'inline',
@@ -106,6 +116,7 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Adjusted At',
       'validation' => 'nullable|date',
+      'editable' => false,
     ],
   ],
   'detailComponent' => '',
@@ -182,6 +193,7 @@ return [
     'search' => true,
     'showHideColumns' => true,
     'filterColumns' => true,
+    'editable' => true,
     'softDelete' => true,
     'restore' => true,
     'forceDelete' => true,
@@ -248,8 +260,12 @@ return [
     ],
   ],
   'switchViews' => [
-    'default' => 'list',
+    'default' => 'table',
+    'table' => [
+      'enabled' => true,
+    ],
     'list' => [
+      'enabled' => true,
       'titleFields' => [
         '0' => 'attendance.employee.first_name',
         '1' => 'attendance.employee.last_name',
@@ -269,8 +285,35 @@ return [
         'absent' => 'danger',
         'late' => 'warning',
         'half_day' => 'info',
+        'unscheduled' => 'secondary',
+        'on_leave' => 'info',
         'holiday' => 'primary',
-        'leave' => 'secondary',
+      ],
+    ],
+    'card' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'attendance.employee.first_name',
+        '1' => 'attendance.employee.last_name',
+      ],
+      'subtitleFields' => [
+        '0' => 'attendance.date',
+        '1' => 'adjusted_status',
+      ],
+      'contentFields' => [
+        '0' => 'original_net_hours',
+        '1' => 'adjusted_net_hours',
+        '2' => 'reason',
+      ],
+      'badgeField' => 'adjusted_status',
+      'badgeColors' => [
+        'present' => 'success',
+        'absent' => 'danger',
+        'late' => 'warning',
+        'half_day' => 'info',
+        'unscheduled' => 'secondary',
+        'on_leave' => 'info',
+        'holiday' => 'primary',
       ],
     ],
   ],

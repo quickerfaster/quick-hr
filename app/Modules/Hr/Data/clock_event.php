@@ -6,9 +6,31 @@ return [
     'employee_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'field_type' => 'select',
+      'label' => 'Employee',
+      'validation' => 'required|integer|exists:employees,id',
+      'filterable' => true,
+      'searchable' => true,
+      'relationship' => [
+        'model' => 'App\Modules\Hr\Models\Employee',
+        'type' => 'belongsTo',
+        'display_field' => 'employee_number',
+        'dynamic_property' => 'employee',
+        'foreign_key' => 'employee_id',
+        'inlineAdd' => false,
+      ],
+      'options' => [
+        'model' => 'App\Modules\Hr\Models\Employee',
+        'column' => 'employee_number',
+        'hintField' => 'first_name,last_name',
+      ],
+    ],
+    'employee_number' => [
+      'display' => 'inline',
+      'fillable' => true,
       'field_type' => 'string',
-      'label' => 'Employee ID',
-      'validation' => 'required',
+      'label' => 'Employee Number',
+      'validation' => 'nullable|string|max:50',
       'filterable' => true,
       'searchable' => true,
     ],
@@ -290,8 +312,35 @@ return [
     ],
   ],
   'switchViews' => [
-    'default' => 'list',
+    'default' => 'table',
+    'table' => [
+      'enabled' => true,
+    ],
     'list' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'employee_id',
+      ],
+      'subtitleFields' => [
+        '0' => 'event_type',
+        '1' => 'timestamp',
+      ],
+      'contentFields' => [
+        '0' => 'method',
+        '1' => 'location_name',
+      ],
+      'badgeField' => 'event_type',
+      'badgeColors' => [
+        'clock_in' => 'success',
+        'clock_out' => 'info',
+        'break_start' => 'warning',
+        'break_end' => 'primary',
+        'meal_start' => 'secondary',
+        'meal_end' => 'dark',
+      ],
+    ],
+    'card' => [
+      'enabled' => true,
       'titleFields' => [
         '0' => 'employee_id',
       ],

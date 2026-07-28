@@ -6,6 +6,7 @@ return [
     'employee_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'livewire-searchable-select',
       'label' => 'Employee',
       'validation' => 'required|exists:employees,id|unique:employee_payroll_profiles,employee_id',
@@ -28,6 +29,7 @@ return [
     'company_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Company',
       'validation' => 'required|integer|exists:companies,id',
@@ -50,6 +52,7 @@ return [
     'pay_schedule_id' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Pay Schedule',
       'validation' => 'required|exists:pay_schedules,id',
@@ -72,6 +75,7 @@ return [
     'bank_name' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Bank Name',
       'validation' => 'nullable|string|max:255',
@@ -80,6 +84,7 @@ return [
     'account_type' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Account Type',
       'validation' => 'nullable|in:checking,savings',
@@ -92,6 +97,7 @@ return [
     'bank_sort_code' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Sort Code (UK)',
       'validation' => 'nullable|string|max:10',
@@ -99,6 +105,7 @@ return [
     'bank_code' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Bank Code (Nigeria)',
       'validation' => 'nullable|string|max:10',
@@ -106,6 +113,7 @@ return [
     'bank_account_name' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Account Name',
       'validation' => 'nullable|string|max:255',
@@ -114,6 +122,7 @@ return [
     'bank_account_number' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Account Number',
       'validation' => 'nullable|string|max:50',
@@ -121,6 +130,7 @@ return [
     'bank_routing_number' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'Routing Number / Sort Code',
       'validation' => 'nullable|string|max:20',
@@ -128,6 +138,7 @@ return [
     'bank_iban' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'IBAN (International)',
       'validation' => 'nullable|string|max:34',
@@ -135,6 +146,7 @@ return [
     'bank_swift' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'string',
       'label' => 'SWIFT / BIC Code',
       'validation' => 'nullable|string|max:11',
@@ -142,6 +154,7 @@ return [
     'payment_method' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Payment Method',
       'validation' => 'required|in:bank_transfer,cheque,cash,other',
@@ -156,6 +169,7 @@ return [
     'tax_filing_status' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Tax Filing Status',
       'validation' => 'nullable|string|max:50',
@@ -171,6 +185,7 @@ return [
     'allowances' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Withholding Allowances',
       'validation' => 'nullable|integer|min:0',
@@ -178,6 +193,7 @@ return [
     'extra_withholding' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'number',
       'label' => 'Extra Withholding ($ per pay period)',
       'validation' => 'nullable|numeric|min:0',
@@ -185,6 +201,7 @@ return [
     'is_exempt_from_federal_tax' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'checkbox',
       'label' => 'Exempt from Federal Income Tax',
       'validation' => 'nullable|boolean',
@@ -193,6 +210,7 @@ return [
     'override_country_code' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Override Country',
       'validation' => 'nullable|string|size:2',
@@ -213,6 +231,7 @@ return [
     'override_state_code' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Override State/Province',
       'validation' => 'nullable|string|max:20',
@@ -222,6 +241,7 @@ return [
     'currency_code' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'select',
       'label' => 'Currency',
       'validation' => 'nullable|string|size:3',
@@ -235,6 +255,7 @@ return [
     'effective_date' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'datepicker',
       'label' => 'Effective From',
       'validation' => 'required|date',
@@ -243,6 +264,7 @@ return [
     'expiry_date' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'datepicker',
       'label' => 'Expiry Date',
       'validation' => 'nullable|date|after:effective_date',
@@ -251,6 +273,7 @@ return [
     'is_active' => [
       'display' => 'inline',
       'fillable' => true,
+      'editable' => true,
       'field_type' => 'checkbox',
       'label' => 'Active',
       'validation' => 'nullable|boolean',
@@ -345,6 +368,7 @@ return [
     ],
     'search' => true,
     'showHideColumns' => true,
+    'editable' => true,
     'filterColumns' => true,
     'softDelete' => true,
     'restore' => true,

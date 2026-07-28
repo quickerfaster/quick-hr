@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Modules\Hr\Models\Employee;
 use App\Modules\Hr\Models\AttendanceSession;
 use App\Modules\Hr\Models\AttendanceAdjustment;
@@ -28,7 +29,6 @@ class Attendance extends Model
 
 
 
-
     protected $table = 'attendances';
 
 
@@ -37,7 +37,7 @@ class Attendance extends Model
 
 
     protected $fillable = [
-        'company_id', 'employee_id', 'date', 'shift_id', 'status', 'net_hours', 'regular_hours', 'overtime_hours', 'double_time_hours', 'absence_type', 'absence_reason', 'leave_request_id', 'is_paid_absence', 'hours_deducted', 'is_approved', 'needs_review', 'notes', 'minutes_late', 'minutes_early_departure', 'missed_break_minutes', 'sessions', 'approved_by', 'approved_at', 'last_calculated_at', 'calculation_method', 'attendance_policy_id', 'work_pattern_id', 'is_unplanned', 'calculation_metadata', 'calculation_version'
+        'company_id', 'department_id', 'company', 'department', 'employee_id', 'date', 'shift_id', 'status', 'net_hours', 'regular_hours', 'overtime_hours', 'double_time_hours', 'absence_type', 'absence_reason', 'leave_request_id', 'is_paid_absence', 'hours_deducted', 'is_approved', 'needs_review', 'notes', 'minutes_late', 'minutes_early_departure', 'missed_break_minutes', 'sessions', 'approved_by', 'approved_at', 'last_calculated_at', 'calculation_method', 'attendance_policy_id', 'work_pattern_id', 'is_unplanned', 'calculation_metadata', 'calculation_version'
     ];
 
     protected $guarded = [
@@ -133,6 +133,11 @@ class Attendance extends Model
     public function employee()
     {
         return $this->belongsTo(\App\Modules\Hr\Models\Employee::class, 'employee_id', 'id');
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
     }
 
     public function attendanceSessions()

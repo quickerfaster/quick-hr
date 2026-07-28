@@ -21,7 +21,7 @@ class PayrollCalculatorService
      * @param DailyAttendance $checkIn
      * @param DailyAttendance $checkOut
      * @param EmployeeProfile $employeeProfile
-     * @param RoleSchedule|null $roleSchedule The specific RoleSchedule for the period, passed from AttendanceService
+     * @param RoleSchedule|null $roleSchedule The specific RoleSchedule for the period
      * @return array Contains 'regular_minutes', 'overtime_minutes', 'unpaid_break_minutes'
      */
 public function calculatePaidHours($checkIn, $checkOut, $employeeProfile, $roleSchedule): array
@@ -180,9 +180,7 @@ public function calculatePaidHours($checkIn, $checkOut, $employeeProfile, $roleS
         return (int) $unpaidBreaks;
     }
 
-    // This method is now primarily used by AttendanceService to determine the work_date for DailyEarning aggregation.
-    // It is less about "effective shift times" for calculation and more about the payroll period alignment.
-    // So, it can remain in AttendanceService using the base Shift times.
+    // Determines the work_date for payroll aggregation based on the core shift definition.
     protected function determineShiftWorkDate(Carbon $checkInTime, ?\App\Models\Shift $assignedShift): Carbon
     {
         // This method determines the work date for payroll aggregation.

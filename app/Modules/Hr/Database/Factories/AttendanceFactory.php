@@ -5,6 +5,7 @@ namespace App\Modules\Hr\Database\Factories;
 use App\Modules\Hr\Models\Attendance;
 use App\Modules\Hr\Models\Employee;
 use App\Modules\Hr\Models\Company;
+use App\Modules\Hr\Models\Department;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AttendanceFactory extends Factory
@@ -18,7 +19,7 @@ class AttendanceFactory extends Factory
 
         return [
             'employee_id' => $employee->id,
-            'employee_number' => $employee->employee_number,
+            'department_id' => Department::factory(),
             'company' => $this->faker->company(),
             'department' => $this->faker->word(),
             'date' => $date,
@@ -87,7 +88,6 @@ class AttendanceFactory extends Factory
         return $this->state(function (array $attributes) use ($employee) {
             return [
                 'employee_id' => $employee->id,
-                'employee_number' => $employee->employee_number,
             ];
         });
     }

@@ -11,6 +11,7 @@ return [
       'validation' => 'required|exists:attendances,id',
       'filterable' => true,
       'searchable' => true,
+      'editable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Attendance',
         'type' => 'belongsTo',
@@ -33,6 +34,7 @@ return [
       'validation' => 'required|integer|exists:companies,id',
       'filterable' => true,
       'searchable' => true,
+      'editable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\Company',
         'type' => 'belongsTo',
@@ -52,16 +54,18 @@ return [
       'fillable' => true,
       'field_type' => 'datetimepicker',
       'label' => 'Session Start',
-      'validation' => 'required|date',
+      'validation' => 'nullable|date',
       'filterable' => true,
+      'editable' => true,
     ],
     'end_time' => [
       'display' => 'inline',
       'fillable' => true,
       'field_type' => 'datetimepicker',
       'label' => 'Session End',
-      'validation' => 'required|date|after:start_time',
+      'validation' => 'nullable|date|after:start_time',
       'filterable' => true,
+      'editable' => true,
     ],
     'duration_hours' => [
       'display' => 'inline',
@@ -69,6 +73,7 @@ return [
       'field_type' => 'number',
       'label' => 'Duration (hours)',
       'validation' => 'required|numeric|min:0|max:24',
+      'editable' => true,
     ],
     'session_type' => [
       'display' => 'inline',
@@ -80,12 +85,10 @@ return [
         'work' => 'Regular Work',
         'paid_break' => 'Paid Break',
         'unpaid_break' => 'Unpaid Break',
-        'meeting' => 'Meeting/Training',
         'overtime' => 'Overtime',
-        'on_call' => 'On-Call',
-        'travel' => 'Travel Time',
       ],
       'filterable' => true,
+      'editable' => true,
     ],
     'is_adjusted' => [
       'display' => 'inline',
@@ -94,6 +97,7 @@ return [
       'label' => 'Manually Adjusted',
       'validation' => 'boolean',
       'filterable' => true,
+      'editable' => true,
     ],
     'adjustment_reason' => [
       'display' => 'inline',
@@ -101,6 +105,7 @@ return [
       'field_type' => 'textarea',
       'label' => 'Adjustment Reason',
       'validation' => 'required_if:is_adjusted,true|string|max:500',
+      'editable' => true,
     ],
     'clock_in_event_id' => [
       'display' => 'inline',
@@ -108,6 +113,7 @@ return [
       'field_type' => 'number',
       'label' => 'Clock-In Event',
       'validation' => 'nullable|exists:clock_events,id',
+      'editable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\ClockEvent',
         'type' => 'belongsTo',
@@ -128,6 +134,7 @@ return [
       'field_type' => 'number',
       'label' => 'Clock-Out Event',
       'validation' => 'nullable|exists:clock_events,id',
+      'editable' => true,
       'relationship' => [
         'model' => 'App\Modules\Hr\Models\ClockEvent',
         'type' => 'belongsTo',
@@ -148,6 +155,7 @@ return [
       'field_type' => 'checkbox',
       'label' => 'Is Overnight',
       'validation' => 'boolean',
+      'editable' => true,
     ],
     'adjusted_by' => [
       'display' => 'inline',
@@ -155,6 +163,7 @@ return [
       'field_type' => 'string',
       'label' => 'Adjusted By',
       'validation' => 'nullable|string',
+      'editable' => false,
     ],
     'adjusted_at' => [
       'display' => 'inline',
@@ -162,6 +171,7 @@ return [
       'field_type' => 'datetimepicker',
       'label' => 'Adjusted At',
       'validation' => 'nullable|date',
+      'editable' => false,
     ],
     'calculated_duration' => [
       'display' => 'inline',
@@ -169,6 +179,7 @@ return [
       'field_type' => 'number',
       'label' => 'Calculated Duration',
       'validation' => 'nullable|numeric',
+      'editable' => false,
     ],
     'validation_status' => [
       'display' => 'inline',
@@ -183,6 +194,7 @@ return [
         'too_short' => 'Session Too Short',
         'too_long' => 'Session Too Long',
       ],
+      'editable' => false,
     ],
     'validation_notes' => [
       'display' => 'inline',
@@ -190,6 +202,7 @@ return [
       'field_type' => 'textarea',
       'label' => 'Validation Notes',
       'validation' => 'nullable|string',
+      'editable' => false,
     ],
   ],
   'detailComponent' => '',
@@ -283,6 +296,7 @@ return [
     'search' => true,
     'showHideColumns' => true,
     'filterColumns' => true,
+    'editable' => true,
     'filters' => [
       '0' => [
         'field' => 'session_type',
@@ -293,10 +307,7 @@ return [
           '1' => 'work',
           '2' => 'paid_break',
           '3' => 'unpaid_break',
-          '4' => 'meeting',
-          '5' => 'overtime',
-          '6' => 'on_call',
-          '7' => 'travel',
+          '4' => 'overtime',
         ],
       ],
       '1' => [
@@ -418,25 +429,12 @@ return [
     ],
   ],
   'switchViews' => [
-    'default' => 'list',
-    'card' => [
-      'titleFields' => [
-        '0' => 'start_time',
-      ],
-      'subtitleFields' => [
-        '0' => 'end_time',
-        '1' => 'duration_hours',
-      ],
-      'contentFields' => [
-        '0' => 'session_type',
-      ],
-      'badgeField' => 'is_adjusted',
-      'badgeColors' => [
-        'true' => 'warning',
-        'false' => 'secondary',
-      ],
+    'default' => 'table',
+    'table' => [
+      'enabled' => true,
     ],
     'list' => [
+      'enabled' => true,
       'titleFields' => [
         '0' => 'attendance.employee.first_name',
         '1' => 'attendance.employee.last_name',
@@ -448,6 +446,24 @@ return [
       'contentFields' => [
         '0' => 'duration_hours',
         '1' => 'session_type',
+      ],
+      'badgeField' => 'is_adjusted',
+      'badgeColors' => [
+        'true' => 'warning',
+        'false' => 'secondary',
+      ],
+    ],
+    'card' => [
+      'enabled' => true,
+      'titleFields' => [
+        '0' => 'start_time',
+      ],
+      'subtitleFields' => [
+        '0' => 'end_time',
+        '1' => 'duration_hours',
+      ],
+      'contentFields' => [
+        '0' => 'session_type',
       ],
       'badgeField' => 'is_adjusted',
       'badgeColors' => [

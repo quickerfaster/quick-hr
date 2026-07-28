@@ -20,7 +20,26 @@ return [
     // Number of retry attempts for a failed batch job (1 = no retry)
     'batch_tries' => env('PAYROLL_BATCH_TRIES', 1),
 
-    // DEPRECATED: Finalization is now dispatched immediately by the last ProcessEmployeeBatch.
-    // 'finalization_delay_per_batch' => env('PAYROLL_FINALIZATION_DELAY_PER_BATCH', 0),
-    // 'finalization_buffer' => env('PAYROLL_FINALIZATION_BUFFER', 30),
+    // Finalisation delay per batch (seconds) – used to estimate when all batches are done
+    'finalization_delay_per_batch' => env('PAYROLL_FINALIZATION_DELAY_PER_BATCH', 5),
+
+    // Additional buffer time for finalisation (seconds)
+    'finalization_buffer' => env('PAYROLL_FINALIZATION_BUFFER', 30),
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attendance Integration
+    |--------------------------------------------------------------------------
+    |
+    | Enable this to pull attendance records (clock events, sessions) for
+    | employees with 'salaried_daily' and 'hourly' pay types.
+    | If disabled, all employees are treated as 'salaried_full'.
+    |
+    */
+    'attendance_integration' => [
+        'enabled' => env('PAYROLL_ATTENDANCE_INTEGRATION_ENABLED', true),
+    ],
+
+
 ];

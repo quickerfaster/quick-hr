@@ -22,10 +22,7 @@ use App\Modules\Hr\Traits\HandlesAttendanceRecord;
 
 class AttendanceCalculator
 {
-
-
     use HandlesAttendanceRecord;
-
 
     /**
      * Calculate attendance for a specific employee and date
@@ -33,9 +30,8 @@ class AttendanceCalculator
      */
     public function calculateForDay(string $employeeNumber, Carbon $date): array
     {
-
         return DB::transaction(function () use ($employeeNumber, $date) {
-            // 1. Get employee with all required relations for the attendance record
+            // 1. Get employee with all required relations
             $employee = Employee::with(['employeePosition.department.company'])
                 ->where('employee_number', $employeeNumber)
                 ->first();
@@ -46,14 +42,14 @@ class AttendanceCalculator
 
             $position = $employee->employeePosition;
 
-            // 2. Schedule & Policy logic (Already improved)
-            $pattern = $this->getApplicableWorkPattern($position, $date);
+            // 2. Schedule & Policy logic (with company filtering)
+            $pattern = $this->getApplicableWorkPattern($employee, $position, $date);
             $schedule = $this->getExpectedSchedule($employee, $position, $pattern, $date);
             $shift = $schedule['shift'] ?? null;
-            $policy = $this->getApplicablePolicy($position, $date, $shift);
+            $policy = $this->getApplicablePolicy($employee, $position, $date, $shift);
 
-            // 3. Get clock events - Ensure the column name matches the value (ID vs Number)
-            $events = ClockEvent::where('employee_id', $employeeNumber) // Changed to number based on your variable
+            // 3. Get clock events using integer employee_id
+            $events = ClockEvent::where('employee_id', $employee->id)
                 ->whereDate('timestamp', $date)
                 ->orderBy('timestamp')
                 ->get();
@@ -65,16 +61,13 @@ class AttendanceCalculator
             $firstClockIn = $sessionData['first_clock_in'];
             $lastClockOut = $sessionData['last_clock_out'];
 
-
-
             // 5. Get or create attendance record
             $attendance = $this->getOrCreateAttendanceRecord($employee, $date, $schedule, $policy);
 
+            // 6. DELETE existing sessions for this attendance (fresh calculation)
+            AttendanceSession::where('attendance_id', $attendance->id)->forceDelete();
 
-            // 7. DELETE existing sessions for this attendance (fresh calculation)
-            AttendanceSession::where('attendance_id', $attendance->id)->delete();
-
-            // 8. CREATE new sessions from processed events
+            // 7. CREATE new sessions from processed events
             foreach ($sessions as $session) {
                 AttendanceSession::create([
                     'attendance_id' => $attendance->id,
@@ -89,7 +82,7 @@ class AttendanceCalculator
                 ]);
             }
 
-            // 9. Calculate attendance metrics using policy
+            // 8. Calculate attendance metrics using policy
             $calculation = $this->calculateAttendanceMetrics(
                 actualWorkedHours: $totalHours,
                 firstClockIn: $firstClockIn,
@@ -101,18 +94,41 @@ class AttendanceCalculator
                 sessions: $sessions
             );
 
+            // Create unpaid break session if policy requires it
+            if ($policy && $policy->unpaid_break_minutes > 0 && $totalHours > 0 && $attendance->id) {
+                $unpaidSession = [
+                    'start' => null,
+                    'end' => null,
+                    'duration' => round($policy->unpaid_break_minutes / 60, 2),
+                    'is_overnight' => false,
+                    'notes' => 'Policy-mandated unpaid break deduction of ' . $policy->unpaid_break_minutes . ' minutes',
+                ];
+                $sessions[] = $unpaidSession;
 
+                AttendanceSession::create([
+                    'company_id' => $employee->company_id,
+                    'attendance_id' => $attendance->id,
+                    'start_time' => null,
+                    'end_time' => null,
+                    'duration_hours' => $unpaidSession['duration'],
+                    'session_type' => 'unpaid_break',
+                    'is_adjusted' => true,
+                    'adjustment_reason' => $unpaidSession['notes'],
+                ]);
+            }
 
+            // Override status if day is not in work pattern
             $dateString = $date->toDateString();
-            $dayOfWeek = $date->dayOfWeekIso; // 1=Monday, 7=Sunday
+            $dayOfWeek = $date->dayOfWeekIso;
+            if ($pattern) {
+                // Fix: parse applicable_days as array of integers
+                $days = array_map('intval', explode(',', $pattern->applicable_days ?? ''));
+                if (!in_array($dayOfWeek, $days, true)) {
+                    $calculation['status'] = 'unscheduled';
+                }
+            }
 
-            // When day of attendance is not part of the Work Pattern the status = 'unscheduled'
-            // For example, 'Sun' in unschedule in the Work Pattern Mon-Fri
-            if ($pattern && !in_array($dayOfWeek, explode(",", $pattern->applicable_days)))
-                $calculation['status'] = 'unscheduled';
-
-
-            // 10. Update attendance record with calculation results
+            // 9. Update attendance record with calculation results
             $attendance->update([
                 'status' => $calculation['status'],
                 'shift_id' => $shift?->id,
@@ -129,13 +145,13 @@ class AttendanceCalculator
                 'calculation_metadata' => json_encode($calculation['breakdown']),
                 'calculation_version' => '1.0',
                 'calculation_method' => 'auto',
-                'sessions' => json_encode(array_map(function ($s) {
+                'sessions' => array_map(function ($s) {
                     return [
                         'start' => $s['start'] ? $s['start']->format('H:i') : null,
                         'end' => $s['end'] ? $s['end']->format('H:i') : null,
                         'duration' => $s['duration']
                     ];
-                }, $sessions)),
+                }, $sessions),
             ]);
 
             return [
@@ -147,8 +163,254 @@ class AttendanceCalculator
         });
     }
 
+    // -------------------- Policy & Schedule Resolution (with company filtering) --------------------
+
     /**
-     * Process raw clock events into work sessions
+     * Get applicable attendance policy with proper priority and company filtering.
+     */
+    public function getApplicablePolicy(Employee $employee, EmployeePosition $position, Carbon $date, ?Shift $shift = null): ?AttendancePolicy
+    {
+        // Priority 1: Employee-specific policy
+        if ($position->attendance_policy_id) {
+            $policyQuery = AttendancePolicy::where('id', $position->attendance_policy_id);
+            if ($employee->company_id) {
+                $policyQuery->where('company_id', $employee->company_id);
+            }
+            $policy = $policyQuery->first();
+            if ($policy && $this->isPolicyActive($policy, $date)) {
+                return $policy;
+            }
+        }
+
+        // Priority 2: Shift-specific policy via PolicyAssignment
+        if ($shift) {
+            $policy = $this->getPolicyForEntity($employee, Shift::class, $shift->id, $date);
+            if ($policy) return $policy;
+        }
+
+        // Priority 3: Department policy
+        if ($position->department) {
+            $policy = $this->getPolicyForEntity($employee, \App\Modules\Hr\Models\Department::class, $position->department->id, $date);
+            if ($policy) return $policy;
+        }
+
+        // Priority 4: Location policy
+        if ($position->location) {
+            $policy = $this->getPolicyForEntity($employee, \App\Modules\Hr\Models\Location::class, $position->location->id, $date);
+            if ($policy) return $policy;
+        }
+
+        // Priority 5: Company policy
+        $policy = $this->getPolicyForEntity($employee, \App\Modules\Hr\Models\Company::class, $employee->company_id, $date);
+        if ($policy) return $policy;
+
+        // Priority 6: System-wide default policy (must belong to the same company)
+        $query = AttendancePolicy::where('is_default', true)
+            ->where('is_active', true)
+            ->whereDate('effective_date', '<=', $date)
+            ->where(function ($q) use ($date) {
+                $q->whereNull('expiration_date')->orWhereDate('expiration_date', '>=', $date);
+            });
+
+        if ($employee->company_id) {
+            $query->where('company_id', $employee->company_id);
+        }
+
+        return $query->first();
+    }
+
+    /**
+     * Fetch a policy assigned to a specific entity with company filter.
+     */
+    protected function getPolicyForEntity(Employee $employee, string $modelClass, ?int $id, Carbon $date): ?AttendancePolicy
+    {
+        // Skip if no entity ID provided
+        if ($id === null) {
+            return null;
+        }
+
+        // Using cache for performance (optional but recommended)
+        $cacheKey = "policy_for_{$modelClass}_{$id}_company_{$employee->company_id}";
+        return \Cache::remember($cacheKey, 3600, function () use ($employee, $modelClass, $id, $date) {
+            $query = PolicyAssignment::where('assignable_type', $modelClass)
+                ->where('assignable_id', $id);
+
+            // Only filter by company_id if the employee has one set
+            if ($employee->company_id) {
+                $query->where('company_id', $employee->company_id);
+            }
+
+            $assignment = $query->with('attendancePolicy')->first();
+
+            if ($assignment && $this->isPolicyActive($assignment->attendancePolicy, $date)) {
+                return $assignment->attendancePolicy;
+            }
+
+            return null;
+        });
+    }
+
+    /**
+     * Check if a policy is active on the given date.
+     */
+    protected function isPolicyActive(AttendancePolicy $policy, Carbon $date): bool
+    {
+        if (!$policy->is_active) return false;
+        if ($policy->effective_date && $policy->effective_date > $date) return false;
+        if ($policy->expiration_date && $policy->expiration_date < $date) return false;
+        return true;
+    }
+
+    /**
+     * Get the applicable work pattern with company filtering.
+     */
+    public function getApplicableWorkPattern(Employee $employee, EmployeePosition $position, Carbon $date): ?WorkPattern
+    {
+        // 1. Employee-specific active work pattern (via EmployeeWorkPattern)
+        $employeeWorkPattern = \App\Modules\Hr\Models\EmployeeWorkPattern::where('employee_id', $employee->id)
+            ->where('start_date', '<=', $date)
+            ->where(function ($q) use ($date) {
+                $q->whereNull('end_date')->orWhereDate('end_date', '>=', $date);
+            })
+            ->with('workPattern')
+            ->first();
+
+        if ($employeeWorkPattern && $employeeWorkPattern->workPattern) {
+            $pattern = $employeeWorkPattern->workPattern;
+            // The EmployeeWorkPattern assignment is an explicit assignment; no additional
+            // company_id check is needed -- the global CompanyScope handles multi-tenancy.
+            if ($this->isWorkPatternActive($pattern, $date)) {
+                return $pattern;
+            }
+        }
+
+        // 2. System-wide default work pattern.
+        // Bypass the global CompanyScope so the system default is always findable
+        // regardless of the employee's company_id or session context.
+        $baseQuery = WorkPattern::withoutGlobalScope(\App\Modules\Admin\Scopes\CompanyScope::class)
+            ->where('is_default', true)
+            ->where('is_active', true)
+            ->whereDate('effective_date', '<=', $date)
+            ->where(function ($q) use ($date) {
+                $q->whereNull('end_date')->orWhereDate('end_date', '>=', $date);
+            });
+
+        // First attempt: filter by employee's company_id if set
+        if ($employee->company_id) {
+            $pattern = (clone $baseQuery)->where('company_id', $employee->company_id)->first();
+            if ($pattern) {
+                return $pattern;
+            }
+        }
+
+        // Second attempt: any system default, regardless of company
+        return $baseQuery->first();
+    }
+
+    /**
+     * Check if a work pattern is active on the given date.
+     */
+    protected function isWorkPatternActive(WorkPattern $pattern, Carbon $date): bool
+    {
+        if (!$pattern->is_active) return false;
+        if ($pattern->effective_date && $pattern->effective_date > $date) return false;
+        if ($pattern->end_date && $pattern->end_date < $date) return false;
+        return true;
+    }
+
+    /**
+     * Get the expected schedule for an employee on a given date with company filtering.
+     */
+    public function getExpectedSchedule(
+        Employee $employee,
+        EmployeePosition $position,
+        ?WorkPattern $pattern,
+        Carbon $date
+    ): ?array {
+        $dateString = $date->toDateString();
+        $dayOfWeek = $date->dayOfWeekIso;
+
+        // Priority 1: Specific ShiftSchedule for the date
+        $shiftSchedule = ShiftSchedule::where('employee_id', $employee->id)
+            ->whereDate('schedule_date', $dateString)
+            ->where('is_published', true)
+            ->first();
+
+        if ($shiftSchedule && $shiftSchedule->shift) {
+            return [
+                'type' => 'specific_shift_schedule',
+                'schedule' => $shiftSchedule,
+                'start_time' => $shiftSchedule->start_time_override
+                    ? Carbon::parse($shiftSchedule->start_time_override)
+                    : Carbon::parse($shiftSchedule->shift->start_time),
+                'end_time' => $shiftSchedule->end_time_override
+                    ? Carbon::parse($shiftSchedule->end_time_override)
+                    : Carbon::parse($shiftSchedule->shift->end_time),
+                'shift' => $shiftSchedule->shift
+            ];
+        }
+
+        // Priority 2: WorkPattern for the day of week
+        if ($pattern) {
+            // Fix: parse applicable_days as array of integers
+            $days = array_map('intval', explode(',', $pattern->applicable_days ?? ''));
+            if (in_array($dayOfWeek, $days, true)) {
+                $shift = $pattern->shift;
+                if ($shift) {
+                    $startTimeString = $pattern->override_start_time ?: $shift->start_time;
+                    $endTimeString = $pattern->override_end_time ?: $shift->end_time;
+
+                    return [
+                        'type' => 'work_pattern',
+                        'pattern' => $pattern,
+                        'shift' => $shift,
+                        'start_time' => $date->copy()->setTimeFromTimeString($startTimeString),
+                        'end_time' => $date->copy()->setTimeFromTimeString($endTimeString),
+                        'is_overnight' => $shift->is_overnight
+                    ];
+                }
+            }
+        }
+
+        // Priority 3: Employee's default shift from position
+        if ($position->shift_id) {
+            $shift = Shift::where('id', $position->shift_id)
+                ->where('is_active', true)
+                ->first();
+            if ($shift) {
+                return [
+                    'type' => 'user_default_shift',
+                    'shift' => $shift,
+                    'start_time' => $date->copy()->setTimeFromTimeString($shift->start_time),
+                    'end_time' => $date->copy()->setTimeFromTimeString($shift->end_time),
+                    'is_overnight' => $shift->is_overnight
+                ];
+            }
+        }
+
+        // Priority 4: System-wide default shift
+        $defaultShift = Shift::withoutGlobalScope(\App\Modules\Admin\Scopes\CompanyScope::class)
+            ->where('is_default', true)
+            ->where('is_active', true)
+            ->first();
+
+        if ($defaultShift) {
+            return [
+                'type' => 'system_default_shift',
+                'shift' => $defaultShift,
+                'start_time' => $date->copy()->setTimeFromTimeString($defaultShift->start_time),
+                'end_time' => $date->copy()->setTimeFromTimeString($defaultShift->end_time),
+                'is_overnight' => $defaultShift->is_overnight
+            ];
+        }
+
+        return null;
+    }
+
+    // -------------------- Clock Event Processing --------------------
+
+    /**
+     * Process raw clock events into work sessions.
      */
     protected function processClockEvents($events): array
     {
@@ -192,7 +454,7 @@ class AttendanceCalculator
             }
         }
 
-        // Handle orphaned clock-in (no matching clock-out)
+        // Handle orphaned clock-in
         if ($inSession && $sessionStart && $sessionStartEvent) {
             $sessions[] = [
                 'clock_in_event_id' => $sessionStartEvent->id,
@@ -212,6 +474,8 @@ class AttendanceCalculator
             'last_clock_out' => $lastClockOut
         ];
     }
+
+    // -------------------- Calculation Helpers (unchanged logic, but with company-awareness) --------------------
 
     /**
      * Calculate attendance metrics based on policy
@@ -329,19 +593,24 @@ class AttendanceCalculator
         $result['breakdown']['overtime_calculation'] = $overtimeCalculation['breakdown'];
 
         // Check break compliance (requires break after X hours)
-        if ($policy->requires_break_after_hours > 0 && $policy->break_duration_minutes > 0) {
+        $breakAfterValues = $this->parseBreakRuleValue($policy->requires_break_after_hours);
+        $breakDurationValues = $this->parseBreakRuleValue($policy->break_duration_minutes);
+        if (!empty($breakAfterValues) && !empty($breakDurationValues)) {
             $breakCheck = $this->checkBreakCompliance(
                 $sessions,
                 $policy->requires_break_after_hours,
                 $policy->break_duration_minutes
             );
 
-            if ($breakCheck['missed_break']) {
-                $result['missed_break_minutes'] = $breakCheck['missed_minutes'];
-                $result['violations'][] = [
-                    'type' => 'missed_break',
-                    'minutes' => $breakCheck['missed_minutes']
-                ];
+            if (!$breakCheck['compliant']) {
+                $result['missed_break_minutes'] = $breakCheck['total_missed_minutes'];
+                foreach ($breakCheck['violations'] as $violation) {
+                    $result['violations'][] = [
+                        'type' => 'missed_break',
+                        'minutes' => $violation['required_minutes'],
+                        'after_hours' => $violation['after_hours'],
+                    ];
+                }
             }
         }
 
@@ -376,320 +645,42 @@ class AttendanceCalculator
         return $result;
     }
 
+    // -------------------- Helper Methods (unchanged) --------------------
 
-
-
-
-    public function getApplicablePolicy(EmployeePosition $position, Carbon $date, ?\App\Modules\Hr\Models\Shift $shift = null): ?AttendancePolicy
+    protected function getExpectedHours(?array $schedule): float
     {
-        // Priority 1: Employee-specific policy (direct override)
-        if ($position->attendance_policy_id) {
-            $policy = AttendancePolicy::find($position->attendance_policy_id);
-            if ($policy && $this->isPolicyActive($policy, $date)) {
-                return $policy;
-            }
+        if (!$schedule) return 8.0;
+        if (isset($schedule['shift']->duration_hours) && $schedule['shift']->duration_hours > 0) {
+            return (float) $schedule['shift']->duration_hours;
         }
-
-        // Priority 2: Shift-specific policy (only via PolicyAssignment)
-        if ($shift) {
-            $policy = $this->getPolicyForEntity(\App\Modules\Hr\Models\Shift::class, $shift->id, $date);
-            if ($policy)
-                return $policy;
-        }
-
-        // Priority 3: Department policy
-        if ($position->department) {
-            $policy = $this->getPolicyForEntity(\App\Modules\Hr\Models\Department::class, $position->department->id, $date);
-            if ($policy)
-                return $policy;
-        }
-
-        // Priority 4: Location policy
-        if ($position->location) {
-            $policy = $this->getPolicyForEntity(\App\Modules\Hr\Models\Location::class, $position->location->id, $date);
-            if ($policy)
-                return $policy;
-        }
-
-        // Priority 5: Company policy
-        if ($position->department && $position->department->company) {
-            $policy = $this->getPolicyForEntity(\App\Modules\Hr\Models\Company::class, $position->department->company->id, $date);
-            if ($policy)
-                return $policy;
-        }
-
-        // Priority 6: System-wide default policy
-        return AttendancePolicy::where('is_default', true)
-            ->where('is_active', true)
-            ->whereDate('effective_date', '<=', $date)
-            ->where(function ($q) use ($date) {
-                $q->whereNull('expiration_date')->orWhereDate('expiration_date', '>=', $date);
-            })
-            ->first();
+        $start = $schedule['start_time'];
+        $end = $schedule['end_time'];
+        $duration = $start->diffInMinutes($end) / 60.0;
+        return round($duration, 2);
     }
 
-
-
-    /**
-     * Fetch a policy assigned to a specific entity (company, location, department, shift).
-     *
-     * @param string $modelClass Fully qualified model class (e.g., 'App\Modules\Hr\Models\Company')
-     * @param int $id
-     * @param Carbon $date
-     * @return AttendancePolicy|null
-     */
-    protected function getPolicyForEntity(string $modelClass, int $id, Carbon $date): ?AttendancePolicy
-    {
-        $cacheKey = "policy_for_{$modelClass}_{$id}";
-        return \Cache::remember($cacheKey, 3600, function () use ($modelClass, $id, $date) {
-            $assignment = PolicyAssignment::where('assignable_type', $modelClass)
-                ->where('assignable_id', $id)
-                ->with('attendancePolicy')
-                ->first();
-
-            if ($assignment && $this->isPolicyActive($assignment->attendancePolicy, $date)) {
-                return $assignment->attendancePolicy;
-            }
-
-            return null;
-        });
-    }
-
-    /**
-     * Check if a policy is active on the given date.
-     *
-     * @param AttendancePolicy $policy
-     * @param Carbon $date
-     * @return bool
-     */
-    protected function isPolicyActive(AttendancePolicy $policy, Carbon $date): bool
-    {
-        if (!$policy->is_active)
-            return false;
-        if ($policy->effective_date && $policy->effective_date > $date)
-            return false;
-        if ($policy->expiration_date && $policy->expiration_date < $date)
-            return false;
-        return true;
-    }
-
-    /**
-     * Get the applicable work pattern for an employee on a given date.
-     * Priority: Employee work pattern (from employee_work_patterns) > System default.
-     *
-     * @param \App\Modules\Hr\Models\Employee $employee
-     * @param Carbon $date
-     * @return \App\Modules\Hr\Models\WorkPattern|null
-     */
-    public function getApplicableWorkPattern(EmployeePosition $employee, Carbon $date): ?\App\Modules\Hr\Models\WorkPattern
-    {
-        // 1. Employee-specific active work pattern
-        $employeeWorkPattern = $employee->employeeWorkPatterns()
-            ->where('start_date', '<=', $date)
-            ->where(function ($q) use ($date) {
-                $q->whereNull('end_date')->orWhere('end_date', '>=', $date);
-            })
-            ->with('workPattern')
-            ->first();
-
-        if ($employeeWorkPattern && $this->isWorkPatternActive($employeeWorkPattern->workPattern, $date)) {
-            return $employeeWorkPattern->workPattern;
-        }
-
-        // 2. System-wide default work pattern
-        return \App\Modules\Hr\Models\WorkPattern::where('is_default', true)
-            ->where('is_active', true)
-            ->whereDate('effective_date', '<=', $date)
-            ->where(function ($q) use ($date) {
-                $q->whereNull('end_date')->orWhereDate('end_date', '>=', $date);
-            })
-            ->first();
-    }
-
-    /**
-     * Check if a work pattern is active on the given date.
-     *
-     * @param \App\Modules\Hr\Models\WorkPattern $pattern
-     * @param Carbon $date
-     * @return bool
-     */
-    protected function isWorkPatternActive(\App\Modules\Hr\Models\WorkPattern $pattern, Carbon $date): bool
-    {
-        if (!$pattern->is_active)
-            return false;
-        if ($pattern->effective_date && $pattern->effective_date > $date)
-            return false;
-        if ($pattern->end_date && $pattern->end_date < $date)
-            return false;
-        return true;
-    }
-
-    /**
-     * Get the expected schedule for an employee on a given date.
-     *
-     * @param \App\Modules\Hr\Models\Employee $employee
-     * @param EmployeePosition $position
-     * @param \App\Modules\Hr\Models\WorkPattern|null $pattern
-     * @param Carbon $date
-     * @return array|null
-     */
-    public function getExpectedSchedule(
-        \App\Modules\Hr\Models\Employee $employee,
-        EmployeePosition $position,
-        ?\App\Modules\Hr\Models\WorkPattern $pattern,
-        Carbon $date
-    ): ?array {
-        $dateString = $date->toDateString();
-        $dayOfWeek = $date->dayOfWeekIso; // 1=Monday, 7=Sunday
-
-        // Priority 1: Specific ShiftSchedule for the date
-        $shiftSchedule = \App\Modules\Hr\Models\ShiftSchedule::where('employee_id', $employee->id)
-            ->whereDate('schedule_date', $dateString)
-            ->where('is_published', true)
-            ->first();
-
-        if ($shiftSchedule) {
-            return [
-                'type' => 'specific_shift_schedule',
-                'schedule' => $shiftSchedule,
-                'start_time' => $shiftSchedule->start_time_override
-                    ? Carbon::parse($shiftSchedule->start_time_override)
-                    : Carbon::parse($shiftSchedule->shift->start_time),
-                'end_time' => $shiftSchedule->end_time_override
-                    ? Carbon::parse($shiftSchedule->end_time_override)
-                    : Carbon::parse($shiftSchedule->shift->end_time),
-                'shift' => $shiftSchedule->shift
-            ];
-        }
-
-        // Priority 2: WorkPattern for the day of week
-        if ($pattern && in_array($dayOfWeek, explode(",", $pattern->applicable_days))) {
-            $shift = $pattern->shift;
-            $startTimeString = $pattern->override_start_time ?: $shift->start_time;
-            $endTimeString = $pattern->override_end_time ?: $shift->end_time;
-
-            return [
-                'type' => 'work_pattern',
-                'pattern' => $pattern,
-                'shift' => $shift,
-                'start_time' => $date->copy()->setTimeFromTimeString($startTimeString),
-                'end_time' => $date->copy()->setTimeFromTimeString($endTimeString),
-                'is_overnight' => $shift->is_overnight
-            ];
-        }
-
-        // Priority 3: Employee's default shift from position
-        if ($position->shift_id && $position->shift->is_active) {
-            $shift = $position->shift;
-            return [
-                'type' => 'user_default_shift',
-                'shift' => $shift,
-                'start_time' => $date->copy()->setTimeFromTimeString($shift->start_time),
-                'end_time' => $date->copy()->setTimeFromTimeString($shift->end_time),
-                'is_overnight' => $shift->is_overnight
-            ];
-        }
-
-        // Priority 4: System-wide default shift
-        $defaultShift = Shift::where('is_default', true)
-            ->where('is_active', true)
-            ->first();
-
-        if ($defaultShift) {
-            return [
-                'type' => 'system_default_shift',
-                'shift' => $defaultShift,
-                'start_time' => $date->copy()->setTimeFromTimeString($defaultShift->start_time),
-                'end_time' => $date->copy()->setTimeFromTimeString($defaultShift->end_time),
-                'is_overnight' => $defaultShift->is_overnight
-            ];
-        }
-
-        return null;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * Check for lateness
-     */
     protected function checkLateness(?Carbon $actualStart, Carbon $scheduledStart, int $graceMinutes, Carbon $date): array
     {
-        if (!$actualStart) {
-            return ['is_late' => false, 'minutes_late' => 0];
-        }
-
+        if (!$actualStart) return ['is_late' => false, 'minutes_late' => 0];
         $graceTime = $scheduledStart->copy()->addMinutes($graceMinutes);
-
         if ($actualStart->greaterThan($graceTime)) {
             $minutesLate = $actualStart->diffInMinutes($graceTime);
             return ['is_late' => true, 'minutes_late' => $minutesLate];
         }
-
         return ['is_late' => false, 'minutes_late' => 0];
     }
 
-    /**
-     * Check for early departure
-     */
     protected function checkEarlyDeparture(?Carbon $actualEnd, Carbon $scheduledEnd, int $graceMinutes, Carbon $date): array
     {
-        if (!$actualEnd) {
-            return ['is_early' => false, 'minutes_early' => 0];
-        }
-
+        if (!$actualEnd) return ['is_early' => false, 'minutes_early' => 0];
         $graceTime = $scheduledEnd->copy()->subMinutes($graceMinutes);
-
         if ($actualEnd->lessThan($graceTime)) {
             $minutesEarly = $graceTime->diffInMinutes($actualEnd);
             return ['is_early' => true, 'minutes_early' => $minutesEarly];
         }
-
         return ['is_early' => false, 'minutes_early' => 0];
     }
 
-    /**
-     * Calculate overtime breakdown
-     */
     protected function calculateOvertime(float $totalHours, AttendancePolicy $policy, Carbon $date, int $employeeId): array
     {
         $regularHours = 0.0;
@@ -697,42 +688,70 @@ class AttendanceCalculator
         $doubleTimeHours = 0.0;
         $breakdown = [];
 
-        // Daily overtime
-        if ($totalHours > $policy->overtime_daily_threshold_hours) {
-            $overtimeHours = $totalHours - $policy->overtime_daily_threshold_hours - ($policy->unpaid_break_minutes / 60); // Convert min to hour
-            $regularHours = $policy->overtime_daily_threshold_hours;
+        $dailyThreshold = $policy->overtime_daily_threshold_hours;
+        $weeklyThreshold = $policy->overtime_weekly_threshold_hours ?? 40;
 
-            // Apply max daily overtime limit
-            if ($policy->max_daily_overtime_hours > 0 && $overtimeHours > $policy->max_daily_overtime_hours) {
-                $overtimeHours = $policy->max_daily_overtime_hours;
-                $breakdown['daily_overtime_capped'] = true;
-            }
+        // Step 1: Split today's hours into daily regular and daily overtime
+        // Preserve unpaid_break_minutes deduction for backward compatibility:
+        // overtime is calculated from gross hours minus unpaid break, ensuring
+        // regular + overtime <= net_hours (which already has unpaid break deducted)
+        $effectiveHours = $totalHours - ($policy->unpaid_break_minutes / 60);
+        $dailyRegularHours = min($effectiveHours, $dailyThreshold);
+        $dailyOvertimeHours = max(0, $effectiveHours - $dailyThreshold);
 
-            // Check for double time
-            if (
-                $policy->double_time_threshold_hours > 0 &&
-                $totalHours > $policy->double_time_threshold_hours
-            ) {
+        $breakdown['daily_regular'] = round($dailyRegularHours, 2);
+        $breakdown['daily_overtime'] = round($dailyOvertimeHours, 2);
 
-                $doubleTimeHours = $totalHours - $policy->double_time_threshold_hours;
-                $overtimeHours -= $doubleTimeHours;
+        // Step 2: Sum previous days' regular hours this week
+        $weekStart = $date->copy()->startOfWeek(Carbon::MONDAY);
+        $previousRegularHours = (float) Attendance::where('employee_id', $employeeId)
+            ->whereBetween('date', [$weekStart->format('Y-m-d'), $date->copy()->subDay()->format('Y-m-d')])
+            ->sum('regular_hours');
 
-                // Ensure overtime hours don't go negative
-                if ($overtimeHours < 0) {
-                    $doubleTimeHours += $overtimeHours;
-                    $overtimeHours = 0;
-                }
-            }
+        $weeklyRegularSoFar = $previousRegularHours + $dailyRegularHours;
+        $breakdown['weekly_regular_so_far'] = round($weeklyRegularSoFar, 2);
+        $breakdown['weekly_threshold'] = $weeklyThreshold;
+
+        // Step 3: If weekly regular exceeds threshold, overflow some regular into overtime
+        if ($weeklyRegularSoFar > $weeklyThreshold) {
+            $overflowIntoOvertime = $weeklyRegularSoFar - $weeklyThreshold;
+            // Can only overflow today's regular hours (not previous days')
+            $overflowIntoOvertime = min($overflowIntoOvertime, $dailyRegularHours);
+
+            $finalRegularHours = $dailyRegularHours - $overflowIntoOvertime;
+            $finalOvertimeHours = $dailyOvertimeHours + $overflowIntoOvertime;
+
+            $breakdown['overflow_into_overtime'] = round($overflowIntoOvertime, 2);
         } else {
-            $regularHours = $totalHours;
+            $finalRegularHours = $dailyRegularHours;
+            $finalOvertimeHours = $dailyOvertimeHours;
+            $breakdown['overflow_into_overtime'] = 0;
         }
 
-        // Weekly overtime (simplified - in reality need to check past 7 days)
-        // You'll need to implement this with a weekly aggregation
-        $breakdown['daily_threshold'] = $policy->overtime_daily_threshold_hours;
-        $breakdown['weekly_threshold'] = $policy->overtime_weekly_threshold_hours;
+        $breakdown['final_regular'] = round($finalRegularHours, 2);
+        $breakdown['final_overtime'] = round($finalOvertimeHours, 2);
+
+        $overtimeHours = $finalOvertimeHours;
+        $regularHours = $finalRegularHours;
+
+        // Step 4: Apply max_daily_overtime_hours cap
+        if ($policy->max_daily_overtime_hours > 0 && $overtimeHours > $policy->max_daily_overtime_hours) {
+            $overtimeHours = $policy->max_daily_overtime_hours;
+            $breakdown['daily_overtime_capped'] = true;
+        }
+        $breakdown['daily_threshold'] = $dailyThreshold;
         $breakdown['max_daily_overtime'] = $policy->max_daily_overtime_hours;
         $breakdown['double_time_threshold'] = $policy->double_time_threshold_hours;
+
+        // Step 5: Apply double time threshold
+        if ($policy->double_time_threshold_hours > 0 && $totalHours > $policy->double_time_threshold_hours) {
+            $doubleTimeHours = $totalHours - $policy->double_time_threshold_hours;
+            $overtimeHours -= $doubleTimeHours;
+            if ($overtimeHours < 0) {
+                $doubleTimeHours += $overtimeHours;
+                $overtimeHours = 0;
+            }
+        }
 
         return [
             'regular_hours' => round($regularHours, 2),
@@ -742,92 +761,130 @@ class AttendanceCalculator
         ];
     }
 
-
-
-
-
-    /**
-     * Calculate the expected duration of a shift (from start to end, including any unpaid breaks)
-     * This is used for attendance status comparison (e.g., half-day, incomplete).
-     *
-     * @param array|null $schedule The schedule array (from getExpectedSchedule)
-     * @return float Expected hours between start and end (including overnight)
-     */
-    protected function getExpectedHours(?array $schedule): float
-    {
-        if (!$schedule) {
-            return 8.0; // Default fallback if no schedule
-        }
-
-        // If the shift already has a pre-calculated duration, use it
-        if (isset($schedule['shift']->duration_hours) && $schedule['shift']->duration_hours > 0) {
-            return (float) $schedule['shift']->duration_hours;
-        }
-
-        $start = $schedule['start_time'];
-        $end = $schedule['end_time'];
-
-        // Calculate duration (already handles overnight because end_time is Carbon with correct date)
-        $duration = $start->diffInMinutes($end) / 60.0;
-
-        return round($duration, 2);
-    }
-
-
-
-
-    /**
-     * Check if required break was taken
-     */
     protected function checkBreakCompliance(
         array $sessions,
-        float $requiresBreakAfterHours,
-        int $requiredBreakMinutes
+        $requiresBreakAfterHours,
+        $requiredBreakMinutes
     ): array {
-        if (!$requiresBreakAfterHours || $requiredBreakMinutes <= 0 || empty($sessions)) {
-            return ['missed_break' => false, 'missed_minutes' => 0];
+        // Parse break thresholds: support JSON arrays or scalar values (backward compatible)
+        $breakAfterHours = $this->parseBreakRuleValue($requiresBreakAfterHours);
+        $breakDurationMinutes = $this->parseBreakRuleValue($requiredBreakMinutes);
+
+        // Ensure both are arrays of the same length
+        $ruleCount = max(count($breakAfterHours), count($breakDurationMinutes));
+        $breakAfterHours = array_pad($breakAfterHours, $ruleCount, end($breakAfterHours) ?: 5);
+        $breakDurationMinutes = array_pad($breakDurationMinutes, $ruleCount, end($breakDurationMinutes) ?: 30);
+
+        if (empty($sessions) || $ruleCount === 0) {
+            return [
+                'compliant' => true,
+                'missed_breaks' => 0,
+                'total_missed_minutes' => 0,
+                'violations' => [],
+            ];
         }
 
         $sessions = collect($sessions)->sortBy('start')->values()->toArray();
         $cumulativeHours = 0;
-        $requiredBreakSeconds = $requiredBreakMinutes * 60;
+        $missedBreaks = 0;
+        $totalMissedMinutes = 0;
+        $violations = [];
 
-        for ($i = 0; $i < count($sessions); $i++) {
-            $session = $sessions[$i];
-            if (!$session['end'])
-                continue;
+        foreach ($breakAfterHours as $ruleIndex => $thresholdHours) {
+            $requiredMinutes = $breakDurationMinutes[$ruleIndex] ?? 30;
+            $requiredSeconds = $requiredMinutes * 60;
+            $thresholdReached = false;
 
-            $sessionHours = $session['duration'] ?? 0;
-            $cumulativeHours += $sessionHours;
+            while (!$thresholdReached) {
+                // Check if we can detect a break in the remaining sessions
+                $foundBreak = false;
 
-            // 1. Check if the CURRENT stretch exceeds the limit
-            if ($cumulativeHours > $requiresBreakAfterHours) {
-                return [
-                    'missed_break' => true,
-                    'missed_minutes' => $requiredBreakMinutes
-                ];
-            }
+                for ($i = 0; $i < count($sessions); $i++) {
+                    $session = $sessions[$i];
+                    if (!$session['end']) continue;
 
-            // 2. Check if there is a valid break BEFORE the next session
-            if ($i < count($sessions) - 1) {
-                $nextSessionStart = Carbon::parse($sessions[$i + 1]['start']);
-                $thisSessionEnd = Carbon::parse($session['end']);
-                $gapSeconds = $thisSessionEnd->diffInSeconds($nextSessionStart);
+                    $sessionHours = $session['duration'] ?? 0;
+                    $cumulativeHours += $sessionHours;
 
-                if ($gapSeconds >= $requiredBreakSeconds) {
-                    // VALID BREAK TAKEN: Reset the work timer
-                    $cumulativeHours = 0;
+                    if ($cumulativeHours > $thresholdHours) {
+                        // Check if there's a sufficient gap before the next session
+                        $gapFound = false;
+                        if ($i < count($sessions) - 1) {
+                            $nextSessionStart = Carbon::parse($sessions[$i + 1]['start']);
+                            $thisSessionEnd = Carbon::parse($session['end']);
+                            $gapSeconds = $thisSessionEnd->diffInSeconds($nextSessionStart);
+                            if ($gapSeconds >= $requiredSeconds) {
+                                $gapFound = true;
+                                $cumulativeHours = 0; // Reset after break
+                                $foundBreak = true;
+                            }
+                        }
+
+                        if (!$gapFound) {
+                            // No sufficient break found - record violation
+                            $missedBreaks++;
+                            $totalMissedMinutes += $requiredMinutes;
+                            $violations[] = [
+                                'after_hours' => $thresholdHours,
+                                'required_minutes' => $requiredMinutes,
+                            ];
+                            $cumulativeHours = 0; // Reset for next rule
+                        }
+
+                        $thresholdReached = true;
+                        break;
+                    }
+
+                    // Check for gaps even if threshold not yet reached (natural break)
+                    if ($i < count($sessions) - 1) {
+                        $nextSessionStart = Carbon::parse($sessions[$i + 1]['start']);
+                        $thisSessionEnd = Carbon::parse($session['end']);
+                        $gapSeconds = $thisSessionEnd->diffInSeconds($nextSessionStart);
+                        if ($gapSeconds >= $requiredSeconds) {
+                            $cumulativeHours = 0; // Reset after break
+                        }
+                    }
+                }
+
+                if (!$thresholdReached) {
+                    // Exhausted all sessions without reaching threshold - done
+                    break;
                 }
             }
         }
 
-        return ['missed_break' => false, 'missed_minutes' => 0];
+        return [
+            'compliant' => $missedBreaks === 0,
+            'missed_breaks' => $missedBreaks,
+            'total_missed_minutes' => $totalMissedMinutes,
+            'violations' => $violations,
+        ];
     }
 
-
     /**
-     * Determine final status with refined logic
+     * Parse a break rule value that may be a JSON array or a scalar.
+     *
+     * @param  mixed  $value
+     * @return array
      */
+    protected function parseBreakRuleValue($value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (is_string($value) && str_starts_with(trim($value), '[')) {
+            $decoded = json_decode($value, true);
+            if (is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        // Treat as scalar
+        $numeric = is_numeric($value) ? (float) $value : 0;
+        return $numeric > 0 ? [$numeric] : [];
+    }
+
     protected function determineStatus(
         float $totalHours,
         int $minutesLate,
@@ -835,243 +892,16 @@ class AttendanceCalculator
         float $expectedHours,
         bool $hasViolations = false
     ): string {
-        if ($totalHours == 0) {
-            return 'absent';
-        }
+        if ($totalHours == 0) return 'absent';
+        if ($minutesLate > 0) return 'late';
 
-        // Priority: late or early departure
-        if ($minutesLate > 0) {
-            return 'late';
-        }
-
-
-
-        // Half-day if less than 50% of expected hours (configurable threshold)
         $halfDayThreshold = $expectedHours * 0.5;
         $earlyDepartureThreshold = $expectedHours * 0.9;
-        if ($totalHours <= $halfDayThreshold) {
-            return 'half_day';
-        }
 
-
-        // Incomplete if less than expected but more than half
-        if ($totalHours > $halfDayThreshold && $totalHours < $earlyDepartureThreshold) {
-            return 'incomplete';
-        }
-
-
-        if ($minutesEarly > 0) {
-            return 'early_departure';
-        }
-
-
+        if ($totalHours <= $halfDayThreshold) return 'half_day';
+        if ($totalHours > $halfDayThreshold && $totalHours < $earlyDepartureThreshold) return 'incomplete';
+        if ($minutesEarly > 0) return 'early_departure';
 
         return 'present';
     }
-
-
-
-
-
-
-    /**
-     * Get default policy values when no policy is assigned
-     */
-    protected function getDefaultPolicyValues(): object
-    {
-        return (object) [
-            'grace_period_minutes' => 5,
-            'early_departure_grace_minutes' => 5,
-            'overtime_daily_threshold_hours' => 8.0,
-            'overtime_weekly_threshold_hours' => 40.0,
-            'max_daily_overtime_hours' => 4.0,
-            'overtime_multiplier' => 1.5,
-            'double_time_threshold_hours' => 12.0,
-            'double_time_multiplier' => 2.0,
-            'requires_break_after_hours' => 5.0,
-            'break_duration_minutes' => 30,
-            'unpaid_break_minutes' => 0
-        ];
-    }
-
-    /**
-     * Update or create attendance record with calculation results
-     */
-    /*protected function updateAttendanceRecord(
-        Employee $employee,
-        Carbon $date,
-        array $calculation,
-        ?AttendancePolicy $policy,
-        ?WorkPattern $pattern
-    ): Attendance {
-        $attendance = Attendance::where('employee_number', $employee->employee_number)
-            ->whereDate('date', $date)
-            ->first();
-
-        if (!$attendance) {
-            $attendance = new Attendance();
-            $attendance->employee_id = $employee->id;
-            $attendance->employee_number = $employee->employee_number;
-            $attendance->date = $date;
-        }
-
-        // Update with calculation results
-        $attendance->status = $calculation['status'];
-        $attendance->net_hours = $calculation['total_hours'];
-        $attendance->regular_hours = $calculation['regular_hours'];
-        $attendance->overtime_hours = $calculation['overtime_hours'];
-        $attendance->double_time_hours = $calculation['double_time_hours'];
-        $attendance->minutes_late = $calculation['minutes_late'];
-        $attendance->minutes_early_departure = $calculation['minutes_early_departure'];
-        $attendance->missed_break_minutes = $calculation['missed_break_minutes'];
-        $attendance->needs_review = $calculation['needs_review'];
-        $attendance->attendance_policy_id = $policy?->id;
-        $attendance->work_pattern_id = $pattern?->id;
-        $attendance->calculation_metadata = json_encode($calculation['breakdown']);
-        $attendance->calculation_version = '1.0';
-        $attendance->calculation_method = 'auto';
-
-        $attendance->save();
-
-        return $attendance;
-    }*/
-
-
-    /**
-     * Core calculation logic
-     */
-    /*protected function calculateAttendance(
-        $events,
-        ?array $schedule,
-        ?AttendancePolicy $policy,
-        ?WorkPattern $pattern,
-        Employee $employee,
-        Carbon $date
-    ): array {
-        $result = [
-            'status' => 'absent',
-            'shift_id' => null,
-            'total_hours' => 0.0,
-            'regular_hours' => 0.0,
-            'overtime_hours' => 0.0,
-            'double_time_hours' => 0.0,
-            'minutes_late' => 0,
-            'minutes_early_departure' => 0,
-            'missed_break_minutes' => 0,
-            'violations' => [],
-            'breakdown' => [],
-            'needs_review' => false
-        ];
-
-        // If no schedule, mark as unscheduled
-        if (!$schedule) {
-            $result['status'] = 'unscheduled';
-            $result['needs_review'] = true;
-            return $result;
-        }
-
-        // If no policy, use defaults
-        if (!$policy) {
-            $policy = $this->getDefaultPolicyValues();
-        }
-
-        // Calculate total hours from clock events
-        $sessions = $this->processClockEvents($events);
-        $totalHours = $sessions['total_hours'];
-        $result['total_hours'] = $totalHours;
-        $result['breakdown']['sessions'] = $sessions['sessions'];
-
-        // Check if it's a work day (has schedule but no hours could mean absence)
-        if ($totalHours == 0) {
-            $result['status'] = 'absent';
-            $result['needs_review'] = true;
-            return $result;
-        }
-
-        // Check lateness
-        $latenessCheck = $this->checkLateness(
-            $sessions['first_clock_in'],
-            $schedule['start_time'],
-            $policy->grace_period_minutes,
-            $date
-        );
-
-        if ($latenessCheck['is_late']) {
-            $result['minutes_late'] = $latenessCheck['minutes_late'];
-            $result['violations'][] = [
-                'type' => 'late_arrival',
-                'minutes' => $latenessCheck['minutes_late']
-            ];
-        }
-
-        // Check early departure
-        $earlyDepartureCheck = $this->checkEarlyDeparture(
-            $sessions['last_clock_out'],
-            $schedule['end_time'],
-            $policy->early_departure_grace_minutes,
-            $date
-        );
-
-        if ($earlyDepartureCheck['is_early']) {
-            $result['minutes_early_departure'] = $earlyDepartureCheck['minutes_early'];
-            $result['violations'][] = [
-                'type' => 'early_departure',
-                'minutes' => $earlyDepartureCheck['minutes_early']
-            ];
-        }
-
-        // Calculate overtime breakdown
-        $overtimeCalculation = $this->calculateOvertime(
-            $totalHours,
-            $policy,
-            $date,
-            $employee->id
-        );
-
-        $result['regular_hours'] = $overtimeCalculation['regular_hours'];
-        $result['overtime_hours'] = $overtimeCalculation['overtime_hours'];
-        $result['double_time_hours'] = $overtimeCalculation['double_time_hours'];
-        $result['breakdown']['overtime_calculation'] = $overtimeCalculation['breakdown'];
-
-        // Check break compliance
-        $breakCheck = $this->checkBreakCompliance(
-            $sessions['sessions'],
-            $policy->requires_break_after_hours,
-            $policy->break_duration_minutes
-        );
-
-        if ($breakCheck['missed_break']) {
-            $result['missed_break_minutes'] = $breakCheck['missed_minutes'];
-            $result['violations'][] = [
-                'type' => 'missed_break',
-                'minutes' => $breakCheck['missed_minutes']
-            ];
-        }
-
-        // Determine final status
-        $result['status'] = $this->determineStatus(
-            $totalHours,
-            $result['minutes_late'],
-            $result['minutes_early_departure'],
-            $this->getExpectedHours($schedule),
-            count($result['violations'])
-        );
-
-        $result['needs_review'] = !empty($result['violations']) ||
-            $result['status'] === 'incomplete' ||
-            $result['status'] === 'half_day';
-
-
-        $result['shift_id'] = $schedule['shift']? $schedule['shift']->id : null;
-
-        // Add violation to the breakdown
-        $result['breakdown']['violations'] = $result['violations'];
-
-
-        return $result;
-    }*/
-
-
-
-
 }

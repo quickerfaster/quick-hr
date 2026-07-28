@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,7 +22,6 @@ class ClockEvent extends Model
 
 
 
-
     protected $table = 'clock_events';
 
 
@@ -31,7 +30,7 @@ class ClockEvent extends Model
 
 
     protected $fillable = [
-        'company_id', 'employee_id', 'event_type', 'timestamp', 'method', 'latitude', 'longitude', 'location_name', 'timezone', 'ip_address', 'device_id', 'device_name', 'sync_status', 'sync_attempts'
+        'company_id', 'employee_id', 'employee_number', 'event_type', 'timestamp', 'method', 'latitude', 'longitude', 'location_name', 'timezone', 'ip_address', 'device_id', 'device_name', 'sync_status', 'sync_attempts'
     ];
 
     protected $guarded = [
@@ -107,6 +106,11 @@ class ClockEvent extends Model
     public function company()
     {
         return $this->belongsTo(\App\Modules\Hr\Models\Company::class, 'company_id', 'id');
+    }
+
+    public function employee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'employee_id');
     }
 
     /**

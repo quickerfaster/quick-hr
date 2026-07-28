@@ -67,7 +67,7 @@ class AttendanceAggregator
             }
 
             // SPECIAL CASE 3: No clock events (unplanned absence)
-            $hasClockEvents = ClockEvent::where('employee_id', $employeeNumber)
+            $hasClockEvents = ClockEvent::where('employee_id', $employee->id)
                 ->whereDate('timestamp', $dateOnly)
                 ->exists();
 
@@ -109,7 +109,7 @@ class AttendanceAggregator
         $attendance = $this->getOrCreateAttendanceRecord($employee, $date);
 
         // Delete any existing sessions (shouldn't exist, but clean up)
-        AttendanceSession::where('attendance_id', $attendance->id)->delete();
+        AttendanceSession::where('attendance_id', $attendance->id)->forceDelete();
 
         $attendance->update([
             'status' => 'holiday',
@@ -149,7 +149,9 @@ class AttendanceAggregator
 
         $attendance = $this->getOrCreateAttendanceRecord($employee, $date);
 
-        // Delete any existing sessions
+        AttendanceSession::where('attendance_id', $attendance->id)->delete();
+
+        // Get standard hours from employee's shift if available
         AttendanceSession::where('attendance_id', $attendance->id)->delete();
 
         // Get standard hours from employee's shift if available
@@ -190,7 +192,9 @@ class AttendanceAggregator
     {
         $attendance = $this->getOrCreateAttendanceRecord($employee, $date);
 
-        // Delete any existing sessions
+        AttendanceSession::where('attendance_id', $attendance->id)->delete();
+
+        // Get standard hours for deduction
         AttendanceSession::where('attendance_id', $attendance->id)->delete();
 
         // Get standard hours for deduction
@@ -229,7 +233,7 @@ class AttendanceAggregator
     {
         $attendance = $this->getOrCreateAttendanceRecord($employee, Carbon::parse($date));
 
-        $events = ClockEvent::where('employee_id', $employee->employee_number)
+        $events = ClockEvent::where('employee_id', $employee->id)
             ->whereDate('timestamp', $date)
             ->orderBy('timestamp')
             ->get();

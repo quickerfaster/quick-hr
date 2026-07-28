@@ -12,7 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
             $table->index('company_id');
-            $table->string('employee_id');
+            $table->string('employee_number')->nullable();
+            $table->foreignId('employee_id')->nullable()->constrained('employees')->onDelete('restrict');
             $table->string('event_type');
             $table->datetime('timestamp');
             $table->string('method')->default('web');
@@ -26,15 +27,17 @@ return new class extends Migration
             $table->string('sync_status')->default('pending')->nullable();
             $table->integer('sync_attempts')->default(0)->nullable();
 
-            			$table->index('employee_id');
-			$table->index('event_type');
-			$table->index('timestamp');
-			$table->index('method');
-			$table->index('sync_status');
-			$table->index('deleted_at');
-			$table->index(['employee_id', 'timestamp']);
-			$table->index(['event_type', 'timestamp']);
-			$table->index(['sync_status', 'sync_attempts']);
+            $table->index('employee_id');
+            $table->index('employee_number');
+            $table->index('event_type');
+            $table->index('timestamp');
+            $table->index('method');
+            $table->index('sync_status');
+            $table->index('deleted_at');
+            $table->index(['employee_id', 'timestamp']);
+            $table->index(['employee_number', 'timestamp']);
+            $table->index(['event_type', 'timestamp']);
+            $table->index(['sync_status', 'sync_attempts']);
             $table->softDeletes();
             $table->timestamps();
         });
