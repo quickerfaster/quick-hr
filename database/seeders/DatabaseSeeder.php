@@ -14,23 +14,38 @@ class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        // Core seeders – always run (safe and idempotent)
         $this->call([
             QFDatabaseSeeder::class,
             SystemSeeder::class,
             UserSeeder::class,
-            // HR Module: Creates companies, departments, locations, and 5,000 employees
-            EmployeeWithDependenciesSeeder::class,
-            // HR Module: Multi-company payroll test data (4 companies, pay schedules, 100 employees, adjustments)
-            MultiCompanyPayrollTestDataSeeder::class,
+            // Add any other production‑safe seeders here
         ]);
 
-        AccessControlPermissionService::seedPermissionNames();
+        // Test data seeders – only in non‑production environments
+        $this->seedTestDataIfAllowed();
 
+        // Permissions (must run after roles are seeded)
+        AccessControlPermissionService::seedPermissionNames();
+    }
+
+    /**
+     * Conditionally seed test data based on environment or --force flag.
+     */
+    protected function seedTestDataIfAllowed(): void
+    {
+        $allowed = app()->environment('local', 'staging', 'development')
+            || ($this->command && $this->command->option('force'));
+
+        if (!$allowed) {
+            $this->command->warn('Skipping test data seeders (not in local/staging/development and --force not set).');
+            return;
+        }
+
+        $this->call(EmployeeWithDependenciesSeeder::class);
+        $this->call(MultiCompanyPayrollTestDataSeeder::class);
     }
 }

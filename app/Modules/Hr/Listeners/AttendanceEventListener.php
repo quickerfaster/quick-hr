@@ -71,7 +71,23 @@ class AttendanceEventListener extends DatatableFormListener
         DB::beginTransaction();
 
         try {
-            $attendance = Attendance::with(['employee'])->findOrFail($attendanceId);
+            $attendance = Attendance::with(['employee'])->find($attendanceId);
+
+            if (!$attendance) {
+                DB::rollBack();
+
+                Log::warning('AttendanceEventListener: Record not found during recalculation', [
+                    'attendance_id' => $attendanceId,
+                ]);
+
+                SweetAlertService::showError(
+                    $livewireComponent,
+                    'Error!',
+                    'The attendance record could not be found. It may have been deleted by another user.'
+                );
+
+                return;
+            }
 
             // Check if attendance is already approved (from YAML condition)
             if ($attendance->is_approved) {

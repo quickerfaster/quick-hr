@@ -23,8 +23,8 @@ return new class extends Migration
             $table->decimal('overtime_multiplier', 3, 2)->default(1.5);
             $table->decimal('double_time_threshold_hours', 4, 2)->default(12)->nullable();
             $table->decimal('double_time_multiplier', 3, 2)->default(2)->nullable();
-            $table->decimal('requires_break_after_hours', 4, 2)->default(5)->nullable();
-            $table->integer('break_duration_minutes')->default(30)->nullable();
+            $table->string('requires_break_after_hours', 100)->nullable()->default('5');
+            $table->string('break_duration_minutes', 100)->nullable()->default('30');
             $table->integer('unpaid_break_minutes')->default(0);
             $table->string('country_code')->nullable();
             $table->string('state_code')->nullable();

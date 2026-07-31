@@ -10,76 +10,81 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         $roles = [
-
             // SaaS Platform
             [
-                'name' => 'super_admin',
+                'name'        => 'super_admin',
                 'description' => 'Full SaaS platform access',
             ],
 
             // Company Administration
             [
-                'name' => 'company_admin',
+                'name'        => 'company_admin',
                 'description' => 'Manages company settings, users, and modules',
             ],
 
             // Human Resources
             [
-                'name' => 'hr_manager',
+                'name'        => 'hr_manager',
                 'description' => 'Manages employees, attendance, leave, and HR operations',
             ],
-
             [
-                'name' => 'hr_officer',
+                'name'        => 'hr_officer',
                 'description' => 'Supports daily HR operations',
+            ],
+            // 🔽 NEW: HR Admin (for configuration and approvals)
+            [
+                'name'        => 'hr_admin',
+                'description' => 'Manages HR settings, policies, and approval workflows',
             ],
 
             // Payroll & Finance
             [
-                'name' => 'payroll_officer',
+                'name'        => 'payroll_officer',
                 'description' => 'Processes payroll and salary operations',
             ],
-
             [
-                'name' => 'accountant',
+                'name'        => 'accountant',
                 'description' => 'Handles finance and payroll reports',
+            ],
+            // 🔽 NEW: Payroll Manager (oversight)
+            [
+                'name'        => 'payroll_manager',
+                'description' => 'Oversees payroll runs, approvals, and bank file exports',
             ],
 
             // Department Management
             [
-                'name' => 'manager',
+                'name'        => 'manager',
                 'description' => 'Manages department employees and approvals',
             ],
-
             [
-                'name' => 'supervisor',
+                'name'        => 'supervisor',
                 'description' => 'Supervises team attendance and activities',
             ],
 
             // Recruitment
             [
-                'name' => 'recruiter',
+                'name'        => 'recruiter',
                 'description' => 'Handles recruitment and applicants',
             ],
 
             // Employee
             [
-                'name' => 'employee',
+                'name'        => 'employee',
                 'description' => 'Standard employee access',
             ],
+
         ];
 
         foreach ($roles as $data) {
-
             Role::firstOrCreate(
                 ['name' => $data['name']],
                 [
                     'description' => $data['description'],
-                    'guard_name' => 'web',
-                    'editable' => 'No',
+                    'guard_name'  => 'web',
+                    'editable'    => 'No',
                 ]
             );
         }
     }
 }
-

@@ -45,11 +45,10 @@ class MultiCompanyPayrollTestDataSeeder extends Seeder
      */
     public function run(): void
     {
+
         // Guard: only run in safe environments
-        if (!app()->environment('local', 'staging', 'development')) {
-            if (app()->runningInConsole() && $this->command) {
-                $this->command->warn('Skipping MultiCompanyPayrollTestDataSeeder: Not in local/staging/development environment.');
-            }
+        if (!$this->shouldRun()) {
+            $this->command->warn('Skipping MultiCompanyPayrollTestDataSeeder (not in local/staging/development and --force not set).');
             return;
         }
 
@@ -91,6 +90,16 @@ class MultiCompanyPayrollTestDataSeeder extends Seeder
             $this->command->info('  - 3 Recurring Adjustment Profiles');
         }
     }
+
+    /**
+     * Determine if the seeder should run.
+     */
+    protected function shouldRun(): bool
+    {
+        return app()->environment('local', 'staging', 'development')
+            || ($this->command && $this->command->option('force'));
+    }
+
 
     /**
      * Company configuration data.

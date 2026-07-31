@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('status')->default('draft')->nullable();
             $table->integer('current_step')->default(1)->nullable();
             $table->string('calculation_status')->default('pending')->nullable();
+            $table->timestamp('finalized_at')->nullable();
             $table->decimal('total_gross_pay', 15, 2)->default(0)->nullable();
             $table->decimal('total_deductions', 15, 2)->default(0)->nullable();
             $table->decimal('total_taxes', 15, 2)->default(0)->nullable();

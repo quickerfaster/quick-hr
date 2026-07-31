@@ -23,37 +23,44 @@ class EmployeeWithDependenciesSeeder extends Seeder
     protected $company;
 
     /**
+     * Determine if the seeder should run.
+     */
+    protected function shouldRun(): bool
+    {
+        return app()->environment('local', 'staging', 'development')
+            || ($this->command && $this->command->option('force'));
+    }
+
+    /**
      * Run the seeder.
      */
     public function run(): void
     {
-        // 1. Guard check: Only run on local environments
-        if (!app()->environment('local')) {
-            $this->command->warn('Skipping EmployeeWithDependenciesSeeder: Not in local environment.');
+        if (!$this->shouldRun()) {
+            $this->command->warn('Skipping EmployeeWithDependenciesSeeder (not in local/staging/development and --force not set).');
             return;
         }
 
         $this->command->info('Seeding 5,000 employees with dependencies...');
 
-        // 2. Wrap in a transaction for maximum speed and safety
         DB::transaction(function () {
-
-            // Step 1: Create static dependencies (reused for all employees)
+            // Step 1: Create static dependencies
             $this->createDependencies();
 
-            // Step 2: Create 5,000 employees with EMP0001..EMP5000 numbers
-            $employees = $this->createEmployees(200);
+            // Step 2: Create 5,000 employees
+            $employees = $this->createEmployees(5000);
 
-            // Step 3: Create one active position for each employee
+            // Step 3: Create positions
             $this->createPositionsForEmployees($employees);
 
-            // Step 4: Create one payroll profile for each employee
+            // Step 4: Create payroll profiles
             $this->createPayrollProfilesForEmployees($employees);
-
         });
 
         $this->command->info('Successfully seeded 5,000 employees!');
     }
+
+
 
     /**
      * Create all lookup tables that EmployeePosition and EmployeePayrollProfile reference.

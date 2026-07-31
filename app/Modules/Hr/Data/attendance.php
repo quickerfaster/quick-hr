@@ -462,6 +462,7 @@ return [
       '13' => 'company_id',
       '14' => 'company',
       '15' => 'department',
+      '16' => 'net_hours',
     ],
     'onEditForm' => [
       '0' => 'sessions',
@@ -479,6 +480,8 @@ return [
       '12' => 'company_id',
       '13' => 'company',
       '14' => 'department',
+      '15' => 'net_hours',
+
     ],
     'onQuery' => [
       '0' => 'deleted_at',

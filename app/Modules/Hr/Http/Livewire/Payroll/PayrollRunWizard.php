@@ -9,11 +9,13 @@ use App\Modules\Hr\Models\PayrollRun;
 use App\Modules\Hr\Models\PayrollRunAdjustment;
 use App\Modules\Hr\Models\PayrollPayslip;
 use App\Modules\Hr\Models\Company;
+use QuickerFaster\UILibrary\Concerns\ResolvesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class PayrollRunWizard extends Component
 {
+    use ResolvesModels;
     public int $currentStep = 1;
     public ?int $payrollRunId = null;
     public $pay_schedule_id = null;
@@ -72,7 +74,17 @@ class PayrollRunWizard extends Component
             $this->isMultiCompany = $data['isMultiCompany'] ?? false;
             $this->companyId = $data['companyId'] ?? null;
         } elseif ($payrollRunId) {
-            $run = PayrollRun::findOrFail($payrollRunId);
+            $run = $this->resolveModel(PayrollRun::class, $payrollRunId);
+
+            if (!$run) {
+                $this->cleanupWizardSession(
+                    $this->getWizardId(),
+                    'The payroll run you are trying to edit could not be found. It may have been deleted.',
+                    'payroll-runs.index'
+                );
+                return;
+            }
+
             $this->payrollRunId = $run->id;
             $this->pay_schedule_id = $run->pay_schedule_id;
             $this->title = $run->title;

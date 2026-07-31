@@ -1,4 +1,16 @@
 <div>
+    {{-- Common base selection for all policy types --}}
+    <div class="mb-3">
+        <label class="form-label fw-bold">Apply to</label>
+        <select class="form-select" wire:model.live="calculationBase">
+            <option value="base_salary">Base Salary</option>
+            <option value="gross_pay">Gross Pay (including adjustments)</option>
+        </select>
+        <small class="text-muted d-block">
+            Choose whether this policy applies to the employee's base salary or the total gross pay after adjustments.
+        </small>
+    </div>
+
     @if ($policyType === 'tax')
         <div class="mb-3">
             <label class="form-label fw-bold">Tax Brackets (annual income)</label>
@@ -73,7 +85,6 @@
                 {{-- Employee Value Field --}}
                 @if ($this->showEmployeeField())
                     @php
-                        // Determine label based on policy type
                         $employeeLabel = match($policyType) {
                             'bonus', 'commission', 'reimbursement' => 'Amount Paid to Employee',
                             'deduction' => 'Deduction Amount',

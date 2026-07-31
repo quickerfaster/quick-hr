@@ -5,6 +5,7 @@ namespace App\Modules\Hr\Http\Livewire\Payroll;
 use Livewire\Component;
 use App\Modules\Hr\Models\PayrollRun;
 use App\Modules\Hr\Services\Payroll\PayrollCalculator;
+use QuickerFaster\UILibrary\Concerns\ResolvesModels;
 use Illuminate\Support\Facades\DB;
 use QuickerFaster\UILibrary\Traits\HasCurrencySymbol;
 use QuickerFaster\UILibrary\Services\Config\ConfigResolver;
@@ -15,6 +16,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class PayrollRunDetail extends Component
 {
     use HasCurrencySymbol;
+    use ResolvesModels;
 
     public int $recordId;
     public string $configKey;
@@ -38,7 +40,23 @@ class PayrollRunDetail extends Component
         $this->recordId = $recordId;
         $this->configKey = $configKey;
         $this->returnParams = $returnParams;
-        $this->run = PayrollRun::with(['paySchedule'])->findOrFail($recordId);
+
+        $run = $this->resolveModel(PayrollRun::class, $recordId, [
+            function ($query) {
+                return $query->with(['paySchedule']);
+            },
+        ]);
+
+        if (!$run) {
+            $this->flashAndRedirect(
+                'error',
+                'Payroll run not found. It may have been deleted or is not accessible from your current view.',
+                'payroll-runs.index'
+            );
+            return;
+        }
+
+        $this->run = $run;
         $this->tabs = $this->getTabs();
     }
 
@@ -274,7 +292,7 @@ public function queueSummaryPdf()
         $currencyCode = $this->run->paySchedule->currency_code ?? 'USD';
         $companyName = optional($this->run->paySchedule->company)->name ?? config('app.name', 'Quick HR');
     } else {
-        
+
         // Multi-company or run without pay schedule
         $currencyCode = $this->run->base_currency ?? 'USD';
         if ($this->run->is_multi_company) {

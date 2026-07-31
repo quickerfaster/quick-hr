@@ -101,11 +101,37 @@ class Attendance extends Model
     /**
      * Boot the model.
      */
-    protected static function boot()
-    {
-        parent::boot();
+protected static function boot()
+{
+    parent::boot();
 
-    }
+    static::saving(function ($model) {
+        /*
+        Note: This assumes unpaid break deductions are already applied to the breakdown fields.
+        In AttendanceCalculator, the breakdown fields are computed on gross hours,
+        and net_hours is reduced by unpaid breaks. So if you want the model to also subtract
+        unpaid breaks, you'd need to store unpaid_break_minutes in the attendance record
+        (not currently there).
+        For now, this approach keeps the calculator's logic intact and only enforces
+         consistency for manual entries.
+        */
+
+        // If this record is being saved via the attendance calculator
+        // (calculation_method = 'auto'), skip auto‑calculation — the
+        // calculator already set net_hours correctly.
+        if ($model->calculation_method === 'auto') {
+            return;
+        }
+
+        // Recalculate net_hours from the breakdown fields
+        $model->net_hours = round(
+            ($model->regular_hours ?? 0) +
+            ($model->overtime_hours ?? 0) +
+            ($model->double_time_hours ?? 0),
+            2
+        );
+    });
+}
 
     /**
      * Validate the model instance.

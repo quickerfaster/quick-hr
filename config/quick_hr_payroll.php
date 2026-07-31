@@ -41,5 +41,20 @@ return [
         'enabled' => env('PAYROLL_ATTENDANCE_INTEGRATION_ENABLED', true),
     ],
 
+    // Pay periods per year by frequency
+    'pay_periods_per_year' => [
+        'Monthly'      => 12,
+        'Semi-monthly' => 24,
+        'Bi-weekly'    => 26,
+        'Weekly'       => 52,
+        'Daily'        => 260,
+    ],
+
+    // Default overtime multipliers (fallback if policy doesn't provide)
+    'default_overtime_multiplier' => env('PAYROLL_DEFAULT_OT_MULTIPLIER', 1.5),
+    'default_double_time_multiplier' => env('PAYROLL_DEFAULT_DT_MULTIPLIER', 2.0),
+
+    // Proration basis default ('calendar' or 'working_days')
+    'default_proration_basis' => env('PAYROLL_DEFAULT_PRORATION_BASIS', 'calendar'),
 
 ];

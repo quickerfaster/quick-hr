@@ -360,7 +360,7 @@ protected function saveAdjustmentForEmployee($employeeId, $type, $amount): void
             return 'All Companies';
         }
         $company = \App\Modules\Admin\Models\Company::find($companyId);
-        return $company->name ?? 'Unknown Company';
+        return $company?->name ?? 'Unknown Company';
     }
 
 public function render()

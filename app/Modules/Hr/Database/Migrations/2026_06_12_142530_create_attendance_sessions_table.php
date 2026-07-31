@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
             $table->index('company_id');
             $table->foreignId('attendance_id')->constrained('attendances', 'id')->onDelete('cascade');
-            $table->datetime('start_time');
+            $table->datetime('start_time')->nullable();
             $table->datetime('end_time')->nullable();
             $table->decimal('duration_hours', 6, 2)->default(0);
             $table->string('session_type')->default('work')->nullable();

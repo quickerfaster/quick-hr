@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('date');
             $table->foreignId('shift_id')->nullable()->constrained('shifts', 'id')->onDelete('restrict');
             $table->string('status')->default('present');
-            $table->decimal('net_hours', 6, 2)->nullable();
+            $table->decimal('net_hours', 10, 2)->default(0)->nullable(false);
             $table->string('absence_type')->nullable();
             $table->text('absence_reason')->nullable();
             $table->foreignId('leave_request_id')->nullable()->constrained('leave_requests', 'id')->onDelete('set null');
@@ -37,9 +37,9 @@ return new class extends Migration
 
 
             // Make numeric fields nullable (they currently have default 0)
-            $table->decimal('regular_hours', 6, 2)->nullable();
-            $table->decimal('overtime_hours', 6, 2)->nullable();
-            $table->decimal('double_time_hours', 6, 2)->nullable();
+            $table->decimal('regular_hours', 10, 2)->default(0)->nullable(false);
+            $table->decimal('overtime_hours', 10, 2)->default(0)->nullable(false);
+            $table->decimal('double_time_hours', 10, 2)->default(0)->nullable(false);
             $table->integer('minutes_late')->nullable();
             $table->integer('minutes_early_departure')->nullable();
             $table->integer('missed_break_minutes')->nullable();

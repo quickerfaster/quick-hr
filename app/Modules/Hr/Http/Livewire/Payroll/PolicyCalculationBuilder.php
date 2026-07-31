@@ -11,12 +11,13 @@ class PolicyCalculationBuilder extends Component
 
     // For tax – three‑column bands
     public array $bands = [];
-    public array $bandErrors = []; // stores validation errors per band
+    public array $bandErrors = [];
 
     // For non‑tax
     public string $calculationType = 'percentage';
     public float $employeeValue = 0;
     public float $employerValue = 0;
+    public string $calculationBase = 'base_salary'; // NEW: base_salary or gross_pay
 
     protected $listeners = [
         'parentPolicyTypeChanged' => 'setPolicyType',
@@ -60,15 +61,10 @@ class PolicyCalculationBuilder extends Component
         $this->updateParent();
     }
 
-    /**
-     * Validate that bands are contiguous and non‑overlapping.
-     * Sets $this->bandErrors array with error messages.
-     */
     protected function validateBands(): void
     {
         $this->bandErrors = [];
 
-        // Remove empty rows (all fields empty)
         $nonEmptyBands = array_filter($this->bands, function ($band) {
             return ($band['start'] !== '' && $band['start'] !== null) ||
                    ($band['end'] !== '' && $band['end'] !== null) ||
@@ -79,7 +75,6 @@ class PolicyCalculationBuilder extends Component
             return;
         }
 
-        // Convert empty strings to null and parse numbers
         $parsed = [];
         foreach ($nonEmptyBands as $idx => $band) {
             $start = $band['start'] === '' ? null : (float) $band['start'];
@@ -91,7 +86,6 @@ class PolicyCalculationBuilder extends Component
                 continue;
             }
 
-            // For the first band, start must be 0 or null (interpreted as 0)
             if ($idx === 0 && $start !== null && $start != 0) {
                 $this->bandErrors[$idx] = 'First bracket must start at 0.';
             }
@@ -99,7 +93,6 @@ class PolicyCalculationBuilder extends Component
             $parsed[] = ['start' => $start, 'end' => $end, 'rate' => $rate, 'index' => $idx];
         }
 
-        // Check for overlaps and gaps
         for ($i = 0; $i < count($parsed); $i++) {
             $current = $parsed[$i];
             $prev = $i > 0 ? $parsed[$i-1] : null;
@@ -124,19 +117,11 @@ class PolicyCalculationBuilder extends Component
 
     // ---------- Non‑Tax Methods ----------
 
-    /**
-     * Determine if the employee contribution field should be shown.
-     * For all non‑tax policies, the employee value affects the payslip.
-     */
     protected function showEmployeeField(): bool
     {
         return $this->policyType !== 'tax';
     }
 
-    /**
-     * Determine if the employer contribution field should be shown.
-     * Only pension, insurance, and benefit policies typically have an employer share.
-     */
     protected function showEmployerField(): bool
     {
         return in_array($this->policyType, ['pension', 'insurance', 'benefit']);
@@ -159,6 +144,12 @@ class PolicyCalculationBuilder extends Component
         $this->updateParent();
     }
 
+    // NEW: trigger update when base changes
+    public function updatedCalculationBase(): void
+    {
+        $this->updateParent();
+    }
+
     // ---------- JSON Handling ----------
     protected function loadFromJson(): void
     {
@@ -172,6 +163,9 @@ class PolicyCalculationBuilder extends Component
             $this->resetToDefault();
             return;
         }
+
+        // Load base (new field) – default to base_salary if missing
+        $this->calculationBase = $data['base'] ?? 'base_salary';
 
         if ($this->policyType === 'tax') {
             $rawBands = $data['bands'] ?? [];
@@ -205,6 +199,9 @@ class PolicyCalculationBuilder extends Component
 
     protected function resetToDefault(): void
     {
+        // Preserve base if already set, else default
+        $this->calculationBase = $this->calculationBase ?? 'base_salary';
+
         if ($this->policyType === 'tax') {
             $this->bands = [['start' => '', 'end' => '', 'rate' => '']];
             $this->bandErrors = [];
@@ -218,6 +215,8 @@ class PolicyCalculationBuilder extends Component
 
     protected function buildJson(): string
     {
+        $data = ['base' => $this->calculationBase];
+
         if ($this->policyType === 'tax') {
             $cleanBands = [];
             foreach ($this->bands as $band) {
@@ -238,14 +237,14 @@ class PolicyCalculationBuilder extends Component
             if (empty($cleanBands)) {
                 $cleanBands = [['start' => 0, 'end' => null, 'rate' => 0]];
             }
-            return json_encode(['bands' => $cleanBands]);
+            $data['bands'] = $cleanBands;
         } else {
-            return json_encode([
-                'calculation_type' => $this->calculationType,
-                'employee_value' => (float) $this->employeeValue,
-                'employer_value' => (float) $this->employerValue,
-            ]);
+            $data['calculation_type'] = $this->calculationType;
+            $data['employee_value'] = (float) $this->employeeValue;
+            $data['employer_value'] = (float) $this->employerValue;
         }
+
+        return json_encode($data);
     }
 
     protected function updateParent(): void

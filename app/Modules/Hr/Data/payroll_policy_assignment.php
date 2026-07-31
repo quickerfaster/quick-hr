@@ -71,7 +71,8 @@ return [
       'editable' => true,
       'field_type' => 'morph_to_select',
       'label' => 'Entity',
-      'validation' => 'required|integer',
+      // 'validation' => 'required|integer',
+      'validation' => 'required',
       'filterable' => true,
       'searchable' => true,
       'morph_relation' => 'assignable',
@@ -90,7 +91,7 @@ return [
       'editable' => true,
       'field_type' => 'number',
       'label' => 'Priority',
-      'validation' => 'nullable|integer|min:0',
+      'validation' => 'required|integer|min:0',
     ],
     'effective_date' => [
       'display' => 'inline',

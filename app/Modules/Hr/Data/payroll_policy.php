@@ -61,9 +61,9 @@ return [
       'label' => 'Effect on Pay',
       'validation' => 'required|in:addition,subtraction',
       'options' => [
-        'addition' => 'Addition (adds to gross pay)',
-        'subtraction' => 'Subtraction (deducts from gross pay)',
-      ],
+            'addition' => 'Addition (adds to net pay)',
+            'subtraction' => 'Subtraction (deducts from net pay)',
+        ],
       'filterable' => true,
     ],
     'description' => [

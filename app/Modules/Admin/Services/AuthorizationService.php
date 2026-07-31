@@ -2,6 +2,7 @@
 
 namespace App\Modules\Admin\Services;
 
+use QuickerFaster\UILibrary\Exceptions\RecordNotAccessibleException;
 use App\Modules\Admin\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -271,7 +272,12 @@ public function evaluateConditions($row, array $conditions): bool
             return;
         }
 
-        $record = $this->resolveRecord($recordOrId, $modelClass);
+        try {
+            $record = $this->resolveRecord($recordOrId, $modelClass);
+        } catch (RecordNotAccessibleException $e) {
+            abort($e->getHttpStatusCode(), $e->getUserMessage());
+        }
+
         $can = match ($action) {
             'view' => $this->canView($user, $record),
             'edit', 'update' => $this->canUpdate($user, $record),
@@ -395,10 +401,30 @@ public function evaluateConditions($row, array $conditions): bool
         if ($recordOrId instanceof Model) {
             return $recordOrId;
         }
-        if (is_int($recordOrId) && $modelClass && class_exists($modelClass)) {
-            return $modelClass::findOrFail($recordOrId);
+
+        if (is_int($recordOrId) && $recordOrId > 0 && $modelClass && class_exists($modelClass)) {
+            // Use withoutCompanyScope() because this is an authorization service.
+            // The concern is "does this record exist?" — not "does it match
+            // the current session company?" Company access is handled separately.
+            $record = $modelClass::withoutCompanyScope()->find($recordOrId);
+
+            if (!$record) {
+                throw RecordNotAccessibleException::notFound(
+                    $modelClass,
+                    $recordOrId
+                );
+            }
+
+            return $record;
         }
-        throw new \InvalidArgumentException('Invalid record or ID/class combination.');
+
+        throw new \InvalidArgumentException(
+            sprintf(
+                'Invalid record or ID/class combination. ID: %s, Class: %s',
+                var_export($recordOrId, true),
+                $modelClass ?? 'null'
+            )
+        );
     }
 
     private function getModelNameFromRecord(Model $record): string

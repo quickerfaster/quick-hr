@@ -10,19 +10,25 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->integer('company_id')->nullable();
             $table->string('name');
             $table->string('email')->unique(); // Unique index handles lookups automatically
-            $table->string('status')->default("invited");
-            $table->string('password'); // Changed from text() to string() for standard hash storage
             $table->timestamp('email_verified_at')->nullable(); // Using standard timestamp
+            $table->string('status')->default("active");
+            $table->string('password'); // Changed from text() to string() for standard hash storage
+            $table->text('two_factor_secret')->nullable();
+            $table->text('two_factor_recovery_codes')->nullable();
+            $table->timestamp('two_factor_confirmed_at')->nullable();
+            $table->string('user_type')->default('user');
+            $table->boolean('has_seen_tour')->default(false);
             $table->rememberToken(); // Replaced with standard Laravel helper
             $table->timestamps();
             $table->softDeletes();
 
             // Performance Indexes
-			$table->index('status');
-			$table->index('deleted_at');
-			$table->index(['status', 'email']); // Composite index for filtered lookups
+            $table->index('status');
+            $table->index('deleted_at');
+            $table->index(['status', 'email']); // Composite index for filtered lookups
         });
     }
 

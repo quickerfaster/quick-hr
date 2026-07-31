@@ -11,6 +11,9 @@ use App\Modules\Hr\Models\PayrollRunAdjustment;
 use App\Modules\Hr\Models\PayrollPolicy;
 use App\Modules\Hr\Models\PayrollPolicyAssignment;
 use App\Modules\Hr\Models\Company;
+use App\Modules\Hr\Models\WorkPattern;
+use App\Modules\Hr\Models\AttendancePolicy;
+use App\Modules\Hr\Traits\HasPayPeriods;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +21,7 @@ use Carbon\Carbon;
 
 class PayrollCalculator
 {
+    use HasPayPeriods;
     protected PayrollRun $run;
 
     /**
@@ -116,7 +120,7 @@ protected function isAttendanceIntegrationEnabled(): bool
  */
 protected function getAttendanceSummary(int $employeeId, Carbon $start, Carbon $end): array
 {
-    $attendance = \App\Modules\Hr\Models\Attendance::withoutCompanyScope()
+    $attendances = \App\Modules\Hr\Models\Attendance::withoutCompanyScope()
         ->where('employee_id', $employeeId)
         ->whereBetween('date', [$start, $end])
         ->get();
@@ -128,19 +132,23 @@ protected function getAttendanceSummary(int $employeeId, Carbon $start, Carbon $
         'worked_days' => 0,
     ];
 
-    foreach ($attendance as $day) {
-        // Count as worked day if:
-        // - net_hours > 0 (has actual work)
-        // - OR status is not 'absent' (e.g., on leave, but still paid)
-        // - OR it's a paid absence
+    foreach ($attendances as $day) {
         if ($day->net_hours > 0 || $day->status !== 'absent' || $day->is_paid_absence) {
             $summary['worked_days']++;
-            $summary['regular_hours'] += $day->regular_hours ?? 0;
-            $summary['overtime_hours'] += $day->overtime_hours ?? 0;
-            $summary['double_time_hours'] += $day->double_time_hours ?? 0;
+            $regular = $day->regular_hours ?? 0;
+            $overtime = $day->overtime_hours ?? 0;
+            $double = $day->double_time_hours ?? 0;
+
+            // FALLBACK: if breakdown missing, use net_hours as regular
+            if ($regular == 0 && $overtime == 0 && $double == 0 && $day->net_hours > 0) {
+                $regular = $day->net_hours;
+            }
+
+            $summary['regular_hours'] += $regular;
+            $summary['overtime_hours'] += $overtime;
+            $summary['double_time_hours'] += $double;
         }
     }
-
     return $summary;
 }
 
@@ -189,25 +197,70 @@ protected function getWorkdaysInPeriod(Carbon $start, Carbon $end, ?int $workPat
 /**
  * Resolve the work pattern ID for an employee position.
  * Looks up EmployeeWorkPattern for the employee that overlaps the payroll period.
+ * Falls back to the default work pattern if no employee-specific assignment exists.
  */
 protected function resolveWorkPatternId(EmployeePosition $position): ?int
 {
-    $employeeId = $position->employee_id;
-
-    // Try to find an active work pattern assignment that overlaps the payroll period
+    // First try employee‑specific assignment
     $assignment = \App\Modules\Hr\Models\EmployeeWorkPattern::withoutCompanyScope()
-        ->where('employee_id', $employeeId)
-        ->where(function ($q) {
-            $q->whereNull('end_date')
-              ->orWhere('end_date', '>=', $this->run->period_start);
-        })
+        ->where('employee_id', $position->employee_id)
         ->where('start_date', '<=', $this->run->period_end)
+        ->where(function ($q) {
+            $q->whereNull('end_date')->orWhere('end_date', '>=', $this->run->period_start);
+        })
         ->orderBy('start_date', 'desc')
         ->first();
 
-    return $assignment?->work_pattern_id;
+    if ($assignment) {
+        return $assignment->work_pattern_id;
+    }
+
+    // Fallback to default work pattern
+    $defaultPattern = WorkPattern::withoutCompanyScope()
+        ->where('is_default', true)
+        ->where('is_active', true)
+        ->where('effective_date', '<=', $this->run->period_end)
+        ->where(function ($q) {
+            $q->whereNull('end_date')->orWhere('end_date', '>=', $this->run->period_start);
+        })
+        ->when($position->employee->company_id, function ($query, $companyId) {
+            return $query->where('company_id', $companyId);
+        })
+        ->first();
+
+    return $defaultPattern?->id;
 }
 
+    /**
+     * Get the attendance policy applicable to an employee.
+     * Checks employee position assignment first, then falls back to default policy.
+     */
+    protected function getAttendancePolicyForEmployee(EmployeePosition $position): ?AttendancePolicy
+    {
+        // First try the policy directly assigned to the position
+        if ($position->attendance_policy_id) {
+            $policy = AttendancePolicy::withoutCompanyScope()
+                ->where('id', $position->attendance_policy_id)
+                ->where('is_active', true)
+                ->first();
+            if ($policy) {
+                return $policy;
+            }
+        }
+
+        // Fallback to default attendance policy for the company
+        return AttendancePolicy::withoutCompanyScope()
+            ->where('is_default', true)
+            ->where('is_active', true)
+            ->where('effective_date', '<=', $this->run->period_end)
+            ->where(function ($q) {
+                $q->whereNull('expiration_date')->orWhere('expiration_date', '>=', $this->run->period_start);
+            })
+            ->when($position->employee->company_id, function ($query, $companyId) {
+                return $query->where('company_id', $companyId);
+            })
+            ->first();
+    }
 
     /**
      * Update payroll run totals after all employees processed.
@@ -422,22 +475,34 @@ protected function resolveWorkPatternId(EmployeePosition $position): ?int
         return $assignments->pluck('payrollPolicy')->merge($globalPolicies)->unique('id');
     }
 
-    /**
-     * Apply policy logic to calculate amount, with optional proration factor.
-     */
-protected function applyPolicyLogic(PayrollPolicy $policy, array $items, float $baseSalary, float $prorationFactor = 1.0, ?float $annualSalary = null): array
+/**
+ * Apply policy logic to calculate amount, with optional proration factor.
+ * Now supports 'base' key in calculation_logic: 'base_salary' or 'gross_pay'.
+ */
+protected function applyPolicyLogic(
+    PayrollPolicy $policy,
+    array $items,
+    float $baseSalary,
+    float $grossPayBase,
+    float $prorationFactor = 1.0,
+    ?EmployeePosition $position = null
+): array
 {
     $logic = json_decode($policy->calculation_logic, true);
     if (!$logic) {
         return ['employee' => 0, 'employer' => 0];
     }
 
+    // Determine effective base
+    $baseKey = $logic['base'] ?? 'base_salary';
+    $effectiveBase = ($baseKey === 'gross_pay') ? $grossPayBase : $baseSalary;
+
     // --- TAX POLICY ---
     if ($policy->type === 'tax') {
-        // 1. Determine the correct ANNUAL income
-        $annualIncome = $annualSalary ?? ($baseSalary * 12);
+        $frequency = $position?->pay_frequency ?? 'Monthly';
+        $annualIncome = $this->annualizeAmount($effectiveBase, $frequency);
 
-        // 2. Calculate annual tax using the universal bracket logic
+
         $tax = 0;
         $bands = collect($logic['bands'] ?? [])->sortBy('start')->values()->toArray();
 
@@ -446,43 +511,27 @@ protected function applyPolicyLogic(PayrollPolicy $policy, array $items, float $
             $end = $band['end'] ?? PHP_FLOAT_MAX;
             $rate = (float) ($band['rate'] ?? 0) / 100;
 
-            // If annual income doesn't reach this bracket's start, stop entirely.
             if ($annualIncome <= $start) {
                 break;
             }
 
-            // Income portion that falls into this bracket
             $upper = min($annualIncome, $end);
             $taxable = max(0, $upper - $start);
             $tax += $taxable * $rate;
 
-            // If income is fully covered, stop
             if ($annualIncome <= $end) {
                 break;
             }
         }
 
-        // 3. Convert ANNUAL tax to THIS PAY PERIOD'S tax
-        //    (e.g., divide by 12 for Monthly, 26 for Bi-weekly, 52 for Weekly, etc.)
-        if ($baseSalary > 0 && $annualIncome > 0) {
-            $periodFactor = $baseSalary / $annualIncome; // e.g., 20,000 / 520,000 = 1/26
-        } else {
-            $periodFactor = 1 / 12; // Fallback (safety net)
-        }
 
-
-
-
-        $periodTax = $tax * $periodFactor;
-
-        // Proration (if policy started mid-month, etc.)
+        $periodTax = $this->deAnnualizeAmount($tax, $frequency);
         $periodTax *= $prorationFactor;
-
 
         return ['employee' => $periodTax, 'employer' => 0];
     }
 
-    // --- NON-TAX POLICIES (Pension, Benefits, etc.) ---
+    // --- NON-TAX POLICIES ---
     $calcType = $logic['calculation_type'] ?? 'percentage';
     $employeeValue = $logic['employee_value'] ?? 0;
     $employerValue = $logic['employer_value'] ?? 0;
@@ -491,16 +540,20 @@ protected function applyPolicyLogic(PayrollPolicy $policy, array $items, float $
         $employeeAmount = $employeeValue;
         $employerAmount = $employerValue;
     } else { // percentage
-        $employeeAmount = $baseSalary * ($employeeValue / 100);
-        $employerAmount = $baseSalary * ($employerValue / 100);
+        $employeeAmount = $effectiveBase * ($employeeValue / 100);
+        $employerAmount = $effectiveBase * ($employerValue / 100);
     }
 
-    // Apply proration to non-tax policies (as originally intended)
     $employeeAmount *= $prorationFactor;
     $employerAmount *= $prorationFactor;
 
     return ['employee' => $employeeAmount, 'employer' => $employerAmount];
 }
+
+
+
+
+
 
 protected function annualizeSalary(float $salary, string $frequency): float
 {
@@ -699,7 +752,26 @@ public function calculateMultiCompany(PayrollRun $run): void
         int $totalCompanies
     ): array {
         $company = Company::find($companyId);
-        $companyName = $company->name ?? 'Unknown';
+
+        if (!$company) {
+            \Log::warning("PayrollCalculator: Company #{$companyId} not found during payroll run", [
+                'run_id'    => $this->run->id ?? null,
+                'company_id' => $companyId,
+            ]);
+
+            return [
+                'company_id'      => $companyId,
+                'company_name'    => 'Unknown Company (deleted)',
+                'employee_count'  => 0,
+                'processed_count' => 0,
+                'failed_count'    => 0,
+                'status'          => 'skipped',
+                'employees'       => [],
+                'errors'          => ['Company not found in database. It may have been deleted during processing.'],
+            ];
+        }
+
+        $companyName = $company->name;
 
         Log::info("Processing company: {$companyName} (#{$companyId})", [
             'run_id' => $this->run->id,
@@ -830,22 +902,29 @@ public function calculateForEmployee(EmployeePosition $position): PayrollPayslip
 
             if ($effectivePayType === 'salaried_daily') {
                 // Calculate daily rate
-                $workPatternId = $position->work_pattern_id ?? null;
+                $workPatternId = $this->resolveWorkPatternId($position);
                 $totalWorkdays = $this->getWorkdaysInPeriod($periodStart, $periodEnd, $workPatternId);
                 $dailyRate = $totalWorkdays > 0 ? $baseSalary / $totalWorkdays : 0;
                 $workedDays = $attendanceSummary['worked_days'] ?? 0;
                 $grossPay = $dailyRate * $workedDays;
                 $regularPay = $grossPay;
+
+
+
+
+
             } elseif ($effectivePayType === 'hourly') {
                 $regularHours = $attendanceSummary['regular_hours'] ?? 0;
                 $overtimeHours = $attendanceSummary['overtime_hours'] ?? 0;
                 $doubleTimeHours = $attendanceSummary['double_time_hours'] ?? 0;
 
+                // Read overtime multipliers from attendance policy
+                $attendancePolicy = $this->getAttendancePolicyForEmployee($position);
+                $overtimeMultiplier = $attendancePolicy->overtime_multiplier ?? config('quick_hr_payroll.default_overtime_multiplier', 1.5);
+                $doubleTimeMultiplier = $attendancePolicy->double_time_multiplier ?? config('quick_hr_payroll.default_double_time_multiplier', 2.0);
+
                 $regularPay = $regularHours * $hourlyRate;
-                // Overtime rates – you may fetch from a policy; using defaults here
-                $overtimeRate = $hourlyRate * 1.5;
-                $doubleTimeRate = $hourlyRate * 2.0;
-                $overtimePay = ($overtimeHours * $overtimeRate) + ($doubleTimeHours * $doubleTimeRate);
+                $overtimePay = ($overtimeHours * $hourlyRate * $overtimeMultiplier) + ($doubleTimeHours * $hourlyRate * $doubleTimeMultiplier);
                 $grossPay = $regularPay + $overtimePay;
             } else {
                 // Fallback – shouldn't happen
@@ -854,6 +933,11 @@ public function calculateForEmployee(EmployeePosition $position): PayrollPayslip
             }
         }
     }
+
+
+
+
+
 
     // -------------------------------------------------------------
     // 3. Add base salary and overtime line items
@@ -960,6 +1044,9 @@ public function calculateForEmployee(EmployeePosition $position): PayrollPayslip
     $periodEnd = $this->run->period_end;
     $totalDays = $periodStart->diffInDays($periodEnd) + 1;
 
+    // Compute gross pay base (total earnings after adjustments)
+    $grossPayBase = collect($items)->where('type', 'earning')->sum('amount');
+
     foreach ($allPolicies as $policy) {
         $effectivePolicy = $this->resolveEffectivePolicy($policy);
 
@@ -968,8 +1055,8 @@ public function calculateForEmployee(EmployeePosition $position): PayrollPayslip
         $prorationFactor = $activeDays / $totalDays;
 
         // Get employee and employer amounts – pass $grossPay as base
-        $annualSalary = $this->annualizeSalary($position->base_salary, $position->pay_frequency);
-        $amounts = $this->applyPolicyLogic($effectivePolicy, $items, $grossPay, $prorationFactor, $annualSalary);
+        $amounts = $this->applyPolicyLogic($effectivePolicy, $items, $grossPay, $grossPayBase, $prorationFactor, $position);
+
 
         // Build metadata for auditing
         $metadata = [

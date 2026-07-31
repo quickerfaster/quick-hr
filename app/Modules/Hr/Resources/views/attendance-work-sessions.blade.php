@@ -2,10 +2,22 @@
 
 
     @php
-        $attensance_id = request()->get('attendance_id') ?? null;
-        $employeeId = \App\Modules\Hr\Models\Attendance::where('id', $attensance_id)->first()?->employee_id;
-        $employee = \App\Modules\Hr\Models\Employee::findOrFail($employeeId);
-        $subPageTitle = 'For ' . $employee->first_name . ' ' . $employee->last_name . ' (' . $employeeId . ')';
+        $attendance_id = request()->get('attendance_id');
+        $employee = null;
+        $subPageTitle = 'Work Sessions';
+
+        if ($attendance_id) {
+            $attendance = \App\Modules\Hr\Models\Attendance::where('id', $attendance_id)->first();
+            if ($attendance && $attendance->employee_id) {
+                $employee = \App\Modules\Hr\Models\Employee::find($attendance->employee_id);
+            }
+        }
+
+        if ($employee) {
+            $subPageTitle = 'For ' . $employee->first_name . ' ' . $employee->last_name . ' (' . $employee->employee_id . ')';
+        } else {
+            abort(404, 'Attendance record or associated employee not found.');
+        }
     @endphp
 
 
@@ -16,7 +28,7 @@
 
 
     <livewire:qf::data-tables.data-table-manager :selectedItemId="$id ?? null" model="App\Modules\Hr\Models\AttendanceSession"
-        pageTitle="Work Sessions" :subPageTitle=$subPageTitle :pageQueryFilters="[['attendance_id', '=', $attensance_id]]" :hiddenFields="[
+        pageTitle="Work Sessions" :subPageTitle=$subPageTitle :pageQueryFilters="[['attendance_id', '=', $attendance_id]]" :hiddenFields="[
             'onTable' => [
                 '0' => 'attendance_id',
                 '1' => 'clock_in_event_id',

@@ -406,7 +406,7 @@ public function getPayslipsProperty()
             return 'All Companies';
         }
         $company = \App\Modules\Admin\Models\Company::find($companyId);
-        return $company->name ?? 'Unknown Company';
+        return $company?->name ?? 'Unknown Company';
     }
 
 
