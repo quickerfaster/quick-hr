@@ -47,7 +47,8 @@ deployment:
 
     # Install PHP dependencies without running scripts (prevents cache errors)
     - /bin/echo "Installing PHP dependencies..." >> $LOGFILE
-    - /bin/sh -c 'cd "$DEPLOYPATH" && ea-php84 "$COMPOSER_BIN" install --no-dev --no-scripts --optimize-autoloader >> "$LOGFILE" 2>&1'
+    - /bin/sh -c 'cd "$DEPLOYPATH" && ea-php84 "$COMPOSER_BIN" install  --no-scripts --optimize-autoloader >> "$LOGFILE" 2>&1'
+    # - /bin/sh -c 'cd "$DEPLOYPATH" && ea-php84 "$COMPOSER_BIN" install --no-dev --no-scripts --optimize-autoloader >> "$LOGFILE" 2>&1'
 
     # Run Artisan post-deploy tasks manually
     # Artisan tasks with graceful route caching
