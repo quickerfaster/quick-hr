@@ -14,6 +14,7 @@ use App\Modules\Hr\Models\Location;
 use App\Modules\Hr\Models\Shift;
 use App\Modules\Hr\Models\AttendancePolicy;
 use Illuminate\Support\Facades\DB;
+use Faker\Factory as FakerFactory;
 
 class EmployeeWithDependenciesSeeder extends Seeder
 {
@@ -21,6 +22,11 @@ class EmployeeWithDependenciesSeeder extends Seeder
      * The company to associate all seeded data with.
      */
     protected $company;
+
+    /**
+     * Faker instance.
+     */
+    protected $faker;
 
     /**
      * Determine if the seeder should run.
@@ -41,6 +47,8 @@ class EmployeeWithDependenciesSeeder extends Seeder
             return;
         }
 
+        $this->faker = FakerFactory::create(); // Initialize Faker
+
         $this->command->info('Seeding 5,000 employees with dependencies...');
 
         DB::transaction(function () {
@@ -59,8 +67,6 @@ class EmployeeWithDependenciesSeeder extends Seeder
 
         $this->command->info('Successfully seeded 5,000 employees!');
     }
-
-
 
     /**
      * Create all lookup tables that EmployeePosition and EmployeePayrollProfile reference.
@@ -248,12 +254,12 @@ class EmployeeWithDependenciesSeeder extends Seeder
             $employee = Employee::firstOrCreate(
                 ['employee_number' => $employeeNumber],
                 [
-                    'first_name' => fake()->firstName(),
-                    'last_name' => fake()->lastName(),
-                    'email' => fake()->unique()->safeEmail(),
-                    'phone' => fake()->phoneNumber(),
+                    'first_name' => $this->faker->firstName(),
+                    'last_name' => $this->faker->lastName(),
+                    'email' => $this->faker->unique()->safeEmail(),
+                    'phone' => $this->faker->phoneNumber(),
                     'company_id' => $this->company->id,
-                    'hire_date' => fake()->dateTimeBetween('-5 years', 'now')->format('Y-m-d'),
+                    'hire_date' => $this->faker->dateTimeBetween('-5 years', 'now')->format('Y-m-d'),
                 ]
             );
 
@@ -293,9 +299,9 @@ class EmployeeWithDependenciesSeeder extends Seeder
             $paySchedule = $paySchedules->random();
 
             // Decide pay type (70% salaried, 30% hourly)
-            $payType = fake()->boolean(70) ? 'salaried_full' : 'hourly';
-            $baseSalary = $payType === 'salaried_full' ? fake()->randomFloat(2, 40000, 120000) : 0;
-            $hourlyRate = $payType === 'hourly' ? fake()->randomFloat(2, 15, 50) : 0;
+            $payType = $this->faker->boolean(70) ? 'salaried_full' : 'hourly';
+            $baseSalary = $payType === 'salaried_full' ? $this->faker->randomFloat(2, 40000, 120000) : 0;
+            $hourlyRate = $payType === 'hourly' ? $this->faker->randomFloat(2, 15, 50) : 0;
 
             EmployeePosition::firstOrCreate(
                 ['employee_id' => $employee->id],
@@ -312,12 +318,12 @@ class EmployeeWithDependenciesSeeder extends Seeder
                     'pay_type' => $payType,
                     'hourly_rate' => $hourlyRate,
                     'base_salary' => $baseSalary,
-                    'salary_currency' => fake()->randomElement(['USD', 'EUR', 'GBP']),
+                    'salary_currency' => $this->faker->randomElement(['USD', 'EUR', 'GBP']),
                     'pay_frequency' => $paySchedule->frequency,
                     'employment_status' => 'Active',
-                    'cost_center' => fake()->optional(0.5)->bothify('CC-####'),
-                    'work_email' => fake()->optional(0.8)->companyEmail(),
-                    'work_phone_extension' => fake()->optional(0.3)->numerify('###'),
+                    'cost_center' => $this->faker->optional(0.5)->bothify('CC-####'),
+                    'work_email' => $this->faker->optional(0.8)->companyEmail(),
+                    'work_phone_extension' => $this->faker->optional(0.3)->numerify('###'),
                 ]
             );
         }
@@ -347,19 +353,19 @@ class EmployeeWithDependenciesSeeder extends Seeder
                     'company_id' => $this->company->id,
                     'pay_schedule_id' => $paySchedule->id,
                     'bank_account_name' => $employee->first_name . ' ' . $employee->last_name,
-                    'bank_name' => fake()->company() . ' Bank',
-                    'bank_account_number' => fake()->bankAccountNumber(),
-                    'bank_routing_number' => fake()->regexify('[0-9]{9}'),
-                    'bank_iban' => fake()->optional(0.5)->iban('US'),
-                    'bank_swift' => fake()->optional(0.3)->swiftBicNumber(),
-                    'account_type' => fake()->randomElement(['checking', 'savings']),
+                    'bank_name' => $this->faker->company() . ' Bank',
+                    'bank_account_number' => $this->faker->bankAccountNumber(),
+                    'bank_routing_number' => $this->faker->regexify('[0-9]{9}'),
+                    'bank_iban' => $this->faker->optional(0.5)->iban('US'),
+                    'bank_swift' => $this->faker->optional(0.3)->swiftBicNumber(),
+                    'account_type' => $this->faker->randomElement(['checking', 'savings']),
                     'payment_method' => 'bank_transfer',
-                    'tax_filing_status' => fake()->randomElement(['single', 'married', 'head_of_household']),
-                    'allowances' => fake()->numberBetween(0, 5),
-                    'extra_withholding' => fake()->randomFloat(2, 0, 200),
-                    'is_exempt_from_federal_tax' => fake()->boolean(10),
+                    'tax_filing_status' => $this->faker->randomElement(['single', 'married', 'head_of_household']),
+                    'allowances' => $this->faker->numberBetween(0, 5),
+                    'extra_withholding' => $this->faker->randomFloat(2, 0, 200),
+                    'is_exempt_from_federal_tax' => $this->faker->boolean(10),
                     'override_country_code' => 'US',
-                    'override_state_code' => fake()->stateAbbr(),
+                    'override_state_code' => $this->faker->stateAbbr(),
                     'currency_code' => 'USD',
                     'effective_date' => $employee->hire_date,
                     'expiry_date' => null,
@@ -368,6 +374,4 @@ class EmployeeWithDependenciesSeeder extends Seeder
             );
         }
     }
-
-
 }

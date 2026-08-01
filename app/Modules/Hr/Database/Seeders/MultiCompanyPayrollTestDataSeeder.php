@@ -17,6 +17,7 @@ use App\Modules\Hr\Models\Location;
 use App\Modules\Hr\Models\Shift;
 use App\Modules\Hr\Models\AttendancePolicy;
 use Illuminate\Support\Facades\DB;
+use Faker\Factory as FakerFactory;
 
 class MultiCompanyPayrollTestDataSeeder extends Seeder
 {
@@ -41,16 +42,23 @@ class MultiCompanyPayrollTestDataSeeder extends Seeder
     protected array $companyConfigs = [];
 
     /**
+     * Faker instance.
+     */
+    protected $faker;
+
+    /**
      * Run the seeder.
      */
     public function run(): void
     {
-
         // Guard: only run in safe environments
         if (!$this->shouldRun()) {
             $this->command->warn('Skipping MultiCompanyPayrollTestDataSeeder (not in local/staging/development and --force not set).');
             return;
         }
+
+        // Initialize Faker
+        $this->faker = FakerFactory::create();
 
         if (app()->runningInConsole() && $this->command) {
             $this->command->info('Seeding multi-company payroll test data...');
@@ -99,7 +107,6 @@ class MultiCompanyPayrollTestDataSeeder extends Seeder
         return app()->environment('local', 'staging', 'development')
             || ($this->command && $this->command->option('force'));
     }
-
 
     /**
      * Company configuration data.
@@ -454,16 +461,16 @@ class MultiCompanyPayrollTestDataSeeder extends Seeder
 
                 if ($payType === 'salaried_full') {
                     $baseSalary = $currencyCode === 'NGN'
-                        ? fake()->numberBetween(50000, 500000)
-                        : fake()->numberBetween(1500, 8000);
+                        ? $this->faker->numberBetween(50000, 500000)
+                        : $this->faker->numberBetween(1500, 8000);
                 } elseif ($payType === 'salaried_daily') {
                     $baseSalary = $currencyCode === 'NGN'
-                        ? fake()->numberBetween(50000, 300000)
-                        : fake()->numberBetween(1000, 5000);
+                        ? $this->faker->numberBetween(50000, 300000)
+                        : $this->faker->numberBetween(1000, 5000);
                 } elseif ($payType === 'hourly') {
                     $hourlyRate = $currencyCode === 'NGN'
-                        ? fake()->numberBetween(500, 3000)
-                        : fake()->numberBetween(15, 50);
+                        ? $this->faker->numberBetween(500, 3000)
+                        : $this->faker->numberBetween(15, 50);
                 }
 
                 // Edge case 1: Employee #1 per company — zero-hour contract (base_salary = 0)
@@ -472,7 +479,7 @@ class MultiCompanyPayrollTestDataSeeder extends Seeder
                 }
 
                 // Edge case 4: Employee #24 per company — terminated mid-cycle
-                $hireDate = now()->subMonths(fake()->numberBetween(6, 36))->toDateString();
+                $hireDate = now()->subMonths($this->faker->numberBetween(6, 36))->toDateString();
                 if ($i === 15) {
                     // Edge case 2: hired on the 15th of current month
                     $hireDate = now()->startOfMonth()->addDays(14)->toDateString();
@@ -485,7 +492,7 @@ class MultiCompanyPayrollTestDataSeeder extends Seeder
                         'first_name' => $firstName,
                         'last_name'  => $lastName,
                         'email'      => strtolower($firstName . '.' . $lastName . '.' . $config['subdomain']) . '@test.payroll',
-                        'phone'      => fake()->phoneNumber(),
+                        'phone'      => $this->faker->phoneNumber(),
                         'company_id' => $company->id,
                         'hire_date'  => $hireDate,
                     ]
@@ -579,10 +586,10 @@ class MultiCompanyPayrollTestDataSeeder extends Seeder
                         'bank_name'           => $bankNames[$bankIndex],
                         'bank_code'           => $bankCodes[$bankIndex],
                         'bank_account_name'   => $employee->first_name . ' ' . $employee->last_name,
-                        'bank_account_number' => fake()->numerify('##########'),
-                        'bank_sort_code'      => fake()->numerify('##-##-##'),
-                        'bank_routing_number' => fake()->regexify('[0-9]{9}'),
-                        'account_type'        => fake()->randomElement(['checking', 'savings']),
+                        'bank_account_number' => $this->faker->numerify('##########'),
+                        'bank_sort_code'      => $this->faker->numerify('##-##-##'),
+                        'bank_routing_number' => $this->faker->regexify('[0-9]{9}'),
+                        'account_type'        => $this->faker->randomElement(['checking', 'savings']),
                         'currency_code'       => $currencyCode,
                         'effective_date'      => $employee->hire_date,
                         'is_active'           => true,
