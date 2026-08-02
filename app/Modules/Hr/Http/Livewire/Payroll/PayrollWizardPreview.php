@@ -124,8 +124,7 @@ public function mount(int $stepIndex, int $payrollRunId): void
 
 protected function startCalculation(): void
 {
-    // Use a DB transaction with row lock to prevent race conditions.
-    // No cache lock needed – the DB lock is atomic and reliable.
+    // Use DB transaction with row lock to prevent race conditions
     DB::transaction(function () {
         $run = PayrollRun::withoutCompanyScope()
             ->where('id', $this->payrollRunId)
@@ -138,9 +137,7 @@ protected function startCalculation(): void
 
         // Only dispatch if the run is still pending.
         if ($run->calculation_status === 'pending') {
-            // Update status to 'processing' immediately so the UI shows progress.
-            $run->update(['calculation_status' => 'processing']);
-            // Dispatch the job (the job will also handle status, but this ensures immediacy).
+            // Do NOT change status here – let the job handle it.
             ProcessPayrollRun::dispatch($run);
             Log::info("Dispatched ProcessPayrollRun for run #{$run->id}");
         } else {
@@ -148,21 +145,30 @@ protected function startCalculation(): void
         }
     });
 
-    // Read the fresh status from the database (now it should be 'processing').
-    $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
-    if ($run) {
-        $this->calculationStatus = $run->calculation_status;
-        $this->isPolling = ($run->calculation_status === 'processing');
-        // Update progress values (they may still be 0, but that’s fine).
-        $this->totalEmployees = $run->total_employees ?? 0;
-        $this->processedEmployees = $run->processed_employees ?? 0;
+    // Immediately set UI state to processing so the progress card appears.
+    $this->calculationStatus = 'processing';
+    $this->isPolling = true;
+
+    // Optionally load current progress (will be 0 initially, but that's fine).
+    $this->loadProgressData();
+}
+
+/**
+ * Helper to load progress data from the database (already used in checkCalculationStatus).
+ */
+protected function loadProgressData(): void
+{
+    $progress = \App\Modules\Hr\Models\PayrollRunProgress::withoutCompanyScope()
+        ->where('payroll_run_id', $this->payrollRunId)
+        ->first();
+
+    if ($progress) {
+        $this->totalEmployees = $progress->total_employees ?? 0;
+        $this->processedEmployees = $progress->processed_employees ?? 0;
+        $this->calculationStatus = $progress->status ?? $this->calculationStatus;
         if ($this->totalEmployees > 0) {
             $this->progress = round(($this->processedEmployees / $this->totalEmployees) * 100);
         }
-    } else {
-        // Fallback: set to processing so the UI shows the card anyway.
-        $this->calculationStatus = 'processing';
-        $this->isPolling = true;
     }
 }
 
