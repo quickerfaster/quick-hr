@@ -47,8 +47,7 @@ deployment:
 
     # Install PHP dependencies without running scripts (prevents cache errors)
     - /bin/echo "Installing PHP dependencies..." >> $LOGFILE
-    - /bin/sh -c 'cd "$DEPLOYPATH" && ea-php84 "$COMPOSER_BIN" install  --no-scripts --optimize-autoloader >> "$LOGFILE" 2>&1'
-    # - /bin/sh -c 'cd "$DEPLOYPATH" && ea-php84 "$COMPOSER_BIN" install --no-dev --no-scripts --optimize-autoloader >> "$LOGFILE" 2>&1'
+    - /bin/sh -c 'cd "$DEPLOYPATH" && ea-php84 "$COMPOSER_BIN" install --no-dev --no-scripts --optimize-autoloader >> "$LOGFILE" 2>&1'
 
     # Run Artisan post-deploy tasks manually
     # Artisan tasks with graceful route caching
@@ -84,4 +83,5 @@ deployment:
     # Rotate logs - keep only last 5
     - /bin/ls -1t $LOGDIR/deploy_*.log | /usr/bin/tail -n +6 | /bin/xargs -r /bin/rm --
 
-#* * * * * cd /path/to/project && php artisan queue:work --once --stop-when-empty --sleep=3 --tries=1 >> storage/logs/worker.log 2>&1
+#* * * * * cd /home/quickerf/quick_hr && php artisan queue:work --once --stop-when-empty --sleep=3 --tries=1 >> storage/logs/worker.log 2>&1
+#/home/quickerf/quick_hr/worker.sh >> /dev/null 2>&1

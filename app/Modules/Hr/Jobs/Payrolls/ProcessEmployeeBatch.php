@@ -31,68 +31,63 @@ class ProcessEmployeeBatch implements ShouldQueue
         $this->timeout = config('quick_hr_payroll.batch_timeout', 60);
     }
 
-    public function handle(PayrollCalculator $calculator): void
-    {
-        $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
-        if (!$run) {
-            Log::error("Payroll run #{$this->payrollRunId} not found in batch job.");
-            return;
-        }
-
-        // Get employee positions for these employee IDs (with their relationships)
-        $positions = EmployeePosition::withoutCompanyScope()
-            ->whereIn('employee_id', $this->employeeIds)
-            ->where('employment_status', 'Active')
-            ->with([
-                'employee' => function ($q) {
-                    $q->withoutCompanyScope();
-                },
-                'location',
-                'employee.employeeProfile',
-                'employee.user',
-            ])
-            ->get();
-
-        if ($positions->isEmpty()) {
-            Log::info("Batch job: No active positions found for employee IDs: " . implode(',', $this->employeeIds));
-            return;
-        }
-
-        // Process each employee inside its own transaction to keep it atomic
-        foreach ($positions as $position) {
-            DB::transaction(function () use ($calculator, $position, $run) {
-                // Ensure the calculator uses the correct run
-                $calculator->setRun($run);
-                $calculator->calculateForEmployee($position);
-                // Set company_id on the payslip (if multi-company)
-                // The calculator already creates the payslip, but we may need to update its company_id.
-                // We'll handle that in the calculator.
-            });
-        }
-
-        // Increment processed count by the number of employees in this batch
-        $count = $positions->count();
-PayrollRunProgress::withoutCompanyScope()
-    ->where('payroll_run_id', $this->payrollRunId)
-    ->increment('processed_employees', $count);
-
-        // If all employees are now processed, mark the run as completed immediately
-        // so the preview UI shows payslips without waiting for FinalizePayrollRun's delay.
-        $progress = PayrollRunProgress::withoutCompanyScope()
-            ->where('payroll_run_id', $this->payrollRunId)
-            ->first();
-
-        if ($progress && $progress->processed_employees >= $progress->total_employees) {
-            $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
-            if ($run && $run->calculation_status !== 'completed') {
-                $run->update(['calculation_status' => 'completed']);
-            }
-            // Dispatch finalization immediately from the last batch
-            \App\Modules\Hr\Jobs\Payrolls\FinalizePayrollRun::dispatch($this->payrollRunId);
-        }
-
-        Log::info("Batch job processed {$count} employees for run #{$this->payrollRunId}");
+public function handle(PayrollCalculator $calculator): void
+{
+    $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
+    if (!$run) {
+        Log::error("Payroll run #{$this->payrollRunId} not found in batch job.");
+        return;
     }
+
+    // Get employee positions for these employee IDs (with their relationships)
+    $positions = EmployeePosition::withoutCompanyScope()
+        ->whereIn('employee_id', $this->employeeIds)
+        ->where('employment_status', 'Active')
+        ->with([
+            'employee' => function ($q) {
+                $q->withoutCompanyScope();
+            },
+            'location',
+            'employee.employeeProfile',
+            'employee.user',
+        ])
+        ->get();
+
+    if ($positions->isEmpty()) {
+        Log::info("Batch job: No active positions found for employee IDs: " . implode(',', $this->employeeIds));
+        return;
+    }
+
+    // Process each employee inside its own transaction to keep it atomic
+    foreach ($positions as $position) {
+        DB::transaction(function () use ($calculator, $position, $run) {
+            $calculator->setRun($run);
+            $calculator->calculateForEmployee($position);
+            // The calculator already sets company_id on the payslip
+        });
+
+        // Increment progress immediately after each employee
+        PayrollRunProgress::withoutCompanyScope()
+            ->where('payroll_run_id', $this->payrollRunId)
+            ->increment('processed_employees');
+    }
+
+    // After processing the entire batch, check if all employees are done
+    $progress = PayrollRunProgress::withoutCompanyScope()
+        ->where('payroll_run_id', $this->payrollRunId)
+        ->first();
+
+    if ($progress && $progress->processed_employees >= $progress->total_employees) {
+        $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
+        if ($run && $run->calculation_status !== 'completed') {
+            $run->update(['calculation_status' => 'completed']);
+        }
+        // Dispatch finalization immediately from the last batch
+        \App\Modules\Hr\Jobs\Payrolls\FinalizePayrollRun::dispatch($this->payrollRunId);
+    }
+
+    Log::info("Batch job processed {$positions->count()} employees for run #{$this->payrollRunId}");
+}
 
     public function failed(\Throwable $exception): void
     {

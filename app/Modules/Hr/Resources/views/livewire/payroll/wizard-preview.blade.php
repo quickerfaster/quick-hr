@@ -1,7 +1,7 @@
 <div>
     {{-- Processing (with polling) --}}
     @if ($calculationStatus === 'processing')
-        <div class="card mb-4" wire:poll.2s="checkCalculationStatus">
+        <div class="card mb-4" wire:poll.1s="checkCalculationStatus">
             <div class="card-body text-center">
                 <div class="progress mb-3" style="height: 30px;">
                     <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar"
