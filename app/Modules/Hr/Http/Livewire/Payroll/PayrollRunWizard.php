@@ -65,6 +65,12 @@ class PayrollRunWizard extends Component
         if (session()->has($wizardId)) {
             $data = session()->get($wizardId);
             $this->currentStep = $data['currentStep'] ?? 1;
+    $stepFromQuery = request()->query('step');
+    if ($stepFromQuery) {
+        $this->currentStep = (int) $stepFromQuery;
+    }
+
+
             $this->payrollRunId = $data['payrollRunId'] ?? null;
             $this->pay_schedule_id = $data['pay_schedule_id'] ?? null;
             $this->title = $data['title'] ?? "";
@@ -352,12 +358,16 @@ public function goToStep2()
 
 
 
-    public function goToStep3()
-    {
-        $this->currentStep = 3;
-        $this->saveToSession();
-        $this->dispatch('refreshPreview');
-    }
+public function goToStep3()
+{
+    // Save session data before redirect
+    $this->saveToSession();
+
+    // Build the URL with proper query parameters
+    $url = url('/hr/payroll-wizard') . '?payrollRunId=' . $this->payrollRunId . '&step=3';
+
+    return redirect()->to($url);
+}
 
     /**
      * Finalize the wizard – does NOT run calculation synchronously.
