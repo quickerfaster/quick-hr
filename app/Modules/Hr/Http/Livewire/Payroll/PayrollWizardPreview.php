@@ -77,34 +77,77 @@ public function mount(int $stepIndex, int $payrollRunId): void
     $this->loadPreviewData();
 }
 
-    public function loadPreviewData(): void
-    {
-        $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
+public function loadPreviewData(): void
+{
+    $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
+    if (!$run) {
+        $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found.']);
+        return;
+    }
+
+    $this->calculationStatus = $run->calculation_status;
+    $this->totalEmployees = $run->total_employees ?? 0;
+    $this->processedEmployees = $run->processed_employees ?? 0;
+    $this->isFinalized = $run->finalized_at !== null;
+
+    if ($this->totalEmployees > 0) {
+        $this->progress = round(($this->processedEmployees / $this->totalEmployees) * 100);
+    }
+
+    if ($this->calculationStatus === 'completed') {
+        $this->loadCalculatedData();
+        $this->isPolling = false;
+    } elseif ($this->calculationStatus === 'failed') {
+        $this->isPolling = false;
+        $this->dispatch('showAlert', ['type' => 'error', 'message' => 'Calculation failed.']);
+    } elseif ($this->calculationStatus === 'pending' || $this->calculationStatus === 'processing') {
+        // Dispatch the job if still pending
+        if ($this->calculationStatus === 'pending') {
+            $this->dispatchJob();
+        }
+
+        // Immediately set UI to processing – regardless of DB state.
+        $this->calculationStatus = 'processing';
+        $this->isPolling = true;
+
+        // Load any existing progress (will be zero initially, but that's okay)
+        $progress = \App\Modules\Hr\Models\PayrollRunProgress::withoutCompanyScope()
+            ->where('payroll_run_id', $this->payrollRunId)
+            ->first();
+        if ($progress) {
+            $this->totalEmployees = $progress->total_employees ?? 0;
+            $this->processedEmployees = $progress->processed_employees ?? 0;
+            if ($this->totalEmployees > 0) {
+                $this->progress = round(($this->processedEmployees / $this->totalEmployees) * 100);
+            }
+        }
+    }
+}
+
+/**
+ * Dispatch the payroll job only if the run is still pending.
+ */
+protected function dispatchJob(): void
+{
+    DB::transaction(function () {
+        $run = PayrollRun::withoutCompanyScope()
+            ->where('id', $this->payrollRunId)
+            ->lockForUpdate()
+            ->first();
+
         if (!$run) {
-            $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found.']);
             return;
         }
 
-        $this->calculationStatus = $run->calculation_status;
-        $this->totalEmployees = $run->total_employees ?? 0;
-        $this->processedEmployees = $run->processed_employees ?? 0;
-        $this->isFinalized = $run->finalized_at !== null;
-
-        if ($this->totalEmployees > 0) {
-            $this->progress = round(($this->processedEmployees / $this->totalEmployees) * 100);
+        // Only dispatch if pending – avoids double-dispatch
+        if ($run->calculation_status === 'pending') {
+            \App\Modules\Hr\Jobs\Payrolls\ProcessPayrollRun::dispatch($run);
+            Log::info("Dispatched ProcessPayrollRun for run #{$run->id}");
+        } else {
+            Log::info("Run #{$run->id} already in status: {$run->calculation_status}. Not dispatching.");
         }
-
-        if ($this->calculationStatus === 'completed') {
-            $this->loadCalculatedData();
-        } elseif ($this->calculationStatus === 'failed') {
-            $this->dispatch('showAlert', [
-                'type' => 'error',
-                'message' => 'Payroll calculation failed. Please check logs or try again.'
-            ]);
-        } elseif ($this->calculationStatus === 'pending' || $this->calculationStatus === 'processing') {
-            $this->startCalculation();
-        }
-    }
+    });
+}
 
 
 
