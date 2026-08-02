@@ -124,43 +124,46 @@ public function mount(int $stepIndex, int $payrollRunId): void
 
 protected function startCalculation(): void
 {
-    $lock = Cache::lock('payroll_run_' . $this->payrollRunId . '_start', 10);
-    if (!$lock->get()) {
-        Log::info("Another process is already starting run #{$this->payrollRunId}");
-        return;
-    }
+    // Use a DB transaction with row lock to prevent race conditions.
+    // No cache lock needed – the DB lock is atomic and reliable.
+    DB::transaction(function () {
+        $run = PayrollRun::withoutCompanyScope()
+            ->where('id', $this->payrollRunId)
+            ->lockForUpdate()
+            ->first();
 
-    try {
-        $run = DB::transaction(function () {
-            $run = PayrollRun::withoutCompanyScope()
-                ->where('id', $this->payrollRunId)
-                ->lockForUpdate()
-                ->first();
+        if (!$run) {
+            return;
+        }
 
-            if (!$run) {
-                return null;
-            }
-
-            if ($run->calculation_status !== 'pending') {
-                Log::info("Run #{$run->id} already in status: {$run->calculation_status}. Not dispatching.");
-                $this->calculationStatus = $run->calculation_status;
-                $this->isPolling = ($run->calculation_status === 'processing');
-                return null;
-            }
-
-            return $run;
-        });
-
-        if ($run) {
+        // Only dispatch if the run is still pending.
+        if ($run->calculation_status === 'pending') {
+            // Update status to 'processing' immediately so the UI shows progress.
+            $run->update(['calculation_status' => 'processing']);
+            // Dispatch the job (the job will also handle status, but this ensures immediacy).
             ProcessPayrollRun::dispatch($run);
             Log::info("Dispatched ProcessPayrollRun for run #{$run->id}");
+        } else {
+            Log::info("Run #{$run->id} already in status: {$run->calculation_status}. Not dispatching.");
         }
-    } finally {
-        $lock->release();
-    }
+    });
 
-    $this->calculationStatus = 'processing';
-    $this->isPolling = true;
+    // Read the fresh status from the database (now it should be 'processing').
+    $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
+    if ($run) {
+        $this->calculationStatus = $run->calculation_status;
+        $this->isPolling = ($run->calculation_status === 'processing');
+        // Update progress values (they may still be 0, but that’s fine).
+        $this->totalEmployees = $run->total_employees ?? 0;
+        $this->processedEmployees = $run->processed_employees ?? 0;
+        if ($this->totalEmployees > 0) {
+            $this->progress = round(($this->processedEmployees / $this->totalEmployees) * 100);
+        }
+    } else {
+        // Fallback: set to processing so the UI shows the card anyway.
+        $this->calculationStatus = 'processing';
+        $this->isPolling = true;
+    }
 }
 
     protected function loadCalculatedData(): void
