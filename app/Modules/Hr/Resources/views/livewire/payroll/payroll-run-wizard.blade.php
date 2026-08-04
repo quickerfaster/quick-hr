@@ -196,10 +196,17 @@
 
                     {{-- Back --}}
                     <button type="button" class="btn btn-link text-decoration-none text-muted fw-bold p-0"
-                        wire:click="goToStep({{ $currentStep - 1 }})" wire:loading.attr="disabled"
+                        wire:click="goToStep({{ $currentStep - 1 }})"
+                        wire:loading.attr="disabled"
+                        wire:target="goToStep"
                         @if ($currentStep <= 1 || $isProcessing) disabled
                         style="opacity: {{ $currentStep <= 1 ? '0' : '0.5' }}; pointer-events: none;" @endif>
-                        <i class="fas fa-chevron-left me-1"></i> Back
+                        <span wire:loading.remove wire:target="goToStep">
+                            <i class="fas fa-chevron-left me-1"></i> Back
+                        </span>
+                        <span wire:loading wire:target="goToStep">
+                            <i class="fas fa-spinner fa-spin me-1"></i> Loading...
+                        </span>
                     </button>
 
 
@@ -207,27 +214,55 @@
 
                         {{-- Cancel --}}
                         <button type="button" class="btn btn-link text-decoration-none text-danger me-4 fw-bold p-0"
-                            wire:click="confirmCancel()" @if ($isProcessing) disabled @endif>
-                            Cancel
+                            wire:click="confirmCancel()"
+                            wire:loading.attr="disabled"
+                            wire:target="confirmCancel"
+                            @if ($isProcessing) disabled @endif>
+                            <span wire:loading.remove wire:target="confirmCancel">Cancel</span>
+                            <span wire:loading wire:target="confirmCancel">
+                                <i class="fas fa-spinner fa-spin me-1"></i> Cancelling...
+                            </span>
                         </button>
 
                         {{-- Next --}}
                         @if ($currentStep == 1)
                             <button type="button" class="btn btn-primary btn-lg px-5 shadow-sm fw-bold"
-                                wire:click="goToStep2" @if ($isProcessing) disabled @endif>
-                                Continue <i class="fas fa-chevron-right ms-2"></i>
+                                wire:click="goToStep2"
+                                wire:loading.attr="disabled"
+                                wire:target="goToStep2"
+                                @if ($isProcessing) disabled @endif>
+                                <span wire:loading.remove wire:target="goToStep2">
+                                    Continue <i class="fas fa-chevron-right ms-2"></i>
+                                </span>
+                                <span wire:loading wire:target="goToStep2">
+                                    <i class="fas fa-spinner fa-spin me-1"></i> Processing...
+                                </span>
                             </button>
                         @elseif($currentStep == 2)
                             <button type="button" class="btn btn-primary btn-lg px-5 shadow-sm fw-bold"
                                 wire:click="$dispatch('saveAdjustments')"
+                                wire:loading.attr="disabled"
+                                wire:target="saveAdjustments"
                                 @if ($isProcessing) disabled @endif>
-                                Save & Continue <i class="fas fa-chevron-right ms-2"></i>
+                                <span wire:loading.remove wire:target="saveAdjustments">
+                                    Save & Continue <i class="fas fa-chevron-right ms-2"></i>
+                                </span>
+                                <span wire:loading wire:target="saveAdjustments">
+                                    <i class="fas fa-spinner fa-spin me-1"></i> Saving...
+                                </span>
                             </button>
                         @elseif($currentStep == 3)
                             <button type="button" class="btn btn-primary btn-lg px-5 shadow-sm fw-bold"
                                 wire:click="$dispatch('savePreview')"
+                                wire:loading.attr="disabled"
+                                wire:target="savePreview"
                                 @if ($isProcessing) disabled @endif>
-                                Complete Setup <i class="fas fa-check ms-2"></i>
+                                <span wire:loading.remove wire:target="savePreview">
+                                    Complete Setup <i class="fas fa-check ms-2"></i>
+                                </span>
+                                <span wire:loading wire:target="savePreview">
+                                    <i class="fas fa-spinner fa-spin me-1"></i> Finalizing...
+                                </span>
                             </button>
                         @endif
 

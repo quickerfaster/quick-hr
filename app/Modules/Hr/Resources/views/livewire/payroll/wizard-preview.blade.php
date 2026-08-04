@@ -46,8 +46,16 @@
                     <i class="fas fa-exclamation-triangle me-2"></i>
                     <strong>Calculation failed.</strong> The error has been logged.
                 </div>
-                <button wire:click="retryCalculation" class="btn btn-primary">
-                    <i class="fas fa-redo-alt me-2"></i> Retry Calculation
+                <button wire:click="retryCalculation"
+                        wire:loading.attr="disabled"
+                        wire:target="retryCalculation"
+                        class="btn btn-primary">
+                    <span wire:loading.remove wire:target="retryCalculation">
+                        <i class="fas fa-redo-alt me-2"></i> Retry Calculation
+                    </span>
+                    <span wire:loading wire:target="retryCalculation">
+                        <i class="fas fa-spinner fa-spin me-2"></i> Retrying...
+                    </span>
                 </button>
                 <p class="text-muted small mt-2">You can also go back and adjust data before retrying.</p>
             </div>
@@ -131,8 +139,16 @@
             </div>
 
             <div class="col-md-2 d-flex align-items-end">
-                <button wire:click="resetFilters" class="btn btn-sm btn-secondary w-100">
-                    <i class="fas fa-undo-alt"></i> Reset Filters
+                <button wire:click="resetFilters"
+                        wire:loading.attr="disabled"
+                        wire:target="resetFilters"
+                        class="btn btn-sm btn-secondary w-100">
+                    <span wire:loading.remove wire:target="resetFilters">
+                        <i class="fas fa-undo-alt"></i> Reset Filters
+                    </span>
+                    <span wire:loading wire:target="resetFilters">
+                        <i class="fas fa-spinner fa-spin"></i> Resetting...
+                    </span>
                 </button>
             </div>
         </div>
@@ -216,8 +232,15 @@
                             <td>{{ $currencySymbol }}{{ number_format($payslip->net_pay, 2) }}</td>
                             <td>
                                 <button wire:click="toggleDetails({{ $payslip->id }})"
+                                    wire:loading.attr="disabled"
+                                    wire:target="toggleDetails"
                                     class="btn btn-sm btn-outline-info">
-                                    <i class="fas fa-list"></i>
+                                    <span wire:loading.remove wire:target="toggleDetails">
+                                        <i class="fas fa-list"></i>
+                                    </span>
+                                    <span wire:loading wire:target="toggleDetails">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </span>
                                 </button>
                             </td>
                         </tr>

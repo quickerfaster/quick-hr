@@ -1,10 +1,21 @@
 #!/bin/bash
 PROJECT_DIR="/home/quickerf/quick_hr"
 LOCKFILE="$PROJECT_DIR/storage/framework/queue-worker.lock"
-# FIXED: Use ea-php84 (the cPanel EasyApache PHP 8.4 binary) instead of
-# /usr/local/bin/php which is a different/older PHP version. This matches
-# what .cpanel.yml uses for all Artisan and Composer commands.
-PHP_BIN="ea-php84"
+# PHP_BIN: find the correct PHP 8.4 binary for cPanel.
+# .cpanel.yml uses 'ea-php84' as a bare command, but cron has a minimal PATH
+# so the bare name fails with "command not found". We try full paths first,
+# then fall back to the bare command (works in deployment context).
+if command -v /opt/cpanel/ea-php84/root/usr/bin/php &> /dev/null; then
+    PHP_BIN="/opt/cpanel/ea-php84/root/usr/bin/php"
+elif command -v /opt/alt/php84/usr/bin/php &> /dev/null; then
+    PHP_BIN="/opt/alt/php84/usr/bin/php"
+elif command -v ea-php84 &> /dev/null; then
+    PHP_BIN="ea-php84"
+elif command -v /usr/local/bin/php &> /dev/null; then
+    PHP_BIN="/usr/local/bin/php"
+else
+    PHP_BIN="/usr/bin/php"
+fi
 ARTISAN="$PROJECT_DIR/artisan"
 LOG="$PROJECT_DIR/storage/logs/queue-worker.log"
 

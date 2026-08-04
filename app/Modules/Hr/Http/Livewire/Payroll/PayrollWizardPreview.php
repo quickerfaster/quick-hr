@@ -154,6 +154,10 @@ public function loadPreviewData(): void
  */
 protected function dispatchJob(): void
 {
+    if ($this->isPolling || $this->calculationStatus === 'processing') {
+        return; // Already dispatched, ignore duplicate calls
+    }
+
     DB::transaction(function () {
         $run = PayrollRun::withoutCompanyScope()
             ->where('id', $this->payrollRunId)
@@ -275,8 +279,10 @@ protected function loadProgressData(): void
 
                 if ($progress->status === 'completed') {
                     $this->loadCalculatedData();
+                    $this->dispatch('processingFinished');
                 } else {
                     session()->flash('error', 'Payroll calculation failed. Please try again.');
+                    $this->dispatch('processingFinished');
                 }
                 return;
             }
@@ -296,12 +302,14 @@ protected function loadProgressData(): void
             $this->isPolling = false;
             $this->processedEmployees = $this->totalEmployees;
             $this->loadCalculatedData();
+            $this->dispatch('processingFinished');
             return;
         }
 
         if ($run->calculation_status === 'failed') {
             $this->isPolling = false;
             session()->flash('error', 'Payroll calculation failed.');
+            $this->dispatch('processingFinished');
             return;
         }
 
@@ -478,6 +486,10 @@ public function getPayslipsProperty()
 
     public function retryCalculation(): void
     {
+        if ($this->isPolling || $this->calculationStatus === 'processing') {
+            return; // Already processing, ignore duplicate clicks
+        }
+
         $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
         if (!$run) {
             $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found.']);

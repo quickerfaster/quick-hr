@@ -267,6 +267,10 @@ protected function computeAllEligibleCompanies(): array
 
 public function goToStep2()
 {
+    if ($this->isProcessing) {
+        return; // Already processing, ignore duplicate clicks
+    }
+
     $rules = [
         'period_start' => 'required|date',
         'period_end'   => 'required|date|after:period_start',
@@ -368,6 +372,10 @@ public function goToStep2()
 
 public function goToStep3()
 {
+    if ($this->isProcessing) {
+        return; // Already processing, ignore duplicate clicks
+    }
+
     // Save session data before redirect
     $this->saveToSession();
 
@@ -386,6 +394,10 @@ public function goToStep3()
      */
 public function finalize()
 {
+    if ($this->isProcessing) {
+        return; // Already processing, ignore duplicate clicks
+    }
+
     $run = PayrollRun::find($this->payrollRunId);
     if (!$run) {
         session()->forget($this->getWizardId());

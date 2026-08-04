@@ -63,8 +63,16 @@
 
     <div class="row mb-3">
         <div class="col-md-12">
-            <button wire:click="resetFilters" class="btn btn-sm btn-secondary">
-                <i class="fas fa-undo-alt"></i> Reset Filters
+            <button wire:click="resetFilters"
+                    wire:loading.attr="disabled"
+                    wire:target="resetFilters"
+                    class="btn btn-sm btn-secondary">
+                <span wire:loading.remove wire:target="resetFilters">
+                    <i class="fas fa-undo-alt"></i> Reset Filters
+                </span>
+                <span wire:loading wire:target="resetFilters">
+                    <i class="fas fa-spinner fa-spin"></i> Resetting...
+                </span>
             </button>
         </div>
     </div>

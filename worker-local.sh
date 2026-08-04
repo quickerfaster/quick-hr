@@ -1,9 +1,16 @@
 #!/bin/bash
 PROJECT_DIR="./"
 LOCKFILE="$PROJECT_DIR/storage/framework/queue-worker.lock"
-# Local development uses the standard 'php' binary (whatever is in PATH).
-# Production worker.sh uses 'ea-php84' for cPanel compatibility.
-PHP_BIN="php"
+# Local development: try 'php' from PATH first, then common local paths.
+if command -v php &> /dev/null; then
+    PHP_BIN="php"
+elif command -v /usr/local/bin/php &> /dev/null; then
+    PHP_BIN="/usr/local/bin/php"
+elif command -v /opt/homebrew/bin/php &> /dev/null; then
+    PHP_BIN="/opt/homebrew/bin/php"
+else
+    PHP_BIN="/usr/bin/php"
+fi
 ARTISAN="$PROJECT_DIR/artisan"
 LOG="$PROJECT_DIR/storage/logs/queue-worker.log"
 
