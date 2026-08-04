@@ -36,9 +36,11 @@ class ProcessPayrollRun implements ShouldQueue
     public $timeout = 300; // 5 minutes – more than enough
 
     /**
-     * No retries – if this fails, the run must be manually re-triggered.
+     * Allow up to 3 attempts. Transient failures (DB timeout, brief
+     * connection loss) are common on shared hosting and shouldn't
+     * require manual re-triggering.
      */
-    public $tries = 1;
+    public $tries = 3;
 
     protected int $payrollRunId;
 

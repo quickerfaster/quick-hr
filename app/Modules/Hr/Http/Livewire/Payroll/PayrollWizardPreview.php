@@ -115,18 +115,22 @@ public function loadPreviewData(): void
     } elseif ($this->calculationStatus === 'pending' || $this->calculationStatus === 'processing') {
         // Dispatch the job if still pending
         if ($this->calculationStatus === 'pending') {
-            // Before dispatching, check if a job is already queued for this run
-            $existingJob = DB::table('jobs')
-                ->where('payload', 'like', '%ProcessPayrollRun%')
-                ->where('payload', 'like', '%"payrollRunId";i:' . $this->payrollRunId . '%')
-                ->exists();
+            // Use a cache lock to prevent duplicate dispatches across
+            // page refreshes, browser tabs, and Livewire reconnects.
+            // The lock auto-expires after 60s (long enough for the job
+            // to be picked up by the cron worker).
+            $lockKey = "payroll-dispatch-{$this->payrollRunId}";
+            $lock = Cache::lock($lockKey, 60);
 
-            if ($existingJob) {
-                Log::info("Payroll run #{$this->payrollRunId}: Job already queued, skipping dispatch.");
+            if ($lock->get()) {
+                // We hold the lock — safe to dispatch
+                $this->dispatchJob();
                 $this->calculationStatus = 'processing';
                 $this->isPolling = true;
+                Log::info("Payroll run #{$this->payrollRunId}: Dispatched (lock acquired).");
             } else {
-                $this->dispatchJob();
+                // Another request already dispatched this run
+                Log::info("Payroll run #{$this->payrollRunId}: Job already dispatched (lock held by another request).");
                 $this->calculationStatus = 'processing';
                 $this->isPolling = true;
             }
