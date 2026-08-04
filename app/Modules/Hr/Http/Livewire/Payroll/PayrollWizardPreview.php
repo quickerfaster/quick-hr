@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Modules\Hr\Models\PayrollRun;
 use App\Modules\Hr\Models\PayrollPayslip;
 use App\Modules\Hr\Models\EmployeePosition;
+use App\Modules\Hr\Models\PayrollRunProgress;
 use App\Modules\Hr\Services\Payroll\PayrollCalculator;
 use QuickerFaster\UILibrary\Traits\HasCurrencySymbol;
 use App\Modules\Hr\Jobs\Payrolls\ProcessPayrollRun;
@@ -85,10 +86,21 @@ public function loadPreviewData(): void
         return;
     }
 
-    $this->calculationStatus = $run->calculation_status;
-    $this->totalEmployees = $run->total_employees ?? 0;
-    $this->processedEmployees = $run->processed_employees ?? 0;
+    $this->calculationStatus = $run->calculation_status ?? 'pending';
     $this->isFinalized = $run->finalized_at !== null;
+
+    // Try PayrollRunProgress first, fall back to payroll_runs
+    $progress = \App\Modules\Hr\Models\PayrollRunProgress::withoutCompanyScope()
+        ->where('payroll_run_id', $this->payrollRunId)
+        ->first();
+
+    if ($progress) {
+        $this->totalEmployees = $progress->total_employees;
+        $this->processedEmployees = $progress->processed_employees;
+    } else {
+        $this->totalEmployees = $run->total_employees ?? 0;
+        $this->processedEmployees = $run->processed_employees ?? 0;
+    }
 
     if ($this->totalEmployees > 0) {
         $this->progress = round(($this->processedEmployees / $this->totalEmployees) * 100);
@@ -103,23 +115,32 @@ public function loadPreviewData(): void
     } elseif ($this->calculationStatus === 'pending' || $this->calculationStatus === 'processing') {
         // Dispatch the job if still pending
         if ($this->calculationStatus === 'pending') {
-            $this->dispatchJob();
+            // Before dispatching, check if a job is already queued for this run
+            $existingJob = DB::table('jobs')
+                ->where('payload', 'like', '%ProcessPayrollRun%')
+                ->where('payload', 'like', '%"payrollRunId";i:' . $this->payrollRunId . '%')
+                ->exists();
+
+            if ($existingJob) {
+                Log::info("Payroll run #{$this->payrollRunId}: Job already queued, skipping dispatch.");
+                $this->calculationStatus = 'processing';
+                $this->isPolling = true;
+            } else {
+                $this->dispatchJob();
+                $this->calculationStatus = 'processing';
+                $this->isPolling = true;
+            }
+        } else {
+            // Already processing
+            $this->calculationStatus = 'processing';
+            $this->isPolling = true;
         }
 
-        // Immediately set UI to processing – regardless of DB state.
-        $this->calculationStatus = 'processing';
-        $this->isPolling = true;
-
-        // Load any existing progress (will be zero initially, but that's okay)
-        $progress = \App\Modules\Hr\Models\PayrollRunProgress::withoutCompanyScope()
-            ->where('payroll_run_id', $this->payrollRunId)
-            ->first();
-        if ($progress) {
-            $this->totalEmployees = $progress->total_employees ?? 0;
-            $this->processedEmployees = $progress->processed_employees ?? 0;
-            if ($this->totalEmployees > 0) {
-                $this->progress = round(($this->processedEmployees / $this->totalEmployees) * 100);
-            }
+        // After dispatchJob() call, ensure we have sane defaults
+        if ($this->totalEmployees === 0 && $this->calculationStatus === 'processing') {
+            // Job hasn't run yet, set a placeholder
+            $this->totalEmployees = 0;
+            $this->processedEmployees = 0;
         }
     }
 }
@@ -235,46 +256,78 @@ protected function loadProgressData(): void
 
     public function checkCalculationStatus(): void
     {
-        $progress = \App\Modules\Hr\Models\PayrollRunProgress::withoutCompanyScope()->where('payroll_run_id', $this->payrollRunId)->first();
+        // 1. Try reading from PayrollRunProgress
+        $progress = PayrollRunProgress::withoutCompanyScope()
+            ->where('payroll_run_id', $this->payrollRunId)
+            ->first();
 
         if ($progress) {
-            $this->calculationStatus = $progress->status;
-            $this->totalEmployees = $progress->total_employees ?? 0;
-            $this->processedEmployees = $progress->processed_employees ?? 0;
+            $this->totalEmployees = (int) $progress->total_employees;
+            $this->processedEmployees = (int) $progress->processed_employees;
 
-            if ($this->totalEmployees > 0) {
-                $this->progress = round(($this->processedEmployees / $this->totalEmployees) * 100);
-            }
-        } else {
-            // fallback: read from payroll_runs
-            $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
-            if (!$run) {
-                $this->redirectRoute('payroll-runs.create', ['error' => 'Payroll run not found.']);
+            if ($progress->status === 'completed' || $progress->status === 'failed') {
+                $this->isPolling = false;
+                $this->calculationStatus = $progress->status;
+
+                if ($progress->status === 'completed') {
+                    $this->loadCalculatedData();
+                } else {
+                    session()->flash('error', 'Payroll calculation failed. Please try again.');
+                }
                 return;
             }
-            $this->calculationStatus = $run->calculation_status;
-            $this->totalEmployees = $run->total_employees ?? 0;
-            $this->processedEmployees = $run->processed_employees ?? 0;
-            $this->progress = $this->totalEmployees ? round(($this->processedEmployees / $this->totalEmployees) * 100) : 0;
+        }
+
+        // 2. Fallback to payroll_runs table
+        $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
+
+        if (!$run) {
+            $this->isPolling = false;
+            return;
+        }
+
+        $this->calculationStatus = $run->calculation_status;
+
+        if ($run->calculation_status === 'completed') {
+            $this->isPolling = false;
+            $this->processedEmployees = $this->totalEmployees;
+            $this->loadCalculatedData();
+            return;
+        }
+
+        if ($run->calculation_status === 'failed') {
+            $this->isPolling = false;
+            session()->flash('error', 'Payroll calculation failed.');
+            return;
+        }
+
+        // 3. If still processing but no progress record yet, show "waiting" state
+        if (!$progress && $run->calculation_status === 'processing') {
+            $this->totalEmployees = max($this->totalEmployees, 0);
+            $this->processedEmployees = max($this->processedEmployees, 0);
+            // The progress bar will show 0% but we display a friendly message in the view
+        }
+
+        // 4. If stuck at 'pending' for too long, the job might not have been picked up
+        if ($run->calculation_status === 'pending') {
+            $secondsSinceUpdate = $run->updated_at->diffInSeconds(now());
+            if ($secondsSinceUpdate > 120) {
+                Log::warning("Payroll run #{$this->payrollRunId}: Stuck in 'pending' state for {$secondsSinceUpdate}s");
+                // Don't dispatch again - just show a message
+            }
+        }
+
+        // Update progress percentage
+        if ($this->totalEmployees > 0) {
+            $this->progress = round(($this->processedEmployees / $this->totalEmployees) * 100);
         }
 
         // Check if finalized
-        $run = PayrollRun::withoutCompanyScope()->find($this->payrollRunId);
-        $this->isFinalized = $run && $run->finalized_at !== null;
+        $this->isFinalized = $run->finalized_at !== null;
 
-        $allProcessed = $this->totalEmployees > 0 && $this->processedEmployees >= $this->totalEmployees;
-
-        if ($this->calculationStatus === 'completed' || $allProcessed) {
-            $this->dispatch('processingFinished');
-            $this->loadCalculatedData();
-        } elseif ($this->calculationStatus === 'failed') {
-            $this->isPolling = false;
-            $this->dispatch('showAlert', ['type' => 'error', 'message' => 'Calculation failed.']);
-        }
-
-        if ($this->progress && $this->progress > 0 && $this->calculationStatus != 'completed')
+        if ($this->progress && $this->progress > 0 && $this->calculationStatus !== 'completed') {
             $this->dispatch('processingStarted');
-
+        }
     }
 
 public function getPayslipsProperty()

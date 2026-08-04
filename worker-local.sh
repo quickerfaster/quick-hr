@@ -1,5 +1,5 @@
 #!/bin/bash
-PROJECT_DIR="/home/quickerf/quick_hr"
+PROJECT_DIR="./"
 LOCKFILE="$PROJECT_DIR/storage/framework/queue-worker.lock"
 PHP_BIN="/usr/local/bin/php"
 ARTISAN="$PROJECT_DIR/artisan"

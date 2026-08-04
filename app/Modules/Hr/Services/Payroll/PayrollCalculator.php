@@ -823,7 +823,13 @@ public function calculateMultiCompany(PayrollRun $run): void
                 $processedCount++;
 
                 // Update overall progress (outside transaction, commits immediately)
-                \App\Modules\Hr\Models\PayrollRunProgress::where('payroll_run_id', $this->run->id)
+                \App\Modules\Hr\Models\PayrollRunProgress::withoutCompanyScope()
+                    ->where('payroll_run_id', $this->run->id)
+                    ->increment('processed_employees');
+
+                // ALSO sync to payroll_runs
+                \App\Modules\Hr\Models\PayrollRun::withoutCompanyScope()
+                    ->where('id', $this->run->id)
                     ->increment('processed_employees');
             }
         });

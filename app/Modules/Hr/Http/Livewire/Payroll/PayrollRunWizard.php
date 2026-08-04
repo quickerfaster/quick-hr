@@ -358,6 +358,14 @@ public function goToStep2()
 
 
 
+    /*public function goToStep3()
+    {
+        $this->currentStep = 3;
+        $this->saveToSession();
+        $this->dispatch('refreshPreview');
+    }*/
+
+
 public function goToStep3()
 {
     // Save session data before redirect
@@ -368,6 +376,9 @@ public function goToStep3()
 
     return redirect()->to($url);
 }
+
+
+
 
     /**
      * Finalize the wizard – does NOT run calculation synchronously.

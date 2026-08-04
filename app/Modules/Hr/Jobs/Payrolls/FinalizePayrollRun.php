@@ -69,12 +69,16 @@ $progress = PayrollRunProgress::withoutCompanyScope()
         $calculator->updateRunTotals();
 
         // Mark the run as finalized
-        $run->update(['finalized_at' => now()]);
+        $run->update([
+            'finalized_at' => now(),
+            'total_employees' => $progress->total_employees,
+            'processed_employees' => $progress->processed_employees,
+        ]);
 
         // Update progress status
-PayrollRunProgress::withoutCompanyScope()
-    ->where('payroll_run_id', $this->payrollRunId)
-    ->update(['status' => 'finalized']);
+        PayrollRunProgress::withoutCompanyScope()
+            ->where('payroll_run_id', $this->payrollRunId)
+            ->update(['status' => 'finalized']);
 
         Log::info("Payroll run #{$this->payrollRunId} finalized successfully.");
     }

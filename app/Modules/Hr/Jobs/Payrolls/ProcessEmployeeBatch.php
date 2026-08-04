@@ -70,6 +70,11 @@ public function handle(PayrollCalculator $calculator): void
         PayrollRunProgress::withoutCompanyScope()
             ->where('payroll_run_id', $this->payrollRunId)
             ->increment('processed_employees');
+
+        // ALSO increment payroll_runs table
+        \App\Modules\Hr\Models\PayrollRun::withoutCompanyScope()
+            ->where('id', $this->payrollRunId)
+            ->increment('processed_employees');
     }
 
     // After processing the entire batch, check if all employees are done

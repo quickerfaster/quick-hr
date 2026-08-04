@@ -88,96 +88,86 @@
                             </div>
                         </div>
 
-                        @if($this->isAllCompaniesMode())
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Process Payroll For</label>
+                        @if ($this->isAllCompaniesMode())
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Process Payroll For</label>
 
-                            {{-- Radio: Single Company --}}
-                            <div class="form-check mb-2">
-                                <input
-                                    class="form-check-input"
-                                    type="radio"
-                                    name="payrollScope"
-                                    id="scopeSingle"
-                                    value="0"
-                                    wire:model.live="isMultiCompany"
-                                    wire:click="$set('isMultiCompany', false)"
-                                >
-                                <label class="form-check-label" for="scopeSingle">
-                                    Single Company
-                                </label>
-                            </div>
+                                {{-- Radio: Single Company --}}
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="payrollScope" id="scopeSingle"
+                                        value="0" wire:model.live="isMultiCompany"
+                                        wire:click="$set('isMultiCompany', false)">
+                                    <label class="form-check-label" for="scopeSingle">
+                                        Single Company
+                                    </label>
+                                </div>
 
-                            {{-- Company dropdown (shown only when Single Company is selected) --}}
-                            @if(!$this->isMultiCompany)
-                            <div class="ms-4 mb-3 p-3 border rounded bg-light">
-                                <label for="companyId" class="form-label">Select Company <span class="text-danger">*</span></label>
-                                <select
-                                    id="companyId"
-                                    class="form-select @error('companyId') is-invalid @enderror"
-                                    wire:model="companyId"
-                                >
-                                    <option value="">-- Select Company --</option>
-                                    @foreach($this->companies as $company)
-                                        <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('companyId')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                {{-- Company dropdown (shown only when Single Company is selected) --}}
+                                @if (!$this->isMultiCompany)
+                                    <div class="ms-4 mb-3 p-3 border rounded bg-light">
+                                        <label for="companyId" class="form-label">Select Company <span
+                                                class="text-danger">*</span></label>
+                                        <select id="companyId"
+                                            class="form-select @error('companyId') is-invalid @enderror"
+                                            wire:model="companyId">
+                                            <option value="">-- Select Company --</option>
+                                            @foreach ($this->companies as $company)
+                                                <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('companyId')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                @endif
+
+                                {{-- Radio: All Companies --}}
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="payrollScope" id="scopeAll"
+                                        value="1" wire:model.live="isMultiCompany"
+                                        wire:click="$set('isMultiCompany', true)">
+                                    <label class="form-check-label" for="scopeAll">
+                                        All Companies
+                                    </label>
+                                </div>
+
+                                {{-- Info box: shown when All Companies is selected --}}
+                                @if ($this->isMultiCompany)
+                                    <div class="ms-4 p-3 border rounded bg-info bg-opacity-10">
+                                        @if ($this->eligibleCompanyCount > 0)
+                                            <div class="d-flex align-items-center mb-2">
+                                                <i class="fas fa-info-circle text-info me-2"></i>
+                                                <strong>{{ $this->eligibleCompanyCount }}
+                                                    compan{{ $this->eligibleCompanyCount === 1 ? 'y' : 'ies' }}</strong>
+                                                <span class="ms-1">will be processed with</span>
+                                                <strong class="ms-1">{{ $this->totalEligibleEmployees }}
+                                                    employee{{ $this->totalEligibleEmployees === 1 ? '' : 's' }}</strong>
+                                                <span class="ms-1">across all companies.</span>
+                                            </div>
+                                            <small class="text-muted d-block">
+                                                Payslips will be generated per entity. Statutory reports remain separate
+                                                per legal entity.
+                                            </small>
+                                            <div class="mt-2 small">
+                                                @foreach ($this->eligibleCompanies as $ec)
+                                                    <span class="badge bg-light text-dark me-1 mb-1">
+                                                        {{ $ec['company_name'] }}: {{ $ec['employee_count'] }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="d-flex align-items-center text-warning">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                No active employees found across any company.
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endif
+
+                                @error('isMultiCompany')
+                                    <div class="text-danger mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
-                            @endif
-
-                            {{-- Radio: All Companies --}}
-                            <div class="form-check mb-2">
-                                <input
-                                    class="form-check-input"
-                                    type="radio"
-                                    name="payrollScope"
-                                    id="scopeAll"
-                                    value="1"
-                                    wire:model.live="isMultiCompany"
-                                    wire:click="$set('isMultiCompany', true)"
-                                >
-                                <label class="form-check-label" for="scopeAll">
-                                    All Companies
-                                </label>
-                            </div>
-
-{{-- Info box: shown when All Companies is selected --}}
-@if($this->isMultiCompany)
-    <div class="ms-4 p-3 border rounded bg-info bg-opacity-10">
-        @if($this->eligibleCompanyCount > 0)
-            <div class="d-flex align-items-center mb-2">
-                <i class="fas fa-info-circle text-info me-2"></i>
-                <strong>{{ $this->eligibleCompanyCount }} compan{{ $this->eligibleCompanyCount === 1 ? 'y' : 'ies' }}</strong>
-                <span class="ms-1">will be processed with</span>
-                <strong class="ms-1">{{ $this->totalEligibleEmployees }} employee{{ $this->totalEligibleEmployees === 1 ? '' : 's' }}</strong>
-                <span class="ms-1">across all companies.</span>
-            </div>
-            <small class="text-muted d-block">
-                Payslips will be generated per entity. Statutory reports remain separate per legal entity.
-            </small>
-            <div class="mt-2 small">
-                @foreach($this->eligibleCompanies as $ec)
-                    <span class="badge bg-light text-dark me-1 mb-1">
-                        {{ $ec['company_name'] }}: {{ $ec['employee_count'] }}
-                    </span>
-                @endforeach
-            </div>
-        @else
-            <div class="d-flex align-items-center text-warning">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                No active employees found across any company.
-            </div>
-        @endif
-    </div>
-@endif
-
-                            @error('isMultiCompany')
-                                <div class="text-danger mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
                         @endif
                     </div>
 
@@ -201,46 +191,52 @@
             </div>
 
             {{-- Navigation --}}
-            <div class="d-flex justify-content-between align-items-center mt-4">
+            @if (!$isProcessing)
+                <div class="d-flex justify-content-between align-items-center mt-4">
 
-                {{-- Back --}}
-                <button type="button" class="btn btn-link text-decoration-none text-muted fw-bold p-0"
-                    wire:click="goToStep({{ $currentStep - 1 }})" wire:loading.attr="disabled"
-                    @if ($currentStep <= 1 || $isProcessing) disabled
+                    {{-- Back --}}
+                    <button type="button" class="btn btn-link text-decoration-none text-muted fw-bold p-0"
+                        wire:click="goToStep({{ $currentStep - 1 }})" wire:loading.attr="disabled"
+                        @if ($currentStep <= 1 || $isProcessing) disabled
                         style="opacity: {{ $currentStep <= 1 ? '0' : '0.5' }}; pointer-events: none;" @endif>
-                    <i class="fas fa-chevron-left me-1"></i> Back
-                </button>
-
-
-                <div class="d-flex align-items-center">
-
-                    {{-- Cancel --}}
-                    <button type="button" class="btn btn-link text-decoration-none text-danger me-4 fw-bold p-0"
-                        wire:click="confirmCancel()" @if ($isProcessing) disabled @endif>
-                        Cancel
+                        <i class="fas fa-chevron-left me-1"></i> Back
                     </button>
 
-                    {{-- Next --}}
-                    @if ($currentStep == 1)
-                        <button type="button" class="btn btn-primary btn-lg px-5 shadow-sm fw-bold"
-                            wire:click="goToStep2" @if ($isProcessing) disabled @endif>
-                            Continue <i class="fas fa-chevron-right ms-2"></i>
+
+                    <div class="d-flex align-items-center">
+
+                        {{-- Cancel --}}
+                        <button type="button" class="btn btn-link text-decoration-none text-danger me-4 fw-bold p-0"
+                            wire:click="confirmCancel()" @if ($isProcessing) disabled @endif>
+                            Cancel
                         </button>
-                    @elseif($currentStep == 2)
-                        <button type="button" class="btn btn-primary btn-lg px-5 shadow-sm fw-bold"
-                            wire:click="$dispatch('saveAdjustments')"
-                            @if ($isProcessing) disabled @endif>
-                            Save & Continue <i class="fas fa-chevron-right ms-2"></i>
-                        </button>
-                    @elseif($currentStep == 3)
-                        <button type="button" class="btn btn-primary btn-lg px-5 shadow-sm fw-bold"
-                            wire:click="$dispatch('savePreview')" @if ($isProcessing) disabled @endif>
-                            Complete Setup <i class="fas fa-check ms-2"></i>
-                        </button>
-                    @endif
+
+                        {{-- Next --}}
+                        @if ($currentStep == 1)
+                            <button type="button" class="btn btn-primary btn-lg px-5 shadow-sm fw-bold"
+                                wire:click="goToStep2" @if ($isProcessing) disabled @endif>
+                                Continue <i class="fas fa-chevron-right ms-2"></i>
+                            </button>
+                        @elseif($currentStep == 2)
+                            <button type="button" class="btn btn-primary btn-lg px-5 shadow-sm fw-bold"
+                                wire:click="$dispatch('saveAdjustments')"
+                                @if ($isProcessing) disabled @endif>
+                                Save & Continue <i class="fas fa-chevron-right ms-2"></i>
+                            </button>
+                        @elseif($currentStep == 3)
+                            <button type="button" class="btn btn-primary btn-lg px-5 shadow-sm fw-bold"
+                                wire:click="$dispatch('savePreview')"
+                                @if ($isProcessing) disabled @endif>
+                                Complete Setup <i class="fas fa-check ms-2"></i>
+                            </button>
+                        @endif
+
+                    </div>
+
 
                 </div>
-            </div>
+            @endif
+
 
         </div>
     </div>

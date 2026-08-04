@@ -1,23 +1,39 @@
 <div>
     {{-- Processing (with polling) --}}
-    @if ($calculationStatus === 'processing')
+    @if ($isPolling)
         <div class="card mb-4" wire:poll.1s="checkCalculationStatus">
             <div class="card-body text-center">
-                <div class="progress mb-3" style="height: 30px;">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar"
-                        style="height: 30px; width: {{ $progress }}%;" aria-valuenow="{{ $progress }}"
+                <h5 class="mb-3">Processing Payroll...</h5>
+                <div class="progress mb-4" style="height: 28px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary py-3"
+                        role="progressbar"
+                        style="width: {{ $totalEmployees > 0 ? round(($processedEmployees / $totalEmployees) * 100) : 0 }}%"
+                        aria-valuenow="{{ $totalEmployees > 0 ? round(($processedEmployees / $totalEmployees) * 100) : 0 }}"
                         aria-valuemin="0" aria-valuemax="100">
-                        {{ $progress }}%
+                        <strong
+                            class="fs-5">{{ $totalEmployees > 0 ? round(($processedEmployees / $totalEmployees) * 100) : 0 }}%
+                        </strong>
                     </div>
                 </div>
-                <p class="mb-0">
-                    <i class="fas fa-spinner fa-spin me-2"></i>
-                    Processing payroll...
-                    @if ($totalEmployees > 0)
-                        ({{ number_format($processedEmployees) }} / {{ number_format($totalEmployees) }} employees)
-                    @endif
-                </p>
-                <p class="text-muted small mt-2">This may take a few minutes. Please do not close this page.</p>
+                @if ($totalEmployees > 0)
+                    <p class="text-muted mt-2">
+                        <i class="fas fa-spinner fa-spin me-2"></i>
+                        Processed {{ number_format($processedEmployees) }} of {{ number_format($totalEmployees) }}
+                        employees...
+                    </p>
+                @elseif ($calculationStatus === 'pending')
+                    <p class="text-muted mt-2">
+                        <i class="fas fa-hourglass-start me-2"></i>
+                        Your payroll calculation has been queued and will begin shortly.
+                        The progress bar will update automatically.
+                    </p>
+                @elseif ($calculationStatus === 'processing' && $totalEmployees == 0)
+                    <p class="text-muted mt-2">
+                        <i class="fas fa-spinner fa-spin me-2"></i>
+                        Preparing to process employees... This may take a moment.
+                    </p>
+                @endif
+                <p class="text-muted small mt-3">This may take a few minutes. Please do not close this page.</p>
             </div>
         </div>
     @endif
@@ -52,7 +68,7 @@
     --}}
 
     {{-- Completed or all employees processed (show preview) --}}
-    @if ($calculationStatus === 'completed' || ($processedEmployees >= $totalEmployees && $totalEmployees > 0))
+    @if (!$isPolling && ($calculationStatus === 'completed' || ($processedEmployees >= $totalEmployees && $totalEmployees > 0)))
         <h4>Review Payroll Run</h4>
         <p class="text-muted">Period: {{ $previewData['period_start'] ?? '' }} – {{ $previewData['period_end'] ?? '' }}
         </p>
@@ -64,23 +80,23 @@
 
         {{-- Filters --}}
         <div class="row mb-3 g-2">
-<div class="col-md-3">
-    <label class="form-label">Company</label>
-    @if($isMultiCompany)
-        <select wire:model.live="filterCompany" class="form-select form-select-sm">
-            <option value="">All Companies</option>
-            @foreach ($companies as $comp)
-                <option value="{{ $comp->id }}">{{ $comp->name }}</option>
-            @endforeach
-        </select>
-    @else
-        <div class="form-control form-control-sm bg-light text-muted d-flex align-items-center"
-             style="border: 1px solid #dee2e6; height: 31px;">
-            <i class="fas fa-building me-1"></i>
-            <span>{{ $companyName ?? 'N/A' }}</span>
-        </div>
-    @endif
-</div>
+            <div class="col-md-3">
+                <label class="form-label">Company</label>
+                @if ($isMultiCompany)
+                    <select wire:model.live="filterCompany" class="form-select form-select-sm">
+                        <option value="">All Companies</option>
+                        @foreach ($companies as $comp)
+                            <option value="{{ $comp->id }}">{{ $comp->name }}</option>
+                        @endforeach
+                    </select>
+                @else
+                    <div class="form-control form-control-sm bg-light text-muted d-flex align-items-center"
+                        style="border: 1px solid #dee2e6; height: 31px;">
+                        <i class="fas fa-building me-1"></i>
+                        <span>{{ $companyName ?? 'N/A' }}</span>
+                    </div>
+                @endif
+            </div>
             <div class="col-md-3">
                 <label class="form-label">Department</label>
                 <select wire:model.live="filterDepartment" class="form-select form-select-sm">

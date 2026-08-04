@@ -82,6 +82,8 @@ class ProcessPayrollRun implements ShouldQueue
                 'calculation_status' => 'processing',
                 'failed_at' => null,
                 'failure_reason' => null,
+                'total_employees' => 0,       // reset for clarity
+                'processed_employees' => 0,   // reset for clarity
             ]);
 
             return $run;
@@ -105,30 +107,48 @@ class ProcessPayrollRun implements ShouldQueue
         // ------------------------------------------------------------
         // 3. Determine which employees to process (unscoped)
         // ------------------------------------------------------------
+        // Employee query - handles both single and multi-company
         $employeeQuery = EmployeePosition::withoutCompanyScope()
             ->where('employment_status', 'Active')
-            ->whereHas('employee', function ($q) {
+            ->whereHas('employee', function ($q) use ($run) {
                 $q->withoutCompanyScope();
+                // Ensure we only get non-deleted employees
+                $q->whereNull('deleted_at');
             });
 
-        if (!$run->is_multi_company) {
-            $employeeQuery->where('pay_schedule_id', $run->pay_schedule_id);
-            if ($run->company_id) {
-                $employeeQuery->whereHas('employee', function ($q) use ($run) {
-                    $q->where('company_id', $run->company_id);
-                });
-            }
+        // For single-company runs with a pay schedule
+        if (!$run->is_multi_company && $run->pay_schedule_id) {
+            $employeeQuery->whereHas('employee', function ($q) use ($run) {
+                $q->where('pay_schedule_id', $run->pay_schedule_id);
+            });
         }
 
-        $employeeIds = $employeeQuery->pluck('employee_id')->toArray();
-        $total = count($employeeIds);
+        $total = $employeeQuery->count();
+
+        Log::info("ProcessPayrollRun #{$this->payrollRunId}: Found {$total} active employees", [
+            'is_multi_company' => $run->is_multi_company,
+            'pay_schedule_id' => $run->pay_schedule_id,
+            'company_id' => $run->company_id,
+        ]);
 
         if ($total === 0) {
-            Log::warning("Payroll run #{$run->id}: No active employees found.");
+            Log::warning("ProcessPayrollRun #{$this->payrollRunId}: No active employees found. Aborting.");
+
+            // Mark as completed with 0 employees and clean up
             $run->update([
-                'calculation_status' => 'failed',
-                'failure_reason' => 'No active employees found.',
+                'calculation_status' => 'completed',
+                'total_employees' => 0,
+                'processed_employees' => 0,
             ]);
+
+            \App\Modules\Hr\Models\PayrollRunProgress::withoutCompanyScope()
+                ->where('payroll_run_id', $run->id)
+                ->update([
+                    'status' => 'completed',
+                    'total_employees' => 0,
+                    'processed_employees' => 0,
+                ]);
+
             return;
         }
 
@@ -149,12 +169,24 @@ class ProcessPayrollRun implements ShouldQueue
                     'total_employees' => $total,
                     'processed_employees' => 0,
                     'status' => 'processing',
+                    'company_id' => $run->company_id ?? 0,
                 ]
             );
+
+        // ALSO sync to payroll_runs table so UI fallback works
+        PayrollRun::withoutCompanyScope()
+            ->where('id', $run->id)
+            ->update([
+                'total_employees' => $total,
+                'processed_employees' => 0,
+            ]);
+
+        Log::info("Payroll run #{$this->payrollRunId}: Progress record created for {$total} employees.");
 
         // ------------------------------------------------------------
         // 6. Chunk and dispatch batch jobs
         // ------------------------------------------------------------
+        $employeeIds = $employeeQuery->pluck('employee_id')->toArray();
         $batchSize = config('quick_hr_payroll.batch_size', 100);
         $chunks = array_chunk($employeeIds, $batchSize);
         foreach ($chunks as $chunk) {
@@ -213,3 +245,4 @@ class ProcessPayrollRun implements ShouldQueue
         }
     }
 }
+
