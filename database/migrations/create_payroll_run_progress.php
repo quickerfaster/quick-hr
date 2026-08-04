@@ -10,8 +10,11 @@ return new class extends Migration {
         Schema::create('payroll_run_progress', function (Blueprint $table) {
             $table->id();
             $table->foreignId('payroll_run_id')->constrained()->onDelete('cascade');
+            $table->foreignId('company_id')->nullable()->constrained('companies', 'id')->onDelete('cascade');
+
             $table->integer('total_employees')->default(0);
             $table->integer('processed_employees')->default(0);
+
             $table->string('status')->default('pending'); // processing, completed, failed
             $table->timestamps();
         });
