@@ -23,7 +23,7 @@ log() { echo "$(date '+%Y-%m-%d %H:%M:%S') - $*" >> "$LOG"; }
     $PHP_BIN "$ARTISAN" queue:work \
         --queue=default \
         --max-time=55 \
-        --timeout=300 \
+        --timeout=310 \
         --sleep=3 \
         --tries=3 \
         --quiet

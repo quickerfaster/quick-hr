@@ -48,14 +48,15 @@ cleanup_stale_lock
 
     cd "$PROJECT_DIR"
 
-    # FIXED: --timeout=300 matches ProcessPayrollRun::$timeout so the
-    # worker won't kill long-running payroll jobs prematurely.
+    # --timeout=310 gives 10s buffer above job $timeout=300 (Laravel best practice).
+    # This prevents the race condition where the worker kills a job before
+    # its own timeout fires. Works for both payroll and UI library jobs.
     # --queue=default is now explicit (was previously implicit).
     # STDERR is captured to the log so PHP fatal errors are visible.
     $PHP_BIN "$ARTISAN" queue:work \
         --queue=default \
         --max-time=55 \
-        --timeout=300 \
+        --timeout=310 \
         --sleep=3 \
         --tries=3 \
         --quiet \
