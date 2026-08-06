@@ -20,7 +20,27 @@ fi
 ARTISAN="$PROJECT_DIR/artisan"
 LOG="$PROJECT_DIR/storage/logs/queue-worker.log"
 
+# Rotate queue-worker.log if it exceeds 10MB
+rotate_log() {
+    local LOG_FILE="$1"
+    local MAX_SIZE=$((10 * 1024 * 1024))  # 10MB
+
+    if [ -f "$LOG_FILE" ]; then
+        local SIZE=$(stat -f%z "$LOG_FILE" 2>/dev/null || stat -c%s "$LOG_FILE" 2>/dev/null || echo 0)
+        if [ "$SIZE" -gt "$MAX_SIZE" ]; then
+            mv "$LOG_FILE" "${LOG_FILE}.1"
+            echo "$(date '+%Y-%m-%d %H:%M:%S') - Log rotated (previous size: $SIZE bytes)" > "$LOG_FILE"
+        fi
+    fi
+}
+
+# Delete rotated logs older than 30 days
+find "$(dirname "$LOG")" -name "queue-worker.log.*" -mtime +30 -delete 2>/dev/null
+
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') - $*" >> "$LOG"; }
+
+# Rotate before writing
+rotate_log "$LOG"
 
 # Log which PHP binary and version is being used (diagnostic)
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Using PHP: $PHP_BIN ($($PHP_BIN -v 2>&1 | head -1))" >> "$LOG"

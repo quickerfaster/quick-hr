@@ -27,6 +27,8 @@ class PayrollWizardPreview extends Component
     use WithPagination;
     use HasCurrencySymbol;
 
+    protected $paginationTheme = 'bootstrap';
+
     public int $stepIndex;
     public int $payrollRunId;
     public array $previewData = [];
