@@ -1,25 +1,29 @@
 #!/bin/bash
 PROJECT_DIR="/home/quickerf/quick_hr"
 LOCKFILE="$PROJECT_DIR/storage/framework/queue-worker.lock"
-# PHP_BIN: find the correct PHP 8.4 binary for cPanel.
-# .cpanel.yml uses 'ea-php84' as a bare command, but cron has a minimal PATH
-# so the bare name fails with "command not found". We try full paths first,
-# then fall back to the bare command (works in deployment context).
+# PHP_BIN: find the correct PHP binary for cPanel cron.
+# .cpanel.yml uses 'ea-php84' as a bare command (works in deployment context),
+# but cron has a minimal PATH so bare names fail with "command not found".
+# We try absolute paths first (cron-safe), then fall back to bare 'php'.
 if command -v /opt/cpanel/ea-php84/root/usr/bin/php &> /dev/null; then
     PHP_BIN="/opt/cpanel/ea-php84/root/usr/bin/php"
 elif command -v /opt/alt/php84/usr/bin/php &> /dev/null; then
     PHP_BIN="/opt/alt/php84/usr/bin/php"
-elif command -v ea-php84 &> /dev/null; then
-    PHP_BIN="ea-php84"
 elif command -v /usr/local/bin/php &> /dev/null; then
     PHP_BIN="/usr/local/bin/php"
-else
+elif command -v /usr/bin/php &> /dev/null; then
     PHP_BIN="/usr/bin/php"
+else
+    # Last resort: rely on PATH (may fail in minimal cron environments)
+    PHP_BIN="php"
 fi
 ARTISAN="$PROJECT_DIR/artisan"
 LOG="$PROJECT_DIR/storage/logs/queue-worker.log"
 
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') - $*" >> "$LOG"; }
+
+# Log which PHP binary and version is being used (diagnostic)
+echo "$(date '+%Y-%m-%d %H:%M:%S') - Using PHP: $PHP_BIN ($($PHP_BIN -v 2>&1 | head -1))" >> "$LOG"
 
 # Clean up stale lock file if the PID that created it no longer exists.
 # This prevents a crashed worker from blocking all subsequent cron runs.

@@ -76,7 +76,7 @@
     --}}
 
     {{-- Completed or all employees processed (show preview) --}}
-    @if (!$isPolling && ($calculationStatus === 'completed' || ($processedEmployees >= $totalEmployees && $totalEmployees > 0)))
+    @if (!$isPolling && (in_array($calculationStatus, ['completed', 'finalized']) || ($processedEmployees >= $totalEmployees && $totalEmployees > 0)))
         <h4>Review Payroll Run</h4>
         <p class="text-muted">Period: {{ $previewData['period_start'] ?? '' }} – {{ $previewData['period_end'] ?? '' }}
         </p>

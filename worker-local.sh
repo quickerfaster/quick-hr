@@ -14,6 +14,9 @@ fi
 ARTISAN="$PROJECT_DIR/artisan"
 LOG="$PROJECT_DIR/storage/logs/queue-worker.log"
 
+# Log which PHP binary and version is being used (diagnostic)
+echo "$(date '+%Y-%m-%d %H:%M:%S') - Using PHP: $PHP_BIN ($($PHP_BIN -v 2>&1 | head -1))" >> "$LOG"
+
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') - $*" >> "$LOG"; }
 
 (

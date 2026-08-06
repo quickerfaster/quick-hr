@@ -171,7 +171,7 @@ class ProcessPayrollRun implements ShouldQueue
                     'total_employees' => $total,
                     'processed_employees' => 0,
                     'status' => 'processing',
-                    'company_id' => $run->company_id ?? 0,
+                    'company_id' => $run->company_id,  // NULL for multi-company, specific ID for single-company
                 ]
             );
 

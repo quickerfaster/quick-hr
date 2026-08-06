@@ -106,7 +106,7 @@ public function loadPreviewData(): void
         $this->progress = round(($this->processedEmployees / $this->totalEmployees) * 100);
     }
 
-    if ($this->calculationStatus === 'completed') {
+    if ($this->calculationStatus === 'completed' || $this->calculationStatus === 'finalized') {
         $this->loadCalculatedData();
         $this->isPolling = false;
     } elseif ($this->calculationStatus === 'failed') {
@@ -237,7 +237,9 @@ protected function loadProgressData(): void
     if ($progress) {
         $this->totalEmployees = $progress->total_employees ?? 0;
         $this->processedEmployees = $progress->processed_employees ?? 0;
-        $this->calculationStatus = $progress->status ?? $this->calculationStatus;
+        // Normalize 'finalized' to 'completed' for UI consistency
+        $status = $progress->status ?? $this->calculationStatus;
+        $this->calculationStatus = $status === 'finalized' ? 'completed' : $status;
         if ($this->totalEmployees > 0) {
             $this->progress = round(($this->processedEmployees / $this->totalEmployees) * 100);
         }
@@ -273,11 +275,11 @@ protected function loadProgressData(): void
             $this->totalEmployees = (int) $progress->total_employees;
             $this->processedEmployees = (int) $progress->processed_employees;
 
-            if ($progress->status === 'completed' || $progress->status === 'failed') {
+            if (in_array($progress->status, ['completed', 'finalized', 'failed'], true)) {
                 $this->isPolling = false;
                 $this->calculationStatus = $progress->status;
 
-                if ($progress->status === 'completed') {
+                if ($progress->status === 'completed' || $progress->status === 'finalized') {
                     $this->loadCalculatedData();
                     $this->dispatch('processingFinished');
                 } else {
@@ -348,7 +350,7 @@ public function getPayslipsProperty()
     // processed (belt-and-suspenders: payslips appear immediately even if the
     // status hasn't flipped yet due to FinalizePayrollRun's delay).
     $allProcessed = $this->totalEmployees > 0 && $this->processedEmployees >= $this->totalEmployees;
-    if ($this->calculationStatus !== 'completed' && !$allProcessed) {
+    if (!in_array($this->calculationStatus, ['completed', 'finalized'], true) && !$allProcessed) {
         return collect();
     }
 

@@ -239,7 +239,7 @@ public function getEmployeesProperty()
 
 public function updatedTempAdjustments($value, $key): void
 {
-        Log::info('updatedTempAdjustments called', ['key' => $key, 'value' => $value]);
+    Log::info('updatedTempAdjustments called', ['key' => $key, 'value' => $value]);
 
     // Normalize key: remove "tempAdjustments." prefix if present
     if (str_starts_with($key, 'tempAdjustments.')) {
